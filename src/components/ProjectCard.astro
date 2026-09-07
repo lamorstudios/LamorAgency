@@ -11,7 +11,7 @@ const sizes = size === 'full' ? '100vw' : size === 'large' ? '(min-width: 900px)
 <article class={`project project--${size} ${className}`} data-reveal style={`--reveal-delay:${(index % 2) * 90}ms`}>
   <a href={`/work/${project.id}/`} class="project__link" data-cursor="View" data-hover-video={hasHoverVideo ? '' : undefined} aria-label={`${d.title} – ${d.client}, ${d.category}`}>
     <div class="project__media">
-      <Media media={d.hero} hover reveal priority={priority} sizes={sizes} />
+      <Media media={d.hero} surface={(index % 8) + 1} hover reveal priority={priority} sizes={sizes} />
       {hasHoverVideo && (
         <video class="project__preview" src={d.preview!.src} muted loop playsinline preload="none" aria-hidden="true"></video>
       )}

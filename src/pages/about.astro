@@ -39,7 +39,7 @@ const ph = (label: string, ratio: 'wide' | 'portrait' | 'square' | 'cinema' = 'w
 
   <section class="about-agency section section--flush-top container" aria-labelledby="agency-title">
     <div class="about-agency__grid">
-      <div class="about-agency__media about-agency__media--a" data-reveal="fade"><Media media={ph('ABOUT IMAGE A', 'portrait')} reveal hover sizes="(min-width: 900px) 40vw, 100vw" /></div>
+      <div class="about-agency__media about-agency__media--a" data-reveal="fade"><Media media={ph('ABOUT IMAGE A', 'portrait')} surface={4} reveal hover sizes="(min-width: 900px) 40vw, 100vw" /></div>
       <div class="about-agency__copy">
         <SectionLabel index="02" label="Agentur" />
         <h2 class="t-h3" id="agency-title" data-reveal>Ein Studio für Idee, Produktion und Distribution.</h2>
@@ -47,7 +47,7 @@ const ph = (label: string, ratio: 'wide' | 'portrait' | 'square' | 'cinema' = 'w
           <p>LAMOR arbeitet von {site.address.city} aus an Social Media, Film, Fotografie, Branding, Grafik- und Webdesign. Konzept, Produktion und Veröffentlichung kommen aus einer Hand. Die Vorstellung der Agentur wird durch den bestehenden Text ersetzt.</p>
         </div>
       </div>
-      <div class="about-agency__media about-agency__media--b" data-reveal="fade" style="--reveal-delay:120ms"><Media media={ph('ABOUT IMAGE B', 'square')} reveal hover sizes="(min-width: 900px) 30vw, 100vw" /></div>
+      <div class="about-agency__media about-agency__media--b" data-reveal="fade" style="--reveal-delay:120ms"><Media media={ph('ABOUT IMAGE B', 'square')} surface={2} reveal hover sizes="(min-width: 900px) 30vw, 100vw" /></div>
     </div>
   </section>
 
@@ -74,7 +74,7 @@ const ph = (label: string, ratio: 'wide' | 'portrait' | 'square' | 'cinema' = 'w
     <ul role="list" class="about-team__grid">
       {team.map((m, i) => (
         <li class="about-team__member" data-reveal style={`--reveal-delay:${i * 80}ms`}>
-          <Media media={m.media} reveal hover sizes="(min-width: 900px) 30vw, 100vw" />
+          <Media media={m.media} surface={[5, 2, 8][i]} reveal hover sizes="(min-width: 900px) 30vw, 100vw" />
           <p class="about-team__name t-h4">{m.name}</p>
           <p class="t-label t-muted">{m.role}</p>
         </li>

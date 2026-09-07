@@ -37,7 +37,7 @@ const meta = [
     </header>
 
     <div class="case__hero" data-reveal="fade" style="--reveal-delay:150ms">
-      <Media media={d.hero} priority parallax sizes="100vw" widths={[768, 1280, 1920, 2560]} ratio={d.hero.ratio === 'portrait' || d.hero.ratio === 'square' || d.hero.ratio === 'story' ? 'wide' : d.hero.ratio} />
+      <Media media={d.hero} surface={(index % 8) + 1} priority parallax sizes="100vw" widths={[768, 1280, 1920, 2560]} ratio={d.hero.ratio === 'portrait' || d.hero.ratio === 'square' || d.hero.ratio === 'story' ? 'wide' : d.hero.ratio} />
     </div>
 
     <div class="case__body container">
@@ -51,9 +51,9 @@ const meta = [
 
     {d.gallery.length > 0 && (
       <div class="case__gallery container" aria-label="Projektbilder">
-        {d.gallery.map((g) => (
+        {d.gallery.map((g, i) => (
           <figure class={`case__fig case__fig--${g.ratio ?? 'wide'}`}>
-            <Media media={g} reveal parallax={g.ratio === 'wide' || g.ratio === 'cinema'} sizes={g.ratio === 'portrait' || g.ratio === 'square' ? '(min-width: 900px) 50vw, 100vw' : '100vw'} />
+            <Media media={g} surface={((index * 3 + i) % 8) + 1} reveal parallax={g.ratio === 'wide' || g.ratio === 'cinema'} sizes={g.ratio === 'portrait' || g.ratio === 'square' ? '(min-width: 900px) 50vw, 100vw' : '100vw'} />
             {g.caption && <figcaption class="t-small t-muted">{g.caption}</figcaption>}
           </figure>
         ))}
@@ -68,7 +68,7 @@ const meta = [
           <p class="t-label" data-reveal="fade">{next.data.client} · {next.data.category}</p>
         </div>
         <div class="case__next-media">
-          <Media media={next.data.hero} ratio="cinema" hover sizes="100vw" />
+          <Media media={next.data.hero} surface={((index + 1) % 8) + 1} ratio="cinema" hover sizes="100vw" />
         </div>
       </a>
       <div class="container case__back"><ArrowLink href="/work/" label="Alle Projekte" /></div>

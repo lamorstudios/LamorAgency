@@ -17,7 +17,7 @@ const categories = [...new Set(posts.map((p) => p.data.category))];
     <section class="blog-featured container" aria-label="Neuester Artikel">
       <a href={`/blog/${featured.id}/`} class="blog-featured__link" data-cursor="Read">
         <div class="blog-featured__media" data-reveal="fade">
-          <Media media={featured.data.cover ?? { type: 'placeholder', label: '[POST IMAGE]' }} reveal hover parallax sizes="100vw" ratio="cinema" />
+          <Media media={featured.data.cover ?? { type: 'placeholder', label: 'POST IMAGE' }} surface={5} reveal hover parallax sizes="100vw" ratio="cinema" />
         </div>
         <div class="blog-featured__body">
           <p class="t-label t-muted" data-reveal="fade">
@@ -35,7 +35,7 @@ const categories = [...new Set(posts.map((p) => p.data.category))];
       {rest.map((p, i) => (
         <li class="blog-list__item" data-reveal style={`--reveal-delay:${(i % 3) * 60}ms`}>
           <a href={`/blog/${p.id}/`} class="blog-list__link" data-cursor="Read">
-            <div class="blog-list__media"><Media media={p.data.cover ?? { type: 'placeholder', label: '[POST IMAGE]' }} hover ratio="wide" sizes="(min-width: 900px) 30vw, 100vw" /></div>
+            <div class="blog-list__media"><Media media={p.data.cover ?? { type: 'placeholder', label: 'POST IMAGE' }} surface={((i + 2) % 8) + 1} hover ratio="wide" sizes="(min-width: 900px) 30vw, 100vw" /></div>
             <div class="blog-list__body">
               <p class="t-label t-muted"><span>{p.data.category}</span> · <time datetime={isoDate(p.data.date)}>{formatDate(p.data.date)}</time> · <span>{readingTime(p.body)} Min.</span></p>
               <h2 class="t-h3 blog-list__title">{p.data.title}</h2>
