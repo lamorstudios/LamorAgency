@@ -1,0 +1,39 @@
+---
+import SectionLabel from '@/components/SectionLabel.astro';
+import { clients } from '@/data/clients';
+interface Props { index?: string; compact?: boolean }
+const { index = '03', compact = false } = Astro.props;
+const images = import.meta.glob<{ default: ImageMetadata }>('/src/assets/brand/clients/*.{svg,png,jpg,webp}');
+const resolved = await Promise.all(clients.map(async (c) => ({ ...c, img: c.logo && images[c.logo] ? (await images[c.logo]()).default : undefined })));
+---
+<section class={`clients ${compact ? 'section--tight' : 'section'}`} aria-labelledby="clients-title">
+  <div class="container">
+    <SectionLabel index={index} label="Selected Clients" />
+    <h2 class="visually-hidden" id="clients-title">Ausgewählte Kunden</h2>
+  </div>
+  <div class="clients__marquee" data-reveal="fade">
+    <ul role="list" class="clients__track">
+      {[...resolved, ...resolved].map((c, i) => (
+        <li class="clients__logo" aria-hidden={i >= resolved.length ? 'true' : undefined}>
+          {c.img ? <img src={c.img.src} width={c.img.width} height={c.img.height} alt={c.name} loading="lazy" decoding="async" /> : <span class="clients__placeholder t-label">{c.name}</span>}
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .clients__marquee { overflow: hidden; border-block: 1px solid var(--line); }
+  .clients__track { display: flex; width: max-content; animation: clients-marquee 45s linear infinite; }
+  .clients__marquee:hover .clients__track { animation-play-state: paused; }
+  .clients__logo { display: grid; place-items: center; width: clamp(11rem, 22vw, 18rem); height: clamp(6rem, 10vw, 9rem); padding: var(--space-5); border-right: 1px solid var(--line); filter: grayscale(1); opacity: 0.75; transition: opacity var(--dur-base), filter var(--dur-base); }
+  .clients__logo:hover { opacity: 1; filter: none; }
+  .clients__logo img { max-height: 100%; width: auto; object-fit: contain; }
+  .clients__placeholder { color: var(--fg-muted); text-align: center; }
+  @keyframes clients-marquee { to { transform: translateX(-50%); } }
+  @media (prefers-reduced-motion: reduce) {
+    .clients__track { animation: none; width: 100%; flex-wrap: wrap; }
+    .clients__logo[aria-hidden='true'] { display: none; }
+    .clients__logo { width: 50%; border-bottom: 1px solid var(--line); }
+  }
+</style>

@@ -1,0 +1,118 @@
+---
+/**
+ * Services als große typografische Liste.
+ * Desktop: Hover wechselt das Sticky-Media rechts. Mobile: Tap öffnet Accordion mit Text + Media.
+ * mode="full": Texte immer sichtbar (Services-Seite).
+ */
+import Media from '@/components/Media.astro';
+import ArrowLink from '@/components/ArrowLink.astro';
+import { services } from '@/data/services';
+interface Props { mode?: 'compact' | 'full'; headingLevel?: 'h2' | 'h3' }
+const { mode = 'compact', headingLevel = 'h3' } = Astro.props;
+const H = headingLevel;
+---
+<div class={`services services--${mode}`} data-services>
+  <ul role="list" class="services__list">
+    {services.map((s, i) => (
+      <li class="services__item" id={mode === 'full' ? s.slug : undefined} data-service={i} data-reveal style={`--reveal-delay:${i * 40}ms`}>
+        <button class="services__row" type="button" aria-expanded={mode === 'full' ? 'true' : 'false'} aria-controls={`svc-${mode}-${s.slug}`} data-service-toggle>
+          <span class="services__index t-label t-num">{s.index}</span>
+          <H class="services__title t-h2">{s.title}</H>
+          <span class="services__plus" aria-hidden="true"></span>
+        </button>
+        <div class="services__panel" id={`svc-${mode}-${s.slug}`} data-service-panel>
+          <div class="services__panel-inner">
+            <p class="t-body services__text">{s.short}</p>
+            <p class="t-label t-muted services__taglist">{s.tags.join(' · ')}</p>
+            {mode === 'compact' && <ArrowLink href={`/services/#${s.slug}`} label="Mehr erfahren" />}
+            <div class="services__mobile-media">
+              <Media media={s.media} ratio="wide" sizes="100vw" />
+            </div>
+          </div>
+        </div>
+      </li>
+    ))}
+  </ul>
+
+  <div class="services__media" aria-hidden="true">
+    <div class="services__media-sticky">
+      {services.map((s, i) => (
+        <div class={`services__media-item ${i === 0 ? 'is-active' : ''}`} data-service-media={i}>
+          <Media media={s.media} ratio="portrait" sizes="(min-width: 900px) 40vw, 100vw" />
+        </div>
+      ))}
+      <p class="services__media-label t-label" data-service-label>{services[0].title}</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .services { display: grid; gap: var(--space-8); }
+  .services__list { border-top: 1px solid var(--line); }
+  .services__item { border-bottom: 1px solid var(--line); }
+  .services__row { display: grid; grid-template-columns: auto 1fr auto; align-items: baseline; gap: var(--space-4); width: 100%; text-align: left; padding-block: clamp(1rem, 2.5vw, 1.75rem); min-height: 44px; transition: color var(--dur-fast); }
+  .services__index { color: var(--fg-muted); min-width: 2ch; }
+  .services__title { font-size: clamp(1.75rem, 1rem + 2.8vw, 3.75rem); line-height: 1.02; transition: transform var(--dur-base) var(--ease-out); text-transform: uppercase; font-weight: var(--fw-medium); }
+  .services__plus { position: relative; width: 1rem; height: 1rem; align-self: center; }
+  .services__plus::before, .services__plus::after { content: ''; position: absolute; background: currentColor; transition: transform var(--dur-base) var(--ease-out); }
+  .services__plus::before { left: 0; right: 0; top: 50%; height: 1px; }
+  .services__plus::after { top: 0; bottom: 0; left: 50%; width: 1px; }
+  .services__row[aria-expanded='true'] .services__plus::after { transform: rotate(90deg) scaleY(0); }
+  .services__panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--dur-slow) var(--ease-expo); }
+  .services__row[aria-expanded='true'] + .services__panel { grid-template-rows: 1fr; }
+  .services__panel-inner { overflow: hidden; display: grid; gap: var(--space-4); }
+  .services__row[aria-expanded='true'] + .services__panel .services__panel-inner { padding-bottom: var(--space-6); }
+  .services__text { max-width: 48ch; }
+  .services__mobile-media { margin-top: var(--space-2); }
+  .services__media { display: none; }
+  .services--full .services__plus { display: none; }
+  .services--full .services__panel { grid-template-rows: 1fr; }
+  .services--full .services__panel-inner { padding-bottom: var(--space-6); }
+
+  @media (hover: hover) { .services__row:hover .services__title { transform: translateX(0.35em); } }
+
+  @media (min-width: 900px) {
+    .services { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--grid-gap); align-items: start; }
+    .services__row { grid-template-columns: 3ch minmax(0, 1fr) 1rem; gap: var(--space-5); }
+    .services__title { white-space: nowrap; }
+    .services__mobile-media { display: none; }
+    .services__media { display: block; }
+    .services__media-sticky { position: sticky; top: calc(var(--header-h) + var(--space-4)); }
+    .services__media-item { position: absolute; inset: 0; opacity: 0; transition: opacity var(--dur-base) var(--ease-out); }
+    .services__media-item:first-child { position: relative; }
+    .services__media-item.is-active { opacity: 1; }
+    .services__media-item :global(.media) { --ratio: 4 / 5; }
+    .services__media-item :global(.media > *) { transform: scale(1.06); transition: transform var(--dur-reveal) var(--ease-out); }
+    .services__media-item.is-active :global(.media > *) { transform: scale(1); }
+    .services__media-label { position: absolute; left: var(--space-4); bottom: var(--space-4); padding: 0.5em 0.75em; background: var(--bg); color: var(--fg); }
+  }
+</style>
+
+<script>
+  function initServices() {
+    document.querySelectorAll<HTMLElement>('[data-services]').forEach((root) => {
+      if ((root as any).__init) return; (root as any).__init = true;
+      const items = root.querySelectorAll<HTMLElement>('[data-service]');
+      const medias = root.querySelectorAll<HTMLElement>('[data-service-media]');
+      const label = root.querySelector<HTMLElement>('[data-service-label]');
+      const full = root.classList.contains('services--full');
+      const activate = (i: number) => {
+        medias.forEach((m) => m.classList.toggle('is-active', m.dataset.serviceMedia === String(i)));
+        if (label) label.textContent = items[i]?.querySelector('.services__title')?.textContent ?? '';
+      };
+      items.forEach((item, i) => {
+        const btn = item.querySelector<HTMLButtonElement>('[data-service-toggle]')!;
+        item.addEventListener('pointerenter', (e) => { if ((e as PointerEvent).pointerType === 'mouse') activate(i); });
+        btn.addEventListener('focus', () => activate(i));
+        btn.addEventListener('click', () => {
+          if (full) return;
+          const open = btn.getAttribute('aria-expanded') === 'true';
+          items.forEach((o) => o.querySelector('[data-service-toggle]')?.setAttribute('aria-expanded', 'false'));
+          btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+          activate(i);
+        });
+      });
+    });
+  }
+  document.addEventListener('astro:page-load', initServices);
+</script>

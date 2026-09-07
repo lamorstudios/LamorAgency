@@ -1,0 +1,103 @@
+---
+/**
+ * Kontaktformular – Netlify Forms (data-netlify) mit progressivem JS-Submit,
+ * Inline-Validierung, Success- und Error-State. Funktioniert auch ohne JS.
+ */
+---
+<form class="form" name="contact" method="POST" action="/contact/?sent=1" data-netlify="true" netlify-honeypot="bot-field" novalidate data-contact-form>
+  <input type="hidden" name="form-name" value="contact" />
+  <p class="visually-hidden" aria-hidden="true"><label>Bitte leer lassen: <input name="bot-field" tabindex="-1" autocomplete="off" /></label></p>
+
+  <div class="form__field" data-reveal>
+    <label for="f-name" class="t-label">Name</label>
+    <input id="f-name" name="name" type="text" autocomplete="name" required minlength="2" placeholder="Wie heißt du?" aria-describedby="e-name" />
+    <p class="form__error t-small" id="e-name" aria-live="polite"></p>
+  </div>
+  <div class="form__field" data-reveal style="--reveal-delay:60ms">
+    <label for="f-email" class="t-label">E-Mail</label>
+    <input id="f-email" name="email" type="email" autocomplete="email" inputmode="email" required placeholder="name@unternehmen.de" aria-describedby="e-email" />
+    <p class="form__error t-small" id="e-email" aria-live="polite"></p>
+  </div>
+  <div class="form__field" data-reveal style="--reveal-delay:120ms">
+    <label for="f-message" class="t-label">Projekt</label>
+    <textarea id="f-message" name="message" rows="5" required minlength="10" placeholder="Erzähl uns kurz, worum es geht." aria-describedby="e-message"></textarea>
+    <p class="form__error t-small" id="e-message" aria-live="polite"></p>
+  </div>
+
+  <div class="form__actions" data-reveal style="--reveal-delay:180ms">
+    <button type="submit" class="btn" data-magnetic>
+      <span data-submit-label>Anfrage senden</span>
+      <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+    </button>
+    <p class="t-small t-muted form__hint">Mit dem Absenden stimmst du der Verarbeitung deiner Daten gemäß <a href="/datenschutz/" class="link">Datenschutzerklärung</a> zu.</p>
+  </div>
+
+  <div class="form__status" role="status" aria-live="polite" data-form-status hidden></div>
+</form>
+
+<style>
+  .form { display: grid; gap: var(--space-6); }
+  .form__field { display: grid; gap: var(--space-2); }
+  .form__field label { color: var(--fg-muted); transition: color var(--dur-fast); }
+  .form__field:focus-within label { color: var(--fg); }
+  .form input, .form textarea { width: 100%; min-height: 3.25rem; padding: 0.9rem 0; background: transparent; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; font-size: var(--fs-lead); line-height: 1.3; color: var(--fg); transition: border-color var(--dur-base) var(--ease-out); -webkit-appearance: none; appearance: none; }
+  .form textarea { resize: vertical; min-height: 8rem; }
+  .form input::placeholder, .form textarea::placeholder { color: color-mix(in srgb, var(--fg-muted) 65%, transparent); }
+  .form input:focus, .form textarea:focus { outline: none; border-bottom-color: var(--fg); }
+  .form input[aria-invalid='true'], .form textarea[aria-invalid='true'] { border-bottom-color: var(--c-accent); }
+  .form__error { color: var(--c-accent); min-height: 1.2em; }
+  .form__error:empty { display: none; }
+  .form__actions { display: grid; gap: var(--space-4); justify-items: start; padding-top: var(--space-2); }
+  .form__hint { max-width: 40ch; }
+  .form__status { padding: var(--space-6); border: 1px solid var(--line); }
+  .form__status.is-success { border-color: var(--fg); }
+  .form__status.is-error { border-color: var(--c-accent); }
+  .form__status h2 { font-size: var(--fs-h3); font-family: var(--font-display); letter-spacing: var(--ls-snug); margin-bottom: var(--space-2); }
+  .form.is-sent .form__field, .form.is-sent .form__actions { display: none; }
+  .form.is-busy .btn { opacity: 0.6; pointer-events: none; }
+</style>
+
+<script>
+  function initForm() {
+    const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
+    if (!form || (form as any).__init) return; (form as any).__init = true;
+    const status = form.querySelector<HTMLElement>('[data-form-status]')!;
+    const fields = Array.from(form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input:not([type=hidden]):not([name=bot-field]), textarea'));
+    const msg = (el: HTMLInputElement | HTMLTextAreaElement) => {
+      if (el.validity.valueMissing) return 'Bitte ausfüllen.';
+      if (el.validity.typeMismatch) return 'Bitte eine gültige E-Mail-Adresse eingeben.';
+      if (el.validity.tooShort) return `Mindestens ${el.minLength} Zeichen.`;
+      return '';
+    };
+    const validate = (el: HTMLInputElement | HTMLTextAreaElement) => {
+      const err = document.getElementById(el.getAttribute('aria-describedby') || '');
+      const m = msg(el);
+      el.setAttribute('aria-invalid', m ? 'true' : 'false');
+      if (err) err.textContent = m;
+      return !m;
+    };
+    fields.forEach((f) => { f.addEventListener('blur', () => validate(f)); f.addEventListener('input', () => { if (f.getAttribute('aria-invalid') === 'true') validate(f); }); });
+    const show = (type: 'success' | 'error', title: string, text: string) => {
+      status.hidden = false; status.className = `form__status is-${type}`;
+      status.innerHTML = `<h2>${title}</h2><p>${text}</p>`;
+      status.focus?.();
+    };
+    if (new URLSearchParams(location.search).get('sent') === '1') { form.classList.add('is-sent'); show('success', 'Danke – Anfrage erhalten.', 'Wir melden uns so schnell wie möglich.'); }
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const ok = fields.map(validate).every(Boolean);
+      if (!ok) { fields.find((f) => f.getAttribute('aria-invalid') === 'true')?.focus(); return; }
+      form.classList.add('is-busy');
+      try {
+        const body = new URLSearchParams(new FormData(form) as any).toString();
+        const res = await fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
+        if (!res.ok) throw new Error(String(res.status));
+        form.classList.add('is-sent');
+        show('success', 'Danke – Anfrage erhalten.', 'Wir melden uns so schnell wie möglich. Bis dahin: Instagram @lamoragency.');
+      } catch {
+        show('error', 'Das hat leider nicht geklappt.', 'Bitte versuch es noch einmal oder schreib uns direkt per E-Mail.');
+      } finally { form.classList.remove('is-busy'); }
+    });
+  }
+  document.addEventListener('astro:page-load', initForm);
+</script>

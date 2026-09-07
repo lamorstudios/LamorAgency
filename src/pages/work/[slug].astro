@@ -1,0 +1,105 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Media from '@/components/Media.astro';
+import Words from '@/components/Words.astro';
+import ArrowLink from '@/components/ArrowLink.astro';
+import { breadcrumb, creativeWork } from '@/lib/schema';
+import { pad } from '@/lib/utils';
+
+export async function getStaticPaths() {
+  const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+  return projects.map((project, i) => ({ params: { slug: project.id }, props: { project, index: i, total: projects.length, next: projects[(i + 1) % projects.length] } }));
+}
+const { project, index, total, next } = Astro.props;
+const d = project.data;
+const { Content } = await render(project);
+const path = `/work/${project.id}/`;
+const jsonLd = d.placeholder ? [] : [breadcrumb([{ name: 'Work', path: '/work/' }, { name: d.title, path }]), creativeWork({ title: d.title, description: d.summary, path, client: d.client, category: d.category, year: d.year })];
+const meta = [
+  { k: 'Kunde', v: d.client },
+  { k: 'Projekt', v: d.title },
+  { k: 'Kategorie', v: d.category },
+  { k: 'Leistungen', v: d.services.join(', ') },
+  ...(d.year ? [{ k: 'Jahr', v: String(d.year) }] : []),
+];
+---
+<BaseLayout title={`${d.title} – ${d.client}`} description={d.summary} noindex={d.placeholder} jsonLd={jsonLd}>
+  <article class="case">
+    <header class="case__head container">
+      <p class="t-label case__kicker" data-reveal="fade">
+        <a href="/work/" class="link">Work</a>
+        <span class="t-muted">— {pad(index + 1)}</span>
+        <span class="t-muted">{d.category}</span>
+      </p>
+      <h1 class="t-display case__title"><Words text={d.title} /></h1>
+      <p class="t-lead case__summary" data-reveal style="--reveal-delay:250ms">{d.summary}</p>
+    </header>
+
+    <div class="case__hero" data-reveal="fade" style="--reveal-delay:150ms">
+      <Media media={d.hero} priority parallax sizes="100vw" widths={[768, 1280, 1920, 2560]} ratio={d.hero.ratio === 'portrait' || d.hero.ratio === 'square' || d.hero.ratio === 'story' ? 'wide' : d.hero.ratio} />
+    </div>
+
+    <div class="case__body container">
+      <dl class="case__meta" data-reveal>
+        {meta.map((m) => (<div class="case__meta-row"><dt class="t-label t-muted">{m.k}</dt><dd class="t-body">{m.v}</dd></div>))}
+      </dl>
+      <div class="case__text prose" data-reveal style="--reveal-delay:120ms">
+        <Content />
+      </div>
+    </div>
+
+    {d.gallery.length > 0 && (
+      <div class="case__gallery container" aria-label="Projektbilder">
+        {d.gallery.map((g) => (
+          <figure class={`case__fig case__fig--${g.ratio ?? 'wide'}`}>
+            <Media media={g} reveal parallax={g.ratio === 'wide' || g.ratio === 'cinema'} sizes={g.ratio === 'portrait' || g.ratio === 'square' ? '(min-width: 900px) 50vw, 100vw' : '100vw'} />
+            {g.caption && <figcaption class="t-small t-muted">{g.caption}</figcaption>}
+          </figure>
+        ))}
+      </div>
+    )}
+
+    <nav class="case__next" aria-label="Nächstes Projekt">
+      <a href={`/work/${next.id}/`} class="case__next-link" data-cursor="Next">
+        <div class="container case__next-inner">
+          <p class="t-label t-muted" data-reveal="fade">Next project — {pad(((index + 1) % total) + 1)}</p>
+          <p class="t-display case__next-title" data-reveal>{next.data.title}</p>
+          <p class="t-label" data-reveal="fade">{next.data.client} · {next.data.category}</p>
+        </div>
+        <div class="case__next-media">
+          <Media media={next.data.hero} ratio="cinema" hover sizes="100vw" />
+        </div>
+      </a>
+      <div class="container case__back"><ArrowLink href="/work/" label="Alle Projekte" /></div>
+    </nav>
+  </article>
+</BaseLayout>
+
+<style>
+  .case__head { padding-top: calc(var(--header-h) + var(--space-8)); padding-bottom: var(--space-7); display: grid; gap: var(--space-6); }
+  .case__kicker { display: flex; gap: 1em; flex-wrap: wrap; }
+  .case__summary { max-width: 36ch; }
+  .case__hero { padding-inline: 0; }
+  .case__hero :global(.media) { --ratio: 4 / 5; }
+  @media (min-width: 768px) { .case__hero :global(.media) { --ratio: 21 / 9; } }
+  .case__body { display: grid; gap: var(--space-8); padding-block: var(--space-9); }
+  .case__meta { display: grid; gap: var(--space-4); align-content: start; }
+  .case__meta-row { display: grid; gap: var(--space-1); padding-bottom: var(--space-4); border-bottom: 1px solid var(--line); }
+  .case__gallery { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--grid-gap); padding-bottom: var(--space-9); }
+  .case__fig { grid-column: 1 / -1; }
+  .case__fig--portrait, .case__fig--square { grid-column: span 6; }
+  .case__fig figcaption { margin-top: var(--space-3); }
+  .case__next { border-top: 1px solid var(--line); }
+  .case__next-link { display: block; }
+  .case__next-inner { display: grid; gap: var(--space-4); padding-block: var(--space-8); }
+  .case__next-title { transition: transform var(--dur-slow) var(--ease-out); }
+  @media (hover: hover) { .case__next-link:hover .case__next-title { transform: translateX(0.15em); } }
+  .case__next-media { max-height: 60vh; overflow: hidden; }
+  .case__back { padding-block: var(--space-6); }
+  @media (min-width: 900px) {
+    .case__body { grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); column-gap: var(--space-9); }
+    .case__meta-row { grid-template-columns: 8rem 1fr; }
+    .case__text { padding-top: 0.2rem; }
+  }
+</style>

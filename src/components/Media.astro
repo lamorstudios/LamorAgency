@@ -1,0 +1,88 @@
+---
+/**
+ * Media – rendert Bild (AVIF/WebP + srcset), Video oder klar erkennbaren Placeholder.
+ * Bilder: src = '/src/assets/…' (wird über import.meta.glob aufgelöst und optimiert).
+ * Videos: src = '/media/…' (aus /public), poster optional.
+ */
+import { Picture } from 'astro:assets';
+
+export interface MediaData {
+  type?: 'image' | 'video' | 'placeholder';
+  src?: string;
+  poster?: string;
+  alt?: string;
+  label?: string;
+  ratio?: 'wide' | 'cinema' | 'square' | 'portrait' | 'story';
+  caption?: string;
+}
+interface Props {
+  media: MediaData;
+  class?: string;
+  sizes?: string;
+  widths?: number[];
+  priority?: boolean; // Hero: eager + fetchpriority high
+  hover?: boolean;    // subtile Skalierung bei Hover
+  reveal?: boolean;   // Clip-Path Reveal beim Scrollen
+  parallax?: boolean; // dezente Parallax-Bewegung
+  autoplay?: boolean; // Video: bei Sichtbarkeit abspielen
+  ratio?: MediaData['ratio'];
+}
+const {
+  media,
+  class: className = '',
+  sizes = '(min-width: 1024px) 50vw, 100vw',
+  widths = [480, 768, 1080, 1440, 1920],
+  priority = false,
+  hover = false,
+  reveal = false,
+  parallax = false,
+  autoplay = true,
+  ratio,
+} = Astro.props;
+
+const images = import.meta.glob<{ default: ImageMetadata }>('/src/assets/**/*.{jpg,jpeg,png,webp,avif}');
+const type = media.type ?? 'placeholder';
+let image: ImageMetadata | undefined;
+if (type === 'image' && media.src && images[media.src]) image = (await images[media.src]()).default;
+const posters = media.poster && images[media.poster] ? (await images[media.poster]()).default : undefined;
+const r = ratio ?? media.ratio ?? 'wide';
+const ratioVar = `var(--ratio-${r})`;
+const classes = ['media', hover && 'media--hover', reveal && 'media--reveal', parallax && 'media--parallax', className].filter(Boolean).join(' ');
+---
+<div class={classes} style={`--ratio:${ratioVar}`} data-parallax={parallax ? '' : undefined}>
+  {type === 'image' && image && (
+    <Picture
+      src={image}
+      formats={['avif', 'webp']}
+      widths={widths}
+      sizes={sizes}
+      alt={media.alt ?? ''}
+      loading={priority ? 'eager' : 'lazy'}
+      decoding={priority ? 'sync' : 'async'}
+      fetchpriority={priority ? 'high' : 'auto'}
+    />
+  )}
+  {type === 'video' && media.src && (
+    <video
+      src={media.src}
+      poster={posters?.src ?? media.poster}
+      muted
+      loop
+      playsinline
+      preload={priority ? 'metadata' : 'none'}
+      data-autoplay={autoplay ? '' : undefined}
+      aria-label={media.alt || undefined}
+    ></video>
+  )}
+  {(type === 'placeholder' || (type === 'image' && !image) || (type === 'video' && !media.src)) && (
+    <div class="placeholder" role="img" aria-label={media.alt || media.label || 'Platzhalter'}>
+      <span class="placeholder__label">{media.label ?? '[MEDIA]'}</span>
+    </div>
+  )}
+</div>
+{media.caption && <p class="t-small t-muted media__caption">{media.caption}</p>}
+
+<style>
+  .media__caption { margin-top: var(--space-3); }
+  .media--parallax > :global(img), .media--parallax > :global(picture), .media--parallax > :global(video), .media--parallax > :global(.placeholder) { inset: -12% 0; height: 124%; will-change: transform; }
+</style>

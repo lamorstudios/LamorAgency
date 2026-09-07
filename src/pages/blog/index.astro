@@ -1,0 +1,70 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import Media from '@/components/Media.astro';
+import ContactCta from '@/components/ContactCta.astro';
+import { formatDate, isoDate, readingTime } from '@/lib/utils';
+import { breadcrumb } from '@/lib/schema';
+const posts = (await getCollection('posts')).filter((p) => !p.data.draft).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const [featured, ...rest] = posts;
+const categories = [...new Set(posts.map((p) => p.data.category))];
+---
+<BaseLayout title="Blog – Social Media, Content & Branding Insights" description="Blog von LAMOR AGENCY München: Insights zu Social Media Marketing, Content Creation, Videoproduktion, Branding und Design." jsonLd={[breadcrumb([{ name: 'Blog', path: '/blog/' }])]}>
+  <PageHeader kicker="Blog" index="04" title="Blog" titleLines={['Notes on', 'brand & culture.']} lead="Gedanken, Insights und Erfahrungen aus Social Media, Film, Branding und Design." meta={`${posts.length} Artikel · ${categories.join(' · ')}`} />
+
+  {featured && (
+    <section class="blog-featured container" aria-label="Neuester Artikel">
+      <a href={`/blog/${featured.id}/`} class="blog-featured__link" data-cursor="Read">
+        <div class="blog-featured__media" data-reveal="fade">
+          <Media media={featured.data.cover ?? { type: 'placeholder', label: '[POST IMAGE]' }} reveal hover parallax sizes="100vw" ratio="cinema" />
+        </div>
+        <div class="blog-featured__body">
+          <p class="t-label t-muted" data-reveal="fade">
+            <span>{featured.data.category}</span> · <time datetime={isoDate(featured.data.date)}>{formatDate(featured.data.date)}</time> · <span>{readingTime(featured.body)} Min.</span>
+          </p>
+          <h2 class="t-h2 blog-featured__title" data-reveal>{featured.data.title}</h2>
+          <p class="t-lead measure" data-reveal style="--reveal-delay:120ms">{featured.data.description}</p>
+        </div>
+      </a>
+    </section>
+  )}
+
+  <section class="blog-list container section" aria-label="Alle Artikel">
+    <ul role="list" class="blog-list__list">
+      {rest.map((p, i) => (
+        <li class="blog-list__item" data-reveal style={`--reveal-delay:${(i % 3) * 60}ms`}>
+          <a href={`/blog/${p.id}/`} class="blog-list__link" data-cursor="Read">
+            <div class="blog-list__media"><Media media={p.data.cover ?? { type: 'placeholder', label: '[POST IMAGE]' }} hover ratio="wide" sizes="(min-width: 900px) 30vw, 100vw" /></div>
+            <div class="blog-list__body">
+              <p class="t-label t-muted"><span>{p.data.category}</span> · <time datetime={isoDate(p.data.date)}>{formatDate(p.data.date)}</time> · <span>{readingTime(p.body)} Min.</span></p>
+              <h2 class="t-h3 blog-list__title">{p.data.title}</h2>
+              <p class="t-body t-muted measure">{p.data.description}</p>
+            </div>
+            <span class="blog-list__arrow" aria-hidden="true">→</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <ContactCta index="05" />
+</BaseLayout>
+
+<style>
+  .blog-featured__link { display: grid; gap: var(--space-6); }
+  .blog-featured__body { display: grid; gap: var(--space-4); }
+  .blog-featured__title { max-width: 20ch; transition: transform var(--dur-base) var(--ease-out); }
+  @media (hover: hover) { .blog-featured__link:hover .blog-featured__title { transform: translateX(0.2em); } }
+  .blog-list__list { border-top: 1px solid var(--line); }
+  .blog-list__link { display: grid; gap: var(--space-5); padding-block: var(--space-7); border-bottom: 1px solid var(--line); }
+  .blog-list__body { display: grid; gap: var(--space-3); align-content: start; }
+  .blog-list__title { transition: transform var(--dur-base) var(--ease-out); }
+  .blog-list__arrow { display: none; font-size: var(--fs-h3); transition: transform var(--dur-base) var(--ease-out); }
+  @media (hover: hover) { .blog-list__link:hover .blog-list__title { transform: translateX(0.2em); } .blog-list__link:hover .blog-list__arrow { transform: translateX(0.4em); } }
+  @media (min-width: 900px) {
+    .blog-featured__link { grid-template-columns: 1fr; }
+    .blog-list__link { grid-template-columns: minmax(0, 4fr) minmax(0, 7fr) auto; align-items: start; column-gap: var(--space-8); }
+    .blog-list__arrow { display: block; }
+  }
+</style>

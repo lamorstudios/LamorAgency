@@ -1,0 +1,23 @@
+---
+/**
+ * Words – zerlegt Text in Wörter für den Mask-Reveal (CSS, ohne Runtime-JS).
+ * lines: mehrere Zeilen als Blöcke. Reveal wird per .is-inview ausgelöst.
+ */
+import type { HTMLTag } from 'astro/types';
+interface Props { text?: string; lines?: string[]; as?: HTMLTag; class?: string; delay?: number; id?: string }
+const { text, lines, as: Tag = 'span', class: className = '', delay = 0, id } = Astro.props as Props;
+const rows: string[] = lines ?? [text ?? ''];
+let i = 0;
+const rendered = rows.map((row) => row.split(/\s+/).filter(Boolean).map((w) => ({ w, i: i++ })));
+---
+<Tag class={`words ${className}`} style={delay ? `--reveal-delay:${delay}ms` : undefined} id={id} data-words>
+  {rendered.map((row, ri) => (
+    <span class="line">
+      {row.map(({ w, i }) => (<><span class="word"><span class="word__inner" style={`--i:${i}`}>{w}</span></span>{' '}</>))}
+      {ri < rendered.length - 1 && <br />}
+    </span>
+  ))}
+</Tag>
+<style>
+  .line { display: block; }
+</style>

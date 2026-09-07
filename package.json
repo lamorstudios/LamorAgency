@@ -1,0 +1,27 @@
+{
+  "name": "lamor-agency",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LAMOR AGENCY – Creative Studio München. Website 2026.",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "astro": "astro"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "astro": "^7.3.1",
+    "gsap": "^3.15.0",
+    "sharp": "^0.35.4"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "typescript": "^6.0.3"
+  }
+}

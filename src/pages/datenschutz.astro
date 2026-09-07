@@ -1,0 +1,34 @@
+---
+import LegalLayout from '@/layouts/LegalLayout.astro';
+import { site } from '@/data/site';
+/**
+ * DATENSCHUTZERKLÄRUNG – Der bestehende Text der Wix-Website wird hier 1:1 übernommen.
+ * Hinweis für die Übernahme: Wix-spezifische Abschnitte (Wix-Hosting, Wix-Cookies) entfallen;
+ * stattdessen Hosting über Netlify und Netlify Forms (Kontaktformular) ergänzen lassen –
+ * inhaltliche Anpassung nur nach manueller/juristischer Prüfung.
+ */
+---
+<LegalLayout title="Datenschutz" description={`Datenschutzerklärung der ${site.name}, ${site.address.city}.`} path="/datenschutz">
+  <h2>1. Datenschutz auf einen Blick</h2>
+  <p>[EXISTING TEXT] Bestehende Datenschutzerklärung 1:1 übernehmen.</p>
+
+  <h2>2. Verantwortliche Stelle</h2>
+  <p>
+    {site.legalName} <span class="todo">TODO_VERIFY</span><br />
+    {site.address.street}<br />
+    {site.address.zip} {site.address.city}<br />
+    E-Mail: <a href={`mailto:${site.email}`}>{site.email}</a>
+  </p>
+
+  <h2>3. Hosting</h2>
+  <p>[EXISTING TEXT] <span class="todo">TODO_VERIFY Hosting-Abschnitt: Wix → Netlify</span></p>
+
+  <h2>4. Kontaktformular</h2>
+  <p>[EXISTING TEXT] <span class="todo">TODO_VERIFY Netlify Forms</span></p>
+
+  <h2>5. Ihre Rechte</h2>
+  <p>[EXISTING TEXT]</p>
+
+  <h2>6. Social Media / Instagram</h2>
+  <p>[EXISTING TEXT]</p>
+</LegalLayout>

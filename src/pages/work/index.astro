@@ -1,0 +1,26 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import WorkGrid from '@/components/WorkGrid.astro';
+import ContactCta from '@/components/ContactCta.astro';
+import { breadcrumb } from '@/lib/schema';
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+const categories = [...new Set(projects.map((p) => p.data.category))];
+---
+<BaseLayout title="Work – Portfolio" description="Ausgewählte Projekte von LAMOR AGENCY: Social Media, Film, Fotografie, Branding, Grafikdesign und Webdesign aus München." jsonLd={[breadcrumb([{ name: 'Work', path: '/work/' }])]}>
+  <PageHeader kicker="Work" index="01" title="Work" titleLines={['Selected', 'work.']} lead="Ausgewählte Projekte aus Social Media, Film, Fotografie, Branding und Design." meta={`${projects.length} Projekte`}>
+    <ul role="list" class="work-cats t-label" data-reveal="fade" style="--reveal-delay:400ms">
+      {categories.map((c) => <li>{c}</li>)}
+    </ul>
+  </PageHeader>
+  <section class="container section section--flush-top" aria-label="Alle Projekte">
+    <WorkGrid projects={projects} />
+  </section>
+  <ContactCta index="02" />
+</BaseLayout>
+
+<style>
+  .work-cats { display: flex; flex-wrap: wrap; gap: 0.5em 1.5em; padding-top: var(--space-5); border-top: 1px solid var(--line); }
+  .work-cats li { color: var(--fg-muted); }
+</style>

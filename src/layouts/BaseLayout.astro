@@ -1,0 +1,74 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import '@/styles/global.css';
+import SEO from '@/components/SEO.astro';
+import type { Props as SEOProps } from '@/components/SEO.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import Cursor from '@/components/Cursor.astro';
+import Intro from '@/components/Intro.astro';
+import { site, social } from '@/data/site';
+
+interface Props extends SEOProps { theme?: 'light' | 'dark'; bodyClass?: string }
+const { theme = 'light', bodyClass = '', jsonLd = [], ...seo } = Astro.props;
+
+const organization = {
+  '@context': 'https://schema.org',
+  '@type': ['Organization', 'ProfessionalService'],
+  '@id': `${site.url}/#organization`,
+  name: site.name,
+  url: site.url,
+  email: site.email,
+  telephone: site.phone,
+  slogan: site.claim,
+  description: site.description,
+  address: { '@type': 'PostalAddress', streetAddress: site.address.street, postalCode: site.address.zip, addressLocality: site.address.city, addressRegion: site.address.region, addressCountry: site.address.country },
+  areaServed: { '@type': 'City', name: site.geoArea },
+  sameAs: social.map((s) => s.href),
+  knowsAbout: ['Social Media Marketing', 'Content Creation', 'Videoproduktion', 'Fotografie', 'Branding', 'Grafikdesign', 'Webdesign', 'Creative Direction'],
+};
+const website = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  '@id': `${site.url}/#website`,
+  url: site.url,
+  name: site.name,
+  inLanguage: site.lang,
+  publisher: { '@id': `${site.url}/#organization` },
+};
+---
+<!doctype html>
+<html lang={site.lang} data-theme={theme}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content={theme === 'dark' ? '#0a0a0a' : '#f2f0eb'} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="generator" content={Astro.generator} />
+    <SEO {...seo} jsonLd={[organization, website, ...jsonLd]} />
+    <script is:inline>
+      // Intro nur beim ersten Aufruf pro Session, nicht bei Reduced Motion – vor dem ersten Paint entscheiden.
+      try {
+        if (!sessionStorage.getItem('lamor-intro') && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          document.documentElement.setAttribute('data-intro', '');
+          sessionStorage.setItem('lamor-intro', '1');
+        }
+      } catch (e) {}
+    </script>
+    <ClientRouter fallback="swap" />
+  </head>
+  <body class={bodyClass} id="top">
+    <a href="#main" class="skip-link">Zum Inhalt springen</a>
+    <Intro />
+    <Header />
+    <main id="main" transition:animate="fade">
+      <slot />
+    </main>
+    <Footer />
+    <Cursor />
+    <script>
+      import '@/scripts/motion';
+    </script>
+  </body>
+</html>

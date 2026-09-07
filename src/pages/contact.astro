@@ -1,0 +1,53 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Words from '@/components/Words.astro';
+import ContactForm from '@/components/ContactForm.astro';
+import { site, social } from '@/data/site';
+import { breadcrumb } from '@/lib/schema';
+---
+<BaseLayout title="Kontakt" description={`Kontakt zu LAMOR AGENCY in ${site.address.city}: Projekt anfragen für Social Media, Film, Fotografie, Branding und Webdesign. ${site.email}`} theme="dark" jsonLd={[breadcrumb([{ name: 'Kontakt', path: '/contact/' }])]}>
+  <section class="contact" data-theme="dark">
+    <header class="contact__head container">
+      <p class="t-label" data-reveal="fade"><span class="t-num t-muted">05</span> <span>Contact</span></p>
+      <h1 class="t-display contact__title"><Words lines={["Let's create", 'something.']} /></h1>
+      <p class="t-lead contact__lead" data-reveal style="--reveal-delay:250ms">Ein Projekt, eine Idee oder erst eine Frage: Schreib uns, wir melden uns.</p>
+    </header>
+
+    <div class="contact__grid container">
+      <div class="contact__form"><ContactForm /></div>
+      <aside class="contact__aside">
+        <div class="contact__block" data-reveal>
+          <p class="t-label t-muted">Direkt</p>
+          <a href={`mailto:${site.email}`} class="contact__big link">{site.email}</a>
+          <a href={site.phoneHref} class="contact__big link">{site.phone}</a>
+        </div>
+        <div class="contact__block" data-reveal style="--reveal-delay:80ms">
+          <p class="t-label t-muted">Studio</p>
+          <address class="t-body">{site.name}<br />{site.address.street}<br />{site.address.zip} {site.address.city}</address>
+        </div>
+        <div class="contact__block" data-reveal style="--reveal-delay:160ms">
+          <p class="t-label t-muted">Social</p>
+          {social.map((s) => <a href={s.href} class="t-body link" target="_blank" rel="noopener noreferrer">{s.label} <span class="t-muted">{s.handle}</span></a>)}
+        </div>
+      </aside>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .contact { background: var(--c-ink); color: var(--c-paper); }
+  .contact__head { padding-top: calc(var(--header-h) + var(--space-8)); padding-bottom: var(--space-8); display: grid; gap: var(--space-6); }
+  .contact__head .t-label { display: flex; gap: 1.5em; }
+  @media (min-width: 768px) { .contact__title :global(.line:nth-child(2)) { padding-left: 10vw; } }
+  .contact__lead { max-width: 34ch; }
+  .contact__grid { display: grid; gap: var(--space-9); padding-bottom: var(--space-10); }
+  .contact__aside { display: grid; gap: var(--space-7); align-content: start; }
+  .contact__block { display: grid; gap: var(--space-3); justify-items: start; }
+  .contact__block address { font-style: normal; line-height: 1.6; }
+  .contact__block .link { min-height: 44px; display: inline-flex; align-items: center; }
+  .contact__big { font-family: var(--font-display); font-size: var(--fs-h4); letter-spacing: var(--ls-snug); overflow-wrap: anywhere; }
+  @media (min-width: 900px) {
+    .contact__grid { grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); column-gap: var(--space-10); }
+    .contact__aside { position: sticky; top: calc(var(--header-h) + var(--space-6)); }
+  }
+</style>

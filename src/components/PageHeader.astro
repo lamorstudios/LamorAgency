@@ -1,0 +1,33 @@
+---
+import Words from '@/components/Words.astro';
+interface Props { kicker: string; index?: string; title: string; titleLines?: string[]; lead?: string; meta?: string; size?: 'display' | 'h1'; class?: string }
+const { kicker, index, title, titleLines, lead, meta, size = 'display', class: className = '' } = Astro.props;
+---
+<header class={`page-head container ${className}`}>
+  <p class="t-label page-head__kicker" data-reveal="fade">
+    {index && <span class="t-num t-muted">{index}</span>}
+    <span>{kicker}</span>
+  </p>
+  <h1 class={`page-head__title ${size === 'display' ? 't-display' : 't-h1'}`}>
+    <Words lines={titleLines ?? [title]} />
+  </h1>
+  {(lead || meta) && (
+    <div class="page-head__row">
+      {lead && <p class="t-lead page-head__lead" data-reveal style="--reveal-delay:250ms">{lead}</p>}
+      {meta && <p class="t-label t-muted page-head__meta" data-reveal="fade" style="--reveal-delay:350ms">{meta}</p>}
+    </div>
+  )}
+  <slot />
+</header>
+
+<style>
+  .page-head { padding-top: calc(var(--header-h) + var(--space-8)); padding-bottom: var(--space-8); display: grid; gap: var(--space-6); }
+  .page-head__kicker { display: flex; gap: 1.5em; }
+  .page-head__title { text-wrap: balance; }
+  .page-head__row { display: grid; gap: var(--space-5); align-items: end; }
+  .page-head__lead { max-width: 30ch; }
+  @media (min-width: 900px) {
+    .page-head__row { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
+    .page-head__meta { text-align: right; }
+  }
+</style>

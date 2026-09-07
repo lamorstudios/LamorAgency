@@ -1,0 +1,28 @@
+/* ==========================================================================
+   LAMOR AGENCY – FONTS
+   --------------------------------------------------------------------------
+   Die bestehenden LAMOR-Markenfonts werden hier zentral eingebunden.
+   1. Font-Dateien (woff2) nach /public/fonts/ legen.
+   2. Die @font-face-Blöcke unten aktivieren und Dateinamen anpassen.
+   3. In tokens.css die Variablen --font-display und --font-body setzen.
+   Bis dahin läuft die Website auf einem neutralen System-Grotesk-Stack,
+   der keine neue Markenidentität etabliert.
+   ========================================================================== */
+
+/*
+@font-face {
+  font-family: 'LAMOR Display';
+  src: url('/fonts/lamor-display.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'LAMOR Text';
+  src: url('/fonts/lamor-text.woff2') format('woff2');
+  font-weight: 400 600;
+  font-style: normal;
+  font-display: swap;
+}
+*/

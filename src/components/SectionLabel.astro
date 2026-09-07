@@ -1,0 +1,16 @@
+---
+interface Props { index?: string; label: string; class?: string; rule?: boolean }
+const { index, label, class: className = '', rule = true } = Astro.props;
+---
+<div class={`section-label ${className}`} data-reveal="fade">
+  <p class="t-label">
+    {index && <span class="section-label__index t-num">{index}</span>}
+    <span>{label}</span>
+  </p>
+  {rule && <div class="rule" aria-hidden="true"></div>}
+</div>
+<style>
+  .section-label { display: grid; gap: var(--space-4); margin-bottom: var(--space-7); }
+  .section-label p { display: flex; gap: 1.5em; }
+  .section-label__index { color: var(--fg-muted); }
+</style>

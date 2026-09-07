@@ -1,0 +1,31 @@
+---
+import { getCollection } from 'astro:content';
+import WorkGrid from '@/components/WorkGrid.astro';
+import SectionLabel from '@/components/SectionLabel.astro';
+import Button from '@/components/Button.astro';
+const projects = (await getCollection('projects')).filter((p) => p.data.featured).sort((a, b) => a.data.order - b.data.order).slice(0, 6);
+---
+<section class="work section" id="work" data-theme="light" aria-labelledby="work-title">
+  <div class="container">
+    <div class="work__head">
+      <SectionLabel index="01" label="Selected Work" />
+      <h2 class="t-h2 work__title" id="work-title">
+        <span class="visually-hidden">Ausgewählte Arbeiten</span>
+        <span aria-hidden="true" data-reveal>Work that people<br />actually feel.</span>
+      </h2>
+    </div>
+
+    <WorkGrid projects={projects} />
+
+    <div class="work__more" data-reveal>
+      <Button href="/work/" label="Alle Projekte" variant="ghost" arrow="right" />
+    </div>
+  </div>
+</section>
+
+<style>
+  .work { background: var(--c-paper); color: var(--c-ink); }
+  .work__head { margin-bottom: var(--space-8); }
+  .work__title { max-width: 16ch; }
+  .work__more { display: flex; justify-content: center; margin-top: var(--space-9); }
+</style>

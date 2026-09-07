@@ -1,0 +1,112 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import Media from '@/components/Media.astro';
+import SectionLabel from '@/components/SectionLabel.astro';
+import Clients from '@/components/Clients.astro';
+import ContactCta from '@/components/ContactCta.astro';
+import ArrowLink from '@/components/ArrowLink.astro';
+import { site } from '@/data/site';
+import { services } from '@/data/services';
+import { breadcrumb } from '@/lib/schema';
+
+// Team: bestehende Team-Darstellung später eintragen (Name, Rolle, Foto). Keine erfundenen Personen.
+const team = [1, 2, 3].map((n) => ({ name: `[TEAM MEMBER 0${n}]`, role: '[ROLE]', media: { type: 'placeholder' as const, label: '[TEAM PHOTO]', alt: '', ratio: 'portrait' as const } }));
+const ph = (label: string, ratio: 'wide' | 'portrait' | 'square' | 'cinema' = 'wide') => ({ type: 'placeholder' as const, label, alt: '', ratio });
+---
+<BaseLayout title="About – Creative Studio München" description={`LAMOR AGENCY ist ein Creative Studio aus ${site.address.city} für Social Media, Content Creation, Film, Fotografie, Branding, Grafikdesign und Webdesign.`} jsonLd={[breadcrumb([{ name: 'About', path: '/about/' }])]}>
+  <PageHeader kicker="About" index="02" title="About" titleLines={['Creative Studio', `aus ${site.address.city}.`]} lead="[EXISTING TEXT] Einleitung von der bestehenden Über-uns-Seite." meta={site.claim} />
+
+  <section class="about-intro container" aria-label="Einführung">
+    <div class="about-intro__media" data-reveal="fade">
+      <Media media={ph('[ABOUT IMAGE — STUDIO / TEAM]', 'cinema')} reveal parallax sizes="100vw" />
+    </div>
+  </section>
+
+  <section class="about-philo section container" aria-labelledby="philo-title">
+    <div class="about-philo__grid">
+      <div>
+        <SectionLabel index="01" label="Philosophie" />
+        <h2 class="t-h2" id="philo-title" data-reveal>Feel the brand,<br />not the ad.</h2>
+      </div>
+      <div class="about-philo__text prose" data-reveal style="--reveal-delay:150ms">
+        <p>[EXISTING TEXT] Philosophie-Text von der bestehenden Website: Warum LAMOR Marken über Inhalte statt über Werbung erlebbar macht.</p>
+        <p>[EXISTING TEXT] Zweiter Absatz.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="about-agency section section--flush-top container" aria-labelledby="agency-title">
+    <div class="about-agency__grid">
+      <div class="about-agency__media about-agency__media--a" data-reveal="fade"><Media media={ph('[ABOUT IMAGE]', 'portrait')} reveal hover sizes="(min-width: 900px) 40vw, 100vw" /></div>
+      <div class="about-agency__copy">
+        <SectionLabel index="02" label="Agentur" />
+        <h2 class="t-h3" id="agency-title" data-reveal>[EXISTING TEXT] Überschrift zur Agentur</h2>
+        <div class="prose" data-reveal style="--reveal-delay:120ms">
+          <p>[EXISTING TEXT] Vorstellung der Agentur: Gründung, Standort {site.address.city}, Arbeitsweise, Schwerpunkte Social Media, Film, Branding und Design.</p>
+        </div>
+      </div>
+      <div class="about-agency__media about-agency__media--b" data-reveal="fade" style="--reveal-delay:120ms"><Media media={ph('[ABOUT IMAGE]', 'square')} reveal hover sizes="(min-width: 900px) 30vw, 100vw" /></div>
+    </div>
+  </section>
+
+  <section class="about-expertise section container" aria-labelledby="expertise-title">
+    <SectionLabel index="03" label="Expertise" />
+    <h2 class="visually-hidden" id="expertise-title">Expertise</h2>
+    <ul role="list" class="about-expertise__list">
+      {services.map((s, i) => (
+        <li data-reveal style={`--reveal-delay:${i * 40}ms`}>
+          <a href={`/services/#${s.slug}`} class="about-expertise__item">
+            <span class="t-label t-num t-muted">{s.index}</span>
+            <span class="about-expertise__title">{s.title}</span>
+            <span class="t-label t-muted hide-mobile">{s.tags.slice(0, 2).join(' / ')}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+    <div class="about-expertise__more" data-reveal><ArrowLink href="/services/" label="Alle Leistungen" /></div>
+  </section>
+
+  <section class="about-team section section--flush-top container" aria-labelledby="team-title">
+    <SectionLabel index="04" label="Team" />
+    <h2 class="t-h2 about-team__title" id="team-title" data-reveal>Die Menschen<br />hinter LAMOR.</h2>
+    <ul role="list" class="about-team__grid">
+      {team.map((m, i) => (
+        <li class="about-team__member" data-reveal style={`--reveal-delay:${i * 80}ms`}>
+          <Media media={m.media} reveal hover sizes="(min-width: 900px) 30vw, 100vw" />
+          <p class="about-team__name t-h4">{m.name}</p>
+          <p class="t-label t-muted">{m.role}</p>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <Clients index="05" />
+  <ContactCta index="06" />
+</BaseLayout>
+
+<style>
+  .about-intro { padding-bottom: var(--space-9); }
+  .about-philo__grid { display: grid; gap: var(--space-7); }
+  .about-philo__text { padding-top: 0.5rem; }
+  .about-agency__grid { display: grid; gap: var(--space-7); }
+  .about-agency__copy { display: grid; gap: var(--space-5); align-content: center; }
+  .about-expertise__list { border-top: 1px solid var(--line); }
+  .about-expertise__item { display: grid; grid-template-columns: 3ch 1fr auto; align-items: baseline; gap: var(--space-4); padding-block: var(--space-4); border-bottom: 1px solid var(--line); min-height: 44px; }
+  .about-expertise__title { font-family: var(--font-display); font-size: var(--fs-h3); letter-spacing: var(--ls-snug); text-transform: uppercase; transition: transform var(--dur-base) var(--ease-out); }
+  @media (hover: hover) { .about-expertise__item:hover .about-expertise__title { transform: translateX(0.3em); } }
+  .about-expertise__more { margin-top: var(--space-6); }
+  .about-team__title { margin-bottom: var(--space-8); }
+  .about-team__grid { display: grid; gap: var(--space-7) var(--grid-gap); }
+  .about-team__member { display: grid; gap: var(--space-2); align-content: start; }
+  .about-team__name { margin-top: var(--space-2); }
+  @media (min-width: 768px) {
+    .about-philo__grid { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); column-gap: var(--space-9); align-items: start; }
+    .about-agency__grid { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--grid-gap); row-gap: var(--space-8); }
+    .about-agency__media--a { grid-column: 1 / 6; grid-row: 1 / 3; }
+    .about-agency__copy { grid-column: 7 / -1; grid-row: 1; }
+    .about-agency__media--b { grid-column: 8 / -1; grid-row: 2; }
+    .about-team__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .about-team__member:nth-child(2) { margin-top: var(--space-8); }
+  }
+</style>

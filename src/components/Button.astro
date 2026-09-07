@@ -1,0 +1,12 @@
+---
+interface Props { href: string; label: string; variant?: 'solid' | 'ghost'; arrow?: 'up' | 'right'; class?: string; magnetic?: boolean; external?: boolean }
+const { href, label, variant = 'solid', arrow = 'up', class: className = '', magnetic = true, external = false } = Astro.props;
+---
+<a href={href} class={`btn ${variant === 'ghost' ? 'btn--ghost' : ''} ${className}`} data-magnetic={magnetic ? '' : undefined} target={external ? '_blank' : undefined} rel={external ? 'noopener noreferrer' : undefined}>
+  <span>{label}</span>
+  {arrow === 'up' ? (
+    <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+  ) : (
+    <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8H14M14 8L9 3M14 8L9 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+  )}
+</a>

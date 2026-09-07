@@ -1,0 +1,36 @@
+---
+import { site } from '@/data/site';
+/** Kurze Brand-Intro (≈900 ms) – nur beim ersten Aufruf pro Session, nicht bei Reduced Motion. */
+---
+<div class="intro" data-intro aria-hidden="true">
+  <div class="intro__inner">
+    <p class="intro__brand t-label">{site.shortName}<sup>®</sup></p>
+    <p class="intro__claim t-display">
+      <span class="intro__line"><span>{site.claimLines[0]}</span></span>
+      <span class="intro__line"><span>{site.claimLines[1]}</span></span>
+    </p>
+  </div>
+</div>
+
+<style>
+  .intro { display: none; position: fixed; inset: 0; z-index: var(--z-intro); background: var(--c-ink); color: var(--c-paper); pointer-events: none; }
+  html[data-intro] .intro { display: block; animation: intro-out 520ms var(--ease-expo) 780ms forwards; }
+  .intro__inner { position: absolute; inset: 0; display: grid; align-content: center; padding-inline: var(--gutter); gap: var(--space-5); }
+  .intro__brand { opacity: 0; animation: intro-fade 300ms var(--ease-out) 60ms forwards; }
+  .intro__line { display: block; overflow: hidden; }
+  .intro__line > span { display: block; transform: translateY(110%); animation: intro-up 620ms var(--ease-expo) forwards; }
+  .intro__line:nth-child(1) > span { animation-delay: 120ms; }
+  .intro__line:nth-child(2) > span { animation-delay: 220ms; }
+  @keyframes intro-up { to { transform: none; } }
+  @keyframes intro-fade { to { opacity: 1; } }
+  @keyframes intro-out { to { transform: translateY(-100%); } }
+  @media (prefers-reduced-motion: reduce) { html[data-intro] .intro { display: none; } }
+</style>
+
+<script>
+  // Attribut wird in BaseLayout (inline, vor dem ersten Paint) gesetzt – hier nur Aufräumen.
+  const html = document.documentElement;
+  if (html.hasAttribute('data-intro')) {
+    setTimeout(() => { html.removeAttribute('data-intro'); html.classList.add('intro-done'); }, 1350);
+  } else html.classList.add('intro-done');
+</script>

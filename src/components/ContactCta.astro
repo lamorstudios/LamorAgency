@@ -1,0 +1,30 @@
+---
+import Words from '@/components/Words.astro';
+import Button from '@/components/Button.astro';
+import { site } from '@/data/site';
+interface Props { index?: string }
+const { index = '04' } = Astro.props;
+---
+<section class="cta section" data-theme="dark" aria-labelledby="cta-title">
+  <div class="container">
+    <p class="t-label cta__kicker" data-reveal="fade"><span class="t-num t-muted">{index}</span> <span>Contact</span></p>
+    <h2 class="t-display cta__title" id="cta-title"><Words lines={["Let's create", 'something.']} /></h2>
+    <div class="cta__row" data-reveal style="--reveal-delay:250ms">
+      <div class="cta__contact">
+        <a href={`mailto:${site.email}`} class="cta__mail t-h3 link">{site.email}</a>
+        <a href={site.phoneHref} class="t-body link">{site.phone}</a>
+      </div>
+      <Button href="/contact/" label="Projekt starten" />
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta { background: var(--c-ink); color: var(--c-paper); }
+  .cta__kicker { display: flex; gap: 1.5em; margin-bottom: var(--space-7); }
+  @media (min-width: 768px) { .cta__title :global(.line:nth-child(2)) { padding-left: 10vw; } }
+  .cta__row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: var(--space-6); margin-top: var(--space-8); padding-top: var(--space-6); border-top: 1px solid var(--c-ink-3); }
+  .cta__contact { display: grid; gap: var(--space-3); justify-items: start; }
+  .cta__mail { overflow-wrap: anywhere; }
+  .cta__contact .link { min-height: 44px; display: inline-flex; align-items: center; }
+</style>

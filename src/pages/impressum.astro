@@ -1,0 +1,38 @@
+---
+import LegalLayout from '@/layouts/LegalLayout.astro';
+import { site } from '@/data/site';
+/**
+ * IMPRESSUM – Der bestehende Impressumstext der Wix-Website wird hier 1:1 übernommen.
+ * Rechtliche Texte werden nicht eigenständig umformuliert. Offensichtlich zu prüfende
+ * Angaben sind mit <span class="todo">TODO_VERIFY</span> markiert.
+ */
+---
+<LegalLayout title="Impressum" description={`Impressum der ${site.name}, ${site.address.city}.`} path="/impressum">
+  <h2>Angaben gemäß § 5 DDG</h2>
+  <p>
+    {site.legalName} <span class="todo">TODO_VERIFY Rechtsform / Inhaber</span><br />
+    {site.address.street}<br />
+    {site.address.zip} {site.address.city}
+  </p>
+
+  <h2>Kontakt</h2>
+  <p>
+    Telefon: <a href={site.phoneHref}>{site.phone}</a><br />
+    E-Mail: <a href={`mailto:${site.email}`}>{site.email}</a>
+  </p>
+
+  <h2>Vertreten durch</h2>
+  <p>[EXISTING TEXT] <span class="todo">TODO_VERIFY</span></p>
+
+  <h2>Umsatzsteuer-ID</h2>
+  <p>[EXISTING TEXT] <span class="todo">TODO_VERIFY</span></p>
+
+  <h2>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h2>
+  <p>[EXISTING TEXT] <span class="todo">TODO_VERIFY</span></p>
+
+  <h2>Streitschlichtung</h2>
+  <p>[EXISTING TEXT] Bestehenden Absatz zur Verbraucherstreitbeilegung / OS-Plattform 1:1 übernehmen.</p>
+
+  <h2>Haftung für Inhalte, Links und Urheberrecht</h2>
+  <p>[EXISTING TEXT] Bestehende Absätze 1:1 übernehmen.</p>
+</LegalLayout>

@@ -1,0 +1,22 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Words from '@/components/Words.astro';
+import Button from '@/components/Button.astro';
+---
+<BaseLayout title="Seite nicht gefunden" description="Diese Seite existiert nicht (mehr)." theme="dark" noindex>
+  <section class="nf container" data-theme="dark">
+    <p class="t-label t-muted" data-reveal="fade">404</p>
+    <h1 class="t-display"><Words lines={['Nothing', 'to see here.']} /></h1>
+    <p class="t-lead measure" data-reveal style="--reveal-delay:200ms">Die Seite wurde verschoben oder existiert nicht. Vielleicht findest du hier, was du suchst:</p>
+    <div class="nf__actions" data-reveal style="--reveal-delay:300ms">
+      <Button href="/" label="Startseite" arrow="right" />
+      <Button href="/work/" label="Work" variant="ghost" arrow="right" />
+      <Button href="/contact/" label="Kontakt" variant="ghost" arrow="right" />
+    </div>
+  </section>
+</BaseLayout>
+<style>
+  .nf { min-height: 90svh; display: grid; align-content: center; gap: var(--space-6); padding-top: var(--header-h); padding-bottom: var(--space-9); }
+  .nf__actions { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+  @media (min-width: 768px) { .nf .t-display :global(.line:nth-child(2)) { padding-left: 8vw; } }
+</style>

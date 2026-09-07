@@ -1,0 +1,25 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import ProjectCard from '@/components/ProjectCard.astro';
+interface Props { projects: CollectionEntry<'projects'>[]; startIndex?: number }
+const { projects, startIndex = 0 } = Astro.props;
+---
+<div class="work-grid">
+  {projects.map((p, i) => <ProjectCard project={p} index={startIndex + i} priority={i === 0} />)}
+</div>
+
+<style>
+  .work-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--space-8) var(--grid-gap); }
+  .work-grid > :global(.project) { grid-column: 1 / -1; }
+  @media (min-width: 768px) {
+    .work-grid { gap: var(--space-9) var(--grid-gap); }
+    .work-grid > :global(.project--medium:nth-child(odd)) { grid-column: 1 / 7; }
+    .work-grid > :global(.project--medium:nth-child(even)) { grid-column: 8 / -1; margin-top: var(--space-9); }
+    .work-grid > :global(.project--large) { grid-column: 3 / -1; }
+    .work-grid > :global(.project--small) { grid-column: 2 / 6; }
+  }
+  @media (min-width: 1280px) {
+    .work-grid > :global(.project--medium:nth-child(odd)) { grid-column: 1 / 6; }
+    .work-grid > :global(.project--medium:nth-child(even)) { grid-column: 7 / -1; }
+  }
+</style>

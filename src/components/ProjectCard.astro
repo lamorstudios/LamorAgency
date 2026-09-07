@@ -1,0 +1,43 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Media from '@/components/Media.astro';
+interface Props { project: CollectionEntry<'projects'>; index: number; size?: 'full' | 'large' | 'medium' | 'small'; priority?: boolean; class?: string }
+const { project, index, size = project.data.size, priority = false, class: className = '' } = Astro.props;
+const d = project.data;
+const num = String(index + 1).padStart(2, '0');
+const hasHoverVideo = d.preview?.type === 'video' && d.preview.src;
+const sizes = size === 'full' ? '100vw' : size === 'large' ? '(min-width: 900px) 80vw, 100vw' : '(min-width: 900px) 48vw, 100vw';
+---
+<article class={`project project--${size} ${className}`} data-reveal style={`--reveal-delay:${(index % 2) * 90}ms`}>
+  <a href={`/work/${project.id}/`} class="project__link" data-cursor="View" data-hover-video={hasHoverVideo ? '' : undefined} aria-label={`${d.title} – ${d.client}, ${d.category}`}>
+    <div class="project__media">
+      <Media media={d.hero} hover reveal priority={priority} sizes={sizes} />
+      {hasHoverVideo && (
+        <video class="project__preview" src={d.preview!.src} muted loop playsinline preload="none" aria-hidden="true"></video>
+      )}
+    </div>
+    <div class="project__meta">
+      <p class="t-label t-num project__num">{num}</p>
+      <h3 class="project__title t-h3">{d.title}</h3>
+      <p class="t-label t-muted project__cat">
+        <span>{d.client}</span>
+        <span aria-hidden="true">·</span>
+        <span>{d.category}</span>
+        {d.year && <><span aria-hidden="true">·</span><span>{d.year}</span></>}
+      </p>
+    </div>
+  </a>
+</article>
+
+<style>
+  .project__link { display: block; }
+  .project__media { position: relative; }
+  .project__preview { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity var(--dur-base) var(--ease-out); }
+  @media (hover: hover) { .project__link:hover .project__preview { opacity: 1; } }
+  .project__meta { display: grid; grid-template-columns: auto 1fr; gap: var(--space-2) var(--space-4); align-items: baseline; padding-top: var(--space-4); }
+  .project__num { color: var(--fg-muted); }
+  .project__title { grid-column: 2; transition: transform var(--dur-base) var(--ease-out); }
+  .project__cat { grid-column: 2; display: flex; flex-wrap: wrap; gap: 0.6em; }
+  @media (hover: hover) { .project__link:hover .project__title { transform: translateX(0.25em); } }
+  .project--full .project__title { font-size: var(--fs-h2); }
+</style>

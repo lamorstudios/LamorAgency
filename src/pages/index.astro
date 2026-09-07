@@ -1,0 +1,47 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/home/Hero.astro';
+import SelectedWork from '@/components/home/SelectedWork.astro';
+import Statement from '@/components/home/Statement.astro';
+import ServicesList from '@/components/ServicesList.astro';
+import SectionLabel from '@/components/SectionLabel.astro';
+import Clients from '@/components/Clients.astro';
+import ContactCta from '@/components/ContactCta.astro';
+import Button from '@/components/Button.astro';
+import { site } from '@/data/site';
+---
+<BaseLayout
+  title={`${site.name} | Social Media, Film & Branding Agentur München`}
+  description={site.description}
+  theme="dark"
+>
+  <Hero />
+  <SelectedWork />
+  <Statement />
+
+  <section class="home-services section" data-theme="light" aria-labelledby="services-title">
+    <div class="container">
+      <div class="home-services__head">
+        <SectionLabel index="02" label="Services" />
+        <h2 class="t-h2 home-services__title" id="services-title" data-reveal>Alles aus einem Studio.<br /><span class="t-muted">Von der Idee bis zum Feed.</span></h2>
+      </div>
+      <ServicesList mode="compact" />
+      <div class="home-services__more" data-reveal>
+        <Button href="/services/" label="Alle Leistungen" variant="ghost" arrow="right" />
+      </div>
+    </div>
+  </section>
+
+  <div data-theme="light" class="surface-light">
+    <Clients index="03" />
+  </div>
+
+  <ContactCta index="04" />
+</BaseLayout>
+
+<style>
+  .home-services { background: var(--c-paper); color: var(--c-ink); }
+  .home-services__head { margin-bottom: var(--space-8); }
+  .home-services__title { max-width: 18ch; }
+  .home-services__more { margin-top: var(--space-8); }
+</style>

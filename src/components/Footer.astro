@@ -1,0 +1,86 @@
+---
+import { mainNav, legalNav } from '@/data/navigation';
+import { site, social } from '@/data/site';
+const year = new Date().getFullYear();
+---
+<footer class="footer" data-theme="dark">
+  <div class="container">
+    <div class="footer__top">
+      <p class="footer__claim t-h3" data-reveal>Neues Projekt, neue Marke, neuer Content?<br /><span class="t-muted">Wir freuen uns auf den Austausch.</span></p>
+      <a href="/contact/" class="btn footer__cta" data-magnetic>
+        <span>Projekt anfragen</span>
+        <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+      </a>
+    </div>
+
+    <div class="footer__grid">
+      <div class="footer__col">
+        <p class="t-label t-muted">Navigation</p>
+        <ul role="list" class="footer__list">
+          {mainNav.map((i) => <li><a href={i.href} class="link">{i.label}</a></li>)}
+        </ul>
+      </div>
+      <div class="footer__col">
+        <p class="t-label t-muted">Contact</p>
+        <ul role="list" class="footer__list">
+          <li><a href={`mailto:${site.email}`} class="link">{site.email}</a></li>
+          <li><a href={site.phoneHref} class="link">{site.phone}</a></li>
+          <li class="footer__address">
+            <address>{site.address.street}<br />{site.address.zip} {site.address.city}</address>
+          </li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <p class="t-label t-muted">Social</p>
+        <ul role="list" class="footer__list">
+          {social.map((s) => <li><a href={s.href} class="link" target="_blank" rel="noopener noreferrer">{s.label}</a></li>)}
+        </ul>
+      </div>
+      <div class="footer__col">
+        <p class="t-label t-muted">Legal</p>
+        <ul role="list" class="footer__list">
+          {legalNav.map((i) => <li><a href={i.href} class="link">{i.label}</a></li>)}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer__wordmark" aria-hidden="true">
+    <span>{site.shortName}<sup>®</sup></span>
+  </div>
+
+  <div class="container footer__bottom">
+    <p class="t-label t-muted">© <span data-year>{year}</span> {site.name}. {site.address.city}.</p>
+    <p class="t-label t-muted">Creative Studio · Social Media · Film · Branding · Design</p>
+    <a href="#top" class="t-label footer__totop link">Nach oben ↑</a>
+  </div>
+</footer>
+
+<style>
+  .footer { background: var(--c-ink); color: var(--c-paper); padding-top: var(--space-9); overflow: hidden; }
+  .footer__top { display: grid; gap: var(--space-6); align-items: end; padding-bottom: var(--space-8); border-bottom: 1px solid var(--c-ink-3); }
+  .footer__claim { max-width: 24ch; }
+  .footer__cta { --btn-bg: var(--c-paper); --btn-fg: var(--c-ink); border-color: var(--c-paper); }
+  .footer__cta::before { background: var(--c-ink); }
+  .footer__cta:hover { color: var(--c-paper); }
+  .footer__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-7) var(--grid-gap); padding-block: var(--space-8); }
+  .footer__col { display: grid; gap: var(--space-4); align-content: start; }
+  .footer__list { display: grid; gap: var(--space-2); }
+  .footer__list a { display: inline-flex; min-height: 44px; align-items: center; }
+  .footer__list .link::after { bottom: 0.6em; }
+  .footer__address address { font-style: normal; color: var(--c-grey-dark); line-height: 1.5; padding-top: 0.5rem; }
+  .footer__wordmark { padding-inline: var(--gutter); line-height: 0.78; font-family: var(--font-display); font-weight: var(--fw-bold); letter-spacing: var(--ls-tight); text-transform: uppercase; font-size: clamp(5rem, 22vw, 26rem); color: var(--c-paper); user-select: none; transform: translateY(0.06em); }
+  .footer__wordmark sup { font-size: 0.16em; vertical-align: top; margin-left: 0.05em; font-weight: var(--fw-regular); position: relative; top: 0.35em; }
+  .footer__bottom { display: flex; flex-wrap: wrap; gap: var(--space-4) var(--space-7); justify-content: space-between; padding-block: var(--space-5); border-top: 1px solid var(--c-ink-3); }
+  .footer__totop { min-height: 44px; display: inline-flex; align-items: center; }
+  @media (min-width: 768px) {
+    .footer__top { grid-template-columns: 1fr auto; }
+    .footer__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
+</style>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    document.querySelectorAll('[data-year]').forEach((el) => (el.textContent = String(new Date().getFullYear())));
+  });
+</script>

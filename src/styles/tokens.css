@@ -1,0 +1,132 @@
+/* ==========================================================================
+   LAMOR AGENCY – DESIGN TOKENS
+   Alle globalen Werte leben hier. Keine Einzelwerte in Components streuen.
+   ========================================================================== */
+:root {
+  /* ---------- Brand Colors (austauschbar – bestehende LAMOR-Farben eintragen) */
+  --c-ink: #0a0a0a;          /* Primär dunkel  */
+  --c-ink-2: #161616;        /* Dunkle Fläche 2 */
+  --c-ink-3: #262626;        /* Linien auf dunkel */
+  --c-paper: #f2f0eb;        /* Primär hell (warmes Off-White) */
+  --c-paper-2: #e7e4dd;      /* Helle Fläche 2 */
+  --c-paper-3: #d6d2c9;      /* Linien auf hell */
+  --c-grey: #66665f;         /* Sekundärtext auf hell (≥ 4.5:1 auf Paper) */
+  --c-grey-dark: #9a9a95;    /* Sekundärtext auf dunkel (≥ 7:1 auf Ink) */
+  --c-accent: #d9351f;       /* Signalfarbe – sehr sparsam (Cursor, Hover, aktive Zustände) */
+
+  /* Semantische Rollen (werden pro Theme umgeschaltet) */
+  --bg: var(--c-paper);
+  --bg-2: var(--c-paper-2);
+  --fg: var(--c-ink);
+  --fg-muted: var(--c-grey);
+  --line: var(--c-paper-3);
+  --placeholder-bg: var(--c-paper-2);
+  --placeholder-fg: var(--c-grey);
+
+  /* ---------- Typography */
+  --font-display: 'LAMOR Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-body: 'LAMOR Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* Fluid type scale (min @ 320px → max @ 1920px) */
+  --fs-hero: clamp(3.25rem, 1rem + 11.5vw, 13.5rem);
+  --fs-display: clamp(2.75rem, 1rem + 7.5vw, 8.5rem);
+  --fs-h1: clamp(2.5rem, 1.25rem + 5vw, 6.5rem);
+  --fs-h2: clamp(2rem, 1rem + 3.6vw, 4.5rem);
+  --fs-h3: clamp(1.5rem, 1rem + 1.6vw, 2.5rem);
+  --fs-h4: clamp(1.125rem, 1rem + 0.6vw, 1.5rem);
+  --fs-lead: clamp(1.125rem, 1rem + 0.9vw, 1.75rem);
+  --fs-body: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --fs-small: 0.875rem;
+  --fs-label: 0.75rem;
+
+  --lh-tight: 0.92;
+  --lh-snug: 1.05;
+  --lh-normal: 1.5;
+  --lh-relaxed: 1.65;
+
+  --ls-tight: -0.035em;
+  --ls-snug: -0.02em;
+  --ls-normal: 0;
+  --ls-wide: 0.12em;
+  --ls-wider: 0.18em;
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-bold: 700;
+
+  /* ---------- Spacing (fluid) */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: clamp(3rem, 2rem + 4vw, 6rem);
+  --space-9: clamp(4rem, 2rem + 8vw, 10rem);
+  --space-10: clamp(6rem, 3rem + 12vw, 15rem);
+
+  --section-y: var(--space-9);
+  --gutter: clamp(1.25rem, 0.5rem + 3vw, 4rem);
+  --container-max: 1920px;
+  --measure: 62ch;
+
+  /* ---------- Grid */
+  --grid-cols: 12;
+  --grid-gap: clamp(0.75rem, 0.5rem + 1.25vw, 2rem);
+
+  /* ---------- Border / Radius */
+  --radius-0: 0;
+  --radius-1: 2px;
+  --radius-pill: 999px;
+  --border: 1px solid var(--line);
+
+  /* ---------- Motion */
+  --dur-fast: 180ms;
+  --dur-base: 420ms;
+  --dur-slow: 900ms;
+  --dur-reveal: 1100ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-expo: cubic-bezier(0.87, 0, 0.13, 1);
+
+  /* ---------- Layers */
+  --z-nav: 200;
+  --z-header: 250;   /* über dem Overlay, damit Logo + Burger sichtbar bleiben */
+  --z-cursor: 300;
+  --z-intro: 400;
+
+  /* ---------- Header */
+  --header-h: 4.5rem;
+
+  /* ---------- Media aspect ratios */
+  --ratio-wide: 16 / 9;
+  --ratio-cinema: 2.35 / 1;
+  --ratio-square: 1 / 1;
+  --ratio-portrait: 4 / 5;
+  --ratio-story: 9 / 16;
+}
+
+/* Dark surfaces (Sections / Pages können [data-theme="dark"] setzen) */
+[data-theme='dark'] {
+  --bg: var(--c-ink);
+  --bg-2: var(--c-ink-2);
+  --fg: var(--c-paper);
+  --fg-muted: var(--c-grey-dark);
+  --line: var(--c-ink-3);
+  --placeholder-bg: var(--c-ink-2);
+  --placeholder-fg: var(--c-grey-dark);
+  color-scheme: dark;
+}
+
+[data-theme='light'] {
+  --bg: var(--c-paper);
+  --bg-2: var(--c-paper-2);
+  --fg: var(--c-ink);
+  --fg-muted: var(--c-grey);
+  --line: var(--c-paper-3);
+  --placeholder-bg: var(--c-paper-2);
+  --placeholder-fg: var(--c-grey);
+  color-scheme: light;
+}

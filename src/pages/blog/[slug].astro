@@ -1,0 +1,100 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Media from '@/components/Media.astro';
+import Words from '@/components/Words.astro';
+import ArrowLink from '@/components/ArrowLink.astro';
+import { formatDate, isoDate, readingTime } from '@/lib/utils';
+import { breadcrumb, blogPosting } from '@/lib/schema';
+
+export async function getStaticPaths() {
+  const posts = (await getCollection('posts')).filter((p) => !p.data.draft).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+  return posts.map((post, i) => ({ params: { slug: post.id }, props: { post, related: posts.filter((_, j) => j !== i).slice(0, 2) } }));
+}
+const { post, related } = Astro.props;
+const d = post.data;
+const { Content, headings } = await render(post);
+const path = `/blog/${post.id}/`;
+const toc = headings.filter((h) => h.depth === 2);
+const jsonLd = d.placeholder ? [] : [breadcrumb([{ name: 'Blog', path: '/blog/' }, { name: d.title, path }]), blogPosting({ title: d.title, description: d.description, date: d.date, updated: d.updated, path })];
+---
+<BaseLayout title={d.title} description={d.description} ogType="article" noindex={d.placeholder} jsonLd={jsonLd} publishedTime={d.date.toISOString()} modifiedTime={d.updated?.toISOString()}>
+  <article class="post">
+    <header class="post__head container">
+      <p class="t-label post__kicker" data-reveal="fade">
+        <a href="/blog/" class="link">Blog</a>
+        <span class="t-muted">— {d.category}</span>
+      </p>
+      <h1 class="t-h1 post__title"><Words text={d.title} /></h1>
+      <p class="t-label t-muted post__meta" data-reveal="fade" style="--reveal-delay:200ms">
+        <time datetime={isoDate(d.date)}>{formatDate(d.date)}</time>
+        <span>·</span><span>{readingTime(post.body)} Min. Lesezeit</span>
+        <span>·</span><span>{d.author}</span>
+        {d.updated && <><span>·</span><span>Aktualisiert {formatDate(d.updated)}</span></>}
+      </p>
+    </header>
+
+    {d.cover && (
+      <div class="post__cover container" data-reveal="fade">
+        <Media media={d.cover} priority parallax ratio="cinema" sizes="100vw" widths={[768, 1280, 1920]} />
+      </div>
+    )}
+
+    <div class="post__body container">
+      {toc.length > 1 && (
+        <nav class="post__toc" aria-label="Inhalt" data-reveal>
+          <p class="t-label t-muted">Inhalt</p>
+          <ol role="list">{toc.map((h) => <li><a href={`#${h.slug}`} class="link t-small">{h.text}</a></li>)}</ol>
+        </nav>
+      )}
+      <div class="prose post__content" data-reveal style="--reveal-delay:100ms">
+        <p class="t-lead">{d.description}</p>
+        <Content />
+      </div>
+    </div>
+
+    <footer class="post__footer container">
+      <div class="post__share">
+        <p class="t-label t-muted">Teilen</p>
+        <a class="link t-small" href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`https://www.lamoragency.de${path}`)}`} target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <a class="link t-small" href={`mailto:?subject=${encodeURIComponent(d.title)}&body=${encodeURIComponent(`https://www.lamoragency.de${path}`)}`}>E-Mail</a>
+      </div>
+      {related.length > 0 && (
+        <div class="post__related">
+          <p class="t-label t-muted">Weiterlesen</p>
+          <ul role="list" class="post__related-list">
+            {related.map((r) => (
+              <li><a href={`/blog/${r.id}/`} class="post__related-link">
+                <span class="t-label t-muted">{r.data.category} · {formatDate(r.data.date)}</span>
+                <span class="t-h4">{r.data.title}</span>
+              </a></li>
+            ))}
+          </ul>
+        </div>
+      )}
+      <ArrowLink href="/blog/" label="Alle Artikel" />
+    </footer>
+  </article>
+</BaseLayout>
+
+<style>
+  .post__head { padding-top: calc(var(--header-h) + var(--space-8)); padding-bottom: var(--space-7); display: grid; gap: var(--space-5); max-width: calc(var(--measure) * 1.9); margin-inline: 0; }
+  .post__kicker { display: flex; gap: 1em; }
+  .post__meta { display: flex; flex-wrap: wrap; gap: 0.6em; }
+  .post__cover { padding-bottom: var(--space-8); }
+  .post__body { display: grid; gap: var(--space-8); padding-bottom: var(--space-9); }
+  .post__toc ol { display: grid; gap: var(--space-2); margin-top: var(--space-3); counter-reset: toc; }
+  .post__toc li { display: flex; gap: 0.75em; }
+  .post__toc li::before { counter-increment: toc; content: counter(toc, decimal-leading-zero); font-family: var(--font-mono); font-size: var(--fs-label); color: var(--fg-muted); padding-top: 0.25em; }
+  .post__content :global(h2) { scroll-margin-top: calc(var(--header-h) + 1rem); }
+  .post__footer { display: grid; gap: var(--space-7); padding-block: var(--space-8); border-top: 1px solid var(--line); }
+  .post__share { display: flex; gap: var(--space-5); align-items: center; flex-wrap: wrap; }
+  .post__related-list { display: grid; gap: var(--space-4); margin-top: var(--space-4); }
+  .post__related-link { display: grid; gap: var(--space-1); padding-block: var(--space-4); border-top: 1px solid var(--line); transition: transform var(--dur-base) var(--ease-out); }
+  @media (hover: hover) { .post__related-link:hover { transform: translateX(0.3em); } }
+  @media (min-width: 900px) {
+    .post__body { grid-template-columns: minmax(0, 3fr) minmax(0, 8fr); column-gap: var(--space-9); }
+    .post__toc { position: sticky; top: calc(var(--header-h) + var(--space-5)); align-self: start; }
+    .post__related-list { grid-template-columns: 1fr 1fr; gap: var(--grid-gap); }
+  }
+</style>

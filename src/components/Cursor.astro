@@ -1,0 +1,54 @@
+---
+/** Cursor-Zusatz (nur Desktop/Feinzeiger). Erscheint über [data-cursor]-Elementen, z.B. VIEW. */
+---
+<div class="cursor" aria-hidden="true" data-cursor-el>
+  <span class="cursor__label" data-cursor-label>View</span>
+</div>
+
+<style>
+  .cursor {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    z-index: var(--z-cursor);
+    pointer-events: none;
+    min-width: 6rem; height: 6rem; padding-inline: 1.25rem;
+    margin: -3rem 0 0 -3rem;
+    white-space: nowrap;
+    border-radius: 50%;
+    background: var(--c-paper);
+    color: var(--c-ink);
+    place-items: center;
+    transform: translate3d(var(--x, -100px), var(--y, -100px), 0) scale(var(--s, 0));
+    transition: transform 120ms var(--ease-out), opacity var(--dur-fast);
+    will-change: transform;
+    mix-blend-mode: difference;
+  }
+  .cursor__label { white-space: nowrap; font-family: var(--font-mono); font-size: var(--fs-label); letter-spacing: var(--ls-wide); text-transform: uppercase; }
+  @media (hover: hover) and (pointer: fine) { .cursor { display: grid; } }
+  @media (prefers-reduced-motion: reduce) { .cursor { transition: none; } }
+</style>
+
+<script>
+  function initCursor() {
+    const el = document.querySelector<HTMLElement>('[data-cursor-el]');
+    if (!el || !matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    if ((el as any).__init) return; (el as any).__init = true;
+    const label = el.querySelector<HTMLElement>('[data-cursor-label]')!;
+    let tx = -100, ty = -100, x = tx, y = ty, active = false, raf = 0;
+    const loop = () => {
+      x += (tx - x) * 0.18; y += (ty - y) * 0.18;
+      el.style.setProperty('--x', x + 'px'); el.style.setProperty('--y', y + 'px');
+      if (Math.abs(tx - x) > 0.1 || Math.abs(ty - y) > 0.1 || active) raf = requestAnimationFrame(loop); else raf = 0;
+    };
+    document.addEventListener('mousemove', (e) => { tx = e.clientX; ty = e.clientY; if (!raf) raf = requestAnimationFrame(loop); }, { passive: true });
+    document.addEventListener('mouseover', (e) => {
+      const t = (e.target as HTMLElement).closest<HTMLElement>('[data-cursor]');
+      if (t) { active = true; label.textContent = t.dataset.cursor || 'View'; el.style.setProperty('--s', '1'); }
+      else if (active) { active = false; el.style.setProperty('--s', '0'); }
+    });
+    document.addEventListener('mouseleave', () => { active = false; el.style.setProperty('--s', '0'); });
+  }
+  document.addEventListener('astro:page-load', initCursor);
+  document.addEventListener('astro:after-swap', () => document.querySelector<HTMLElement>('[data-cursor-el]')?.style.setProperty('--s', '0'));
+</script>
