@@ -10,16 +10,17 @@ import { site } from '@/data/site';
 import { services } from '@/data/services';
 import { breadcrumb } from '@/lib/schema';
 
+// PLACEHOLDER COPY: alle Texte dieser Seite werden durch die bestehenden Über-uns-Texte ersetzt.
 // Team: bestehende Team-Darstellung später eintragen (Name, Rolle, Foto). Keine erfundenen Personen.
-const team = [1, 2, 3].map((n) => ({ name: `[TEAM MEMBER 0${n}]`, role: '[ROLE]', media: { type: 'placeholder' as const, label: '[TEAM PHOTO]', alt: '', ratio: 'portrait' as const } }));
+const team = [1, 2, 3].map((n) => ({ name: `Teammitglied 0${n}`, role: 'Rolle folgt', media: { type: 'placeholder' as const, label: 'TEAM PHOTO', alt: '', ratio: 'portrait' as const } }));
 const ph = (label: string, ratio: 'wide' | 'portrait' | 'square' | 'cinema' = 'wide') => ({ type: 'placeholder' as const, label, alt: '', ratio });
 ---
 <BaseLayout title="About – Creative Studio München" description={`LAMOR AGENCY ist ein Creative Studio aus ${site.address.city} für Social Media, Content Creation, Film, Fotografie, Branding, Grafikdesign und Webdesign.`} jsonLd={[breadcrumb([{ name: 'About', path: '/about/' }])]}>
-  <PageHeader kicker="About" index="02" title="About" titleLines={['Creative Studio', `aus ${site.address.city}.`]} lead="[EXISTING TEXT] Einleitung von der bestehenden Über-uns-Seite." meta={site.claim} />
+  <PageHeader kicker="About" index="02" title="About" titleLines={['Creative Studio', `aus ${site.address.city}.`]} lead="Social Media, Film, Branding und Design – aus einem Studio, mit einer Haltung." meta={site.claim} />
 
   <section class="about-intro container" aria-label="Einführung">
     <div class="about-intro__media" data-reveal="fade">
-      <Media media={ph('[ABOUT IMAGE — STUDIO / TEAM]', 'cinema')} reveal parallax sizes="100vw" />
+      <Media media={ph('ABOUT IMAGE — STUDIO / TEAM', 'cinema')} reveal parallax sizes="100vw" />
     </div>
   </section>
 
@@ -30,23 +31,23 @@ const ph = (label: string, ratio: 'wide' | 'portrait' | 'square' | 'cinema' = 'w
         <h2 class="t-h2" id="philo-title" data-reveal>Feel the brand,<br />not the ad.</h2>
       </div>
       <div class="about-philo__text prose" data-reveal style="--reveal-delay:150ms">
-        <p>[EXISTING TEXT] Philosophie-Text von der bestehenden Website: Warum LAMOR Marken über Inhalte statt über Werbung erlebbar macht.</p>
-        <p>[EXISTING TEXT] Zweiter Absatz.</p>
+        <p>Marken werden nicht über Anzeigen erlebt, sondern über Inhalte: über Bilder, Bewegtbild und Momente, die sich wie Kultur anfühlen. Genau dafür arbeitet LAMOR.</p>
+        <p>Der bestehende Philosophie-Text der Website wird hier übernommen.</p>
       </div>
     </div>
   </section>
 
   <section class="about-agency section section--flush-top container" aria-labelledby="agency-title">
     <div class="about-agency__grid">
-      <div class="about-agency__media about-agency__media--a" data-reveal="fade"><Media media={ph('[ABOUT IMAGE]', 'portrait')} reveal hover sizes="(min-width: 900px) 40vw, 100vw" /></div>
+      <div class="about-agency__media about-agency__media--a" data-reveal="fade"><Media media={ph('ABOUT IMAGE A', 'portrait')} reveal hover sizes="(min-width: 900px) 40vw, 100vw" /></div>
       <div class="about-agency__copy">
         <SectionLabel index="02" label="Agentur" />
-        <h2 class="t-h3" id="agency-title" data-reveal>[EXISTING TEXT] Überschrift zur Agentur</h2>
+        <h2 class="t-h3" id="agency-title" data-reveal>Ein Studio für Idee, Produktion und Distribution.</h2>
         <div class="prose" data-reveal style="--reveal-delay:120ms">
-          <p>[EXISTING TEXT] Vorstellung der Agentur: Gründung, Standort {site.address.city}, Arbeitsweise, Schwerpunkte Social Media, Film, Branding und Design.</p>
+          <p>LAMOR arbeitet von {site.address.city} aus an Social Media, Film, Fotografie, Branding, Grafik- und Webdesign. Konzept, Produktion und Veröffentlichung kommen aus einer Hand. Die Vorstellung der Agentur wird durch den bestehenden Text ersetzt.</p>
         </div>
       </div>
-      <div class="about-agency__media about-agency__media--b" data-reveal="fade" style="--reveal-delay:120ms"><Media media={ph('[ABOUT IMAGE]', 'square')} reveal hover sizes="(min-width: 900px) 30vw, 100vw" /></div>
+      <div class="about-agency__media about-agency__media--b" data-reveal="fade" style="--reveal-delay:120ms"><Media media={ph('ABOUT IMAGE B', 'square')} reveal hover sizes="(min-width: 900px) 30vw, 100vw" /></div>
     </div>
   </section>
 

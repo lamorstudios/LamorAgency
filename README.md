@@ -29,10 +29,15 @@ public/
   media/           Videos (mp4/webm) + Poster
 ```
 
+## Brand Tokens
+
+`src/styles/tokens.css`: Schwarz `--c-ink`, Off-White `--c-paper`, Akzent **Electric Blue** `--c-accent: #3157ff` (+ `--c-accent-deep`). Der Akzent wird an genau einer Stelle geändert und wirkt überall (Cursor, Hover, Band, Statement-Wash, Nummern).
+
 ## Platzhalter ersetzen
 
-Alle Platzhalter sind sichtbar markiert: `[PROJECT VIDEO]`, `[PROJECT IMAGE]`, `[CLIENT LOGO]`, `[EXISTING TEXT]`, `[TEAM MEMBER]`, `[SHOWREEL / HERO VIDEO]`.
-`grep -rn "\[EXISTING TEXT\]\|TODO_VERIFY" src` listet alle offenen Stellen.
+Fehlende Medien werden als **neutrale Media-Surfaces** gerendert (Klasse `.ph`, Varianten `ph--1 … ph--8`), damit das Design beurteilbar ist. Jede Surface ist im Markup über `data-placeholder="…"` gekennzeichnet.
+Platzhalter-Texte sind im Code mit `PLACEHOLDER` bzw. `TODO_VERIFY` markiert:
+`grep -rn "PLACEHOLDER\|TODO_VERIFY\|data-placeholder" src` listet alle offenen Stellen.
 
 ### 1. Fonts (bestehende LAMOR-Fonts)
 1. `.woff2`-Dateien nach `public/fonts/` legen.

@@ -1,28 +1,28 @@
 ---
-title: "[PROJECT 6]"
-client: "[CLIENT]"
+title: "Cover Artwork"  # PLACEHOLDER – Arbeitstitel, durch echtes Projekt ersetzen
+client: "N.N."  # PLACEHOLDER – Kundenname folgt
 category: "Graphic Design"
 services: ["Artwork", "Grafikdesign"]
-summary: "[EXISTING TEXT] Kurzbeschreibung des Projekts – wird durch den bestehenden Portfolio-Text ersetzt."
-hero: { type: placeholder, label: "[PROJECT IMAGE]", alt: "", ratio: square }
-preview: { type: placeholder, label: "[PROJECT VIDEO]", alt: "" }
+summary: "Kurzbeschreibung folgt – wird durch den bestehenden Portfolio-Text ersetzt."
+hero: { type: placeholder, label: "PROJECT IMAGE", alt: "", ratio: square }
+preview: { type: placeholder, label: "PROJECT VIDEO", alt: "" }
 gallery:
-  - { type: placeholder, label: "[PROJECT IMAGE]", ratio: wide }
-  - { type: placeholder, label: "[PROJECT IMAGE]", ratio: portrait }
-  - { type: placeholder, label: "[PROJECT IMAGE]", ratio: portrait }
-  - { type: placeholder, label: "[PROJECT VIDEO]", ratio: cinema }
+  - { type: placeholder, label: "PROJECT IMAGE", ratio: wide }
+  - { type: placeholder, label: "PROJECT IMAGE", ratio: portrait }
+  - { type: placeholder, label: "PROJECT IMAGE", ratio: portrait }
+  - { type: placeholder, label: "PROJECT VIDEO", ratio: cinema }
 size: medium
 order: 6
 featured: true
 placeholder: true
 ---
 
-[EXISTING TEXT] Ausführliche Projektbeschreibung. Hier werden Ausgangslage, Idee, Umsetzung und Ergebnis aus dem bestehenden Portfolio übernommen. Keine erfundenen Inhalte.
+Ausführliche Projektbeschreibung folgt. Hier werden Ausgangslage, Idee, Umsetzung und Ergebnis aus dem bestehenden Portfolio übernommen.
 
 ## Aufgabe
 
-[EXISTING TEXT]
+Text folgt.
 
 ## Umsetzung
 
-[EXISTING TEXT]
+Text folgt.

@@ -16,13 +16,12 @@
     margin: -3rem 0 0 -3rem;
     white-space: nowrap;
     border-radius: 50%;
-    background: var(--c-paper);
-    color: var(--c-ink);
+    background: var(--c-accent);
+    color: #fff;
     place-items: center;
     transform: translate3d(var(--x, -100px), var(--y, -100px), 0) scale(var(--s, 0));
     transition: transform 120ms var(--ease-out), opacity var(--dur-fast);
     will-change: transform;
-    mix-blend-mode: difference;
   }
   .cursor__label { white-space: nowrap; font-family: var(--font-mono); font-size: var(--fs-label); letter-spacing: var(--ls-wide); text-transform: uppercase; }
   @media (hover: hover) and (pointer: fine) { .cursor { display: grid; } }

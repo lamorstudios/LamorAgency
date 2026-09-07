@@ -12,7 +12,10 @@
   --c-paper-3: #d6d2c9;      /* Linien auf hell */
   --c-grey: #66665f;         /* Sekundärtext auf hell (≥ 4.5:1 auf Paper) */
   --c-grey-dark: #9a9a95;    /* Sekundärtext auf dunkel (≥ 7:1 auf Ink) */
-  --c-accent: #d9351f;       /* Signalfarbe – sehr sparsam (Cursor, Hover, aktive Zustände) */
+  --c-accent: #3157ff;       /* LAMOR Electric / Cobalt Blue – zentral änderbar */
+  --c-accent-deep: #1f3fd6;  /* dunklere Stufe für Verläufe */
+  --c-accent-ink: #ffffff;   /* Text auf Akzent */
+  --c-white: #ffffff;
 
   /* Semantische Rollen (werden pro Theme umgeschaltet) */
   --bg: var(--c-paper);
@@ -29,7 +32,7 @@
   --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 
   /* Fluid type scale (min @ 320px → max @ 1920px) */
-  --fs-hero: clamp(3.25rem, 1rem + 11.5vw, 13.5rem);
+  --fs-hero: clamp(3.25rem, 1rem + 9.2vw, 12rem);
   --fs-display: clamp(2.75rem, 1rem + 7.5vw, 8.5rem);
   --fs-h1: clamp(2.5rem, 1.25rem + 5vw, 6.5rem);
   --fs-h2: clamp(2rem, 1rem + 3.6vw, 4.5rem);
@@ -54,6 +57,7 @@
   --fw-regular: 400;
   --fw-medium: 500;
   --fw-bold: 700;
+  --fw-display: 700;        /* Headlines bewusst schwer (RELOAD-Richtung) */
 
   /* ---------- Spacing (fluid) */
   --space-1: 0.25rem;
@@ -108,6 +112,9 @@
   --ratio-story: 9 / 16;
 }
 
+/* Jede Theme-Fläche setzt ihre Textfarbe selbst (sonst erbt sie den berechneten Body-Wert) */
+[data-theme] { color: var(--fg); }
+
 /* Dark surfaces (Sections / Pages können [data-theme="dark"] setzen) */
 [data-theme='dark'] {
   --bg: var(--c-ink);
@@ -117,6 +124,17 @@
   --line: var(--c-ink-3);
   --placeholder-bg: var(--c-ink-2);
   --placeholder-fg: var(--c-grey-dark);
+  color-scheme: dark;
+}
+
+[data-theme='accent'] {
+  --bg: var(--c-accent);
+  --bg-2: var(--c-accent-deep);
+  --fg: var(--c-accent-ink);
+  --fg-muted: rgba(255, 255, 255, 0.72);
+  --line: rgba(255, 255, 255, 0.3);
+  --placeholder-bg: var(--c-accent-deep);
+  --placeholder-fg: var(--c-accent-ink);
   color-scheme: dark;
 }
 

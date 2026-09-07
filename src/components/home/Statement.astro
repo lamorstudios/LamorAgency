@@ -1,12 +1,14 @@
 ---
 import { site } from '@/data/site';
+/** Brand Statement – Sticky Scroll: Zeilen erscheinen mit dem Scrollen, Fläche wäscht sich in Electric Blue. */
 const words = ['Creativity', 'Film', 'Design', 'Branding', 'Culture', 'Social', 'Quality', 'Confidence'];
 ---
-<section class="statement" data-theme="dark" data-statement aria-label="Markenstatement">
+<section class="statement" data-theme="dark" data-bg="dark" data-statement aria-label="Markenstatement">
   <div class="statement__sticky">
-    <div class="container">
+    <div class="statement__wash" data-statement-wash aria-hidden="true"></div>
+    <div class="container statement__content">
       <p class="t-label statement__kicker" data-reveal="fade">{site.name} <span class="t-muted">— {site.address.city}</span></p>
-      <p class="statement__text t-display" aria-label={site.claim}>
+      <p class="statement__text t-hero" aria-label={site.claim}>
         <span class="statement__line" data-statement-line aria-hidden="true">Feel the</span>
         <span class="statement__line statement__line--indent" data-statement-line aria-hidden="true">brand,</span>
         <span class="statement__line" data-statement-line aria-hidden="true">not the ad.</span>
@@ -14,24 +16,30 @@ const words = ['Creativity', 'Film', 'Design', 'Branding', 'Culture', 'Social', 
     </div>
     <div class="statement__marquee" aria-hidden="true">
       <div class="statement__track">
-        {[...words, ...words].map((w) => <span class="t-h3">{w}<i>·</i></span>)}
+        {[...words, ...words].map((w) => <span class="t-h3">{w}<i>✦</i></span>)}
       </div>
     </div>
   </div>
 </section>
 
 <style>
-  .statement { background: var(--c-ink); color: var(--c-paper); }
-  .statement__sticky { position: sticky; top: 0; display: grid; align-content: center; gap: var(--space-8); padding-block: var(--space-9); overflow: hidden; }
-  @media (min-width: 768px) { .statement__sticky { min-height: 100svh; } }
-  .statement__kicker { margin-bottom: var(--space-6); }
+  .statement { position: relative; color: var(--c-paper); height: 260svh; }
+  .statement__sticky { position: sticky; top: 0; height: 100svh; display: grid; grid-template-rows: 1fr auto; overflow: hidden; }
+  .statement__wash { position: absolute; inset: 0; background: var(--c-accent); clip-path: inset(100% 0 0 0); will-change: clip-path; }
+  .statement__content { position: relative; display: grid; align-content: center; gap: var(--space-6); }
   .statement__text { display: grid; }
-  .statement__line { display: block; will-change: transform; }
+  .statement__line { display: block; will-change: transform, opacity; }
   .statement__line--indent { padding-left: 18vw; }
-  .statement__marquee { overflow: hidden; border-block: 1px solid var(--c-ink-3); padding-block: var(--space-4); }
+  .statement__marquee { position: relative; overflow: hidden; border-top: 1px solid rgba(255,255,255,0.18); padding-block: var(--space-4); }
   .statement__track { display: flex; gap: 1.5em; width: max-content; animation: marquee 40s linear infinite; text-transform: uppercase; letter-spacing: var(--ls-snug); }
   .statement__track span { display: inline-flex; gap: 1.5em; white-space: nowrap; }
-  .statement__track i { font-style: normal; color: var(--c-grey-dark); }
+  .statement__track i { font-style: normal; opacity: 0.6; font-size: 0.6em; align-self: center; }
   @keyframes marquee { to { transform: translateX(-50%); } }
-  @media (prefers-reduced-motion: reduce) { .statement__track { animation: none; flex-wrap: wrap; width: auto; } }
+  @media (max-width: 899px) { .statement { height: 220svh; } }
+  @media (prefers-reduced-motion: reduce) {
+    .statement { height: auto; }
+    .statement__sticky { position: relative; height: auto; padding-block: var(--space-10); }
+    .statement__wash { clip-path: none; }
+    .statement__track { animation: none; flex-wrap: wrap; width: auto; }
+  }
 </style>

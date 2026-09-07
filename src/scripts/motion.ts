@@ -82,8 +82,48 @@ function statement() {
   if (reduced()) return;
   document.querySelectorAll<HTMLElement>('[data-statement]').forEach((el) => {
     const lines = el.querySelectorAll<HTMLElement>('[data-statement-line]');
+    const wash = el.querySelector<HTMLElement>('[data-statement-wash]');
     if (!lines.length) return;
-    gsap.fromTo(lines, { xPercent: (i) => (i % 2 ? 6 : -6), opacity: 0.35 }, { xPercent: 0, opacity: 1, ease: 'none', stagger: 0.05, scrollTrigger: { trigger: el, start: 'top 85%', end: 'center 45%', scrub: 0.8 } });
+    const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: 'top top', end: 'bottom bottom', scrub: 0.6 } });
+    tl.fromTo(lines, { yPercent: 110, opacity: 0 }, { yPercent: 0, opacity: 1, ease: 'power2.out', stagger: 0.18, duration: 0.5 }, 0);
+    if (wash) tl.fromTo(wash, { clipPath: 'inset(100% 0 0 0)' }, { clipPath: 'inset(0% 0 0 0)', ease: 'power2.inOut', duration: 0.45 }, 0.55);
+    tl.to({}, { duration: 0.1 });
+  });
+}
+
+const BG: Record<string, string> = { dark: '#0a0a0a', light: '#f2f0eb', accent: '#3157ff' };
+function sectionTransitions() {
+  const sections = document.querySelectorAll<HTMLElement>('[data-bg]');
+  if (!sections.length) { document.body.style.removeProperty('background-color'); return; }
+  const css = getComputedStyle(document.documentElement);
+  BG.dark = css.getPropertyValue('--c-ink').trim() || BG.dark;
+  BG.light = css.getPropertyValue('--c-paper').trim() || BG.light;
+  BG.accent = css.getPropertyValue('--c-accent').trim() || BG.accent;
+  const apply = (key: string, instant = false) => {
+    const color = BG[key] ?? BG.dark;
+    if (instant || reduced()) { gsap.set(document.body, { backgroundColor: color }); return; }
+    gsap.to(document.body, { backgroundColor: color, duration: 0.8, ease: 'power2.inOut', overwrite: true });
+  };
+  apply(sections[0].dataset.bg!, true);
+  sections.forEach((sec) => {
+    ScrollTrigger.create({ trigger: sec, start: 'top 60%', end: 'bottom 60%', onEnter: () => apply(sec.dataset.bg!), onEnterBack: () => apply(sec.dataset.bg!) });
+  });
+  cleanups.push(() => document.body.style.removeProperty('background-color'));
+}
+
+function featured() {
+  document.querySelectorAll<HTMLElement>('[data-featured]').forEach((root) => {
+    const chapters = root.querySelectorAll<HTMLElement>('[data-feat-chapter]');
+    const medias = root.querySelectorAll<HTMLElement>('[data-feat-media]');
+    const steps = root.querySelectorAll<HTMLElement>('[data-feat-step]');
+    const set = (i: number) => {
+      medias.forEach((m) => m.classList.toggle('is-active', m.dataset.featMedia === String(i)));
+      steps.forEach((st) => st.classList.toggle('is-active', st.dataset.featStep === String(i)));
+    };
+    chapters.forEach((ch, i) => {
+      ScrollTrigger.create({ trigger: ch, start: 'top 55%', end: 'bottom 55%', onEnter: () => set(i), onEnterBack: () => set(i) });
+      if (!reduced()) gsap.fromTo(ch.children, { y: 40, opacity: 0 }, { y: 0, opacity: 1, stagger: 0.08, duration: 0.9, ease: 'power3.out', scrollTrigger: { trigger: ch, start: 'top 75%', toggleActions: 'play none none reverse' } });
+    });
   });
 }
 
@@ -94,7 +134,7 @@ function heroScroll() {
   const title = hero.querySelector<HTMLElement>('[data-hero-title]');
   const media = hero.querySelector<HTMLElement>('[data-hero-media]');
   if (title) gsap.to(title, { yPercent: 18, opacity: 0.2, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.5 } });
-  if (media) gsap.to(media, { scale: 1.08, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.5 } });
+  if (media) gsap.to(media, { yPercent: -12, scale: 1.06, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.5 } });
 }
 
 function magnetic() {
@@ -139,7 +179,7 @@ function anchors() {
 }
 
 export function init() {
-  reveal(); header(); videos(); hoverVideos(); parallax(); statement(); heroScroll(); magnetic(); anchors();
+  reveal(); header(); videos(); hoverVideos(); parallax(); sectionTransitions(); statement(); featured(); heroScroll(); magnetic(); anchors();
   requestAnimationFrame(() => ScrollTrigger.refresh());
 }
 

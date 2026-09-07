@@ -6,5 +6,5 @@
 export interface Client { name: string; logo?: string; href?: string }
 
 export const clients: Client[] = Array.from({ length: 8 }, (_, i) => ({
-  name: `[CLIENT LOGO ${String(i + 1).padStart(2, '0')}]`,
+  name: `Client ${String(i + 1).padStart(2, "0")}`, // PLACEHOLDER – echtes Logo + Name eintragen
 }));

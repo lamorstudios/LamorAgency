@@ -1,7 +1,9 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Hero from '@/components/home/Hero.astro';
+import AgencyStatement from '@/components/home/AgencyStatement.astro';
 import SelectedWork from '@/components/home/SelectedWork.astro';
+import FeaturedProject from '@/components/home/FeaturedProject.astro';
 import Statement from '@/components/home/Statement.astro';
 import ServicesList from '@/components/ServicesList.astro';
 import SectionLabel from '@/components/SectionLabel.astro';
@@ -14,15 +16,18 @@ import { site } from '@/data/site';
   title={`${site.name} | Social Media, Film & Branding Agentur München`}
   description={site.description}
   theme="dark"
+  bodyClass="has-bg-transitions"
 >
   <Hero />
+  <AgencyStatement />
   <SelectedWork />
+  <FeaturedProject />
   <Statement />
 
-  <section class="home-services section" data-theme="light" aria-labelledby="services-title">
+  <section class="home-services section" data-theme="light" data-bg="light" aria-labelledby="services-title">
     <div class="container">
       <div class="home-services__head">
-        <SectionLabel index="02" label="Services" />
+        <SectionLabel index="04" label="Services" />
         <h2 class="t-h2 home-services__title" id="services-title" data-reveal>Alles aus einem Studio.<br /><span class="t-muted">Von der Idee bis zum Feed.</span></h2>
       </div>
       <ServicesList mode="compact" />
@@ -32,15 +37,15 @@ import { site } from '@/data/site';
     </div>
   </section>
 
-  <div data-theme="light" class="surface-light">
-    <Clients index="03" />
+  <div data-theme="light" data-bg="light">
+    <Clients index="05" />
   </div>
 
-  <ContactCta index="04" />
+  <ContactCta index="06" />
 </BaseLayout>
 
 <style>
-  .home-services { background: var(--c-paper); color: var(--c-ink); }
+  .home-services { color: var(--c-ink); }
   .home-services__head { margin-bottom: var(--space-8); }
   .home-services__title { max-width: 18ch; }
   .home-services__more { margin-top: var(--space-8); }

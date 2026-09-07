@@ -1,0 +1,62 @@
+---
+import Words from '@/components/Words.astro';
+import Media from '@/components/Media.astro';
+import SectionLabel from '@/components/SectionLabel.astro';
+import ArrowLink from '@/components/ArrowLink.astro';
+import { site, social } from '@/data/site';
+import { services } from '@/data/services';
+/** Agency Statement – kurzer Studio-Moment. Text = PLACEHOLDER COPY, wird durch bestehenden Über-uns-Text ersetzt. */
+---
+<section class="studio section" id="studio" data-theme="light" data-bg="light" aria-labelledby="studio-title">
+  <div class="container">
+    <SectionLabel index="01" label="The Studio" />
+    <h2 class="visually-hidden" id="studio-title">Das Studio</h2>
+    <p class="studio__text t-h2">
+      <Words text="LAMOR ist ein Creative Studio aus München. Social Media, Film, Branding und Design – gemacht für Marken, die man fühlt und nicht überspringt." />
+    </p>
+
+    <div class="studio__grid">
+      <div class="studio__media studio__media--a" data-reveal="fade">
+        <Media media={{ type: 'placeholder', label: 'STUDIO IMAGE', alt: '', ratio: 'portrait' }} reveal parallax hover surface={5} sizes="(min-width: 900px) 34vw, 100vw" />
+      </div>
+      <div class="studio__cols">
+        <div class="studio__col" data-reveal>
+          <p class="t-label t-muted">Disziplinen</p>
+          <ul role="list" class="studio__list">
+            {services.map((s) => <li><span class="t-label t-accent t-num">{s.index}</span><span>{s.title}</span></li>)}
+          </ul>
+        </div>
+        <div class="studio__col" data-reveal style="--reveal-delay:120ms">
+          <p class="t-label t-muted">Haltung</p>
+          <p class="t-lead">Content, der wie Kultur wirkt – nicht wie Werbung. Konzept, Produktion und Distribution aus einer Hand.</p>
+          <ArrowLink href="/about/" label="Über LAMOR" />
+        </div>
+        <div class="studio__col" data-reveal style="--reveal-delay:200ms">
+          <p class="t-label t-muted">Studio</p>
+          <p class="t-body">{site.address.city}<br /><a href={`mailto:${site.email}`} class="link">{site.email}</a><br />{social.map((s) => <a href={s.href} class="link" target="_blank" rel="noopener noreferrer">{s.handle}</a>)}</p>
+        </div>
+      </div>
+      <div class="studio__media studio__media--b" data-reveal="fade" style="--reveal-delay:150ms">
+        <Media media={{ type: 'placeholder', label: 'STUDIO IMAGE 2', alt: '', ratio: 'wide' }} reveal hover surface={4} sizes="(min-width: 900px) 40vw, 100vw" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .studio { color: var(--c-ink); }
+  .studio__text { max-width: 22ch; margin-bottom: var(--space-9); }
+  .studio__grid { display: grid; gap: var(--space-7); }
+  .studio__cols { display: grid; gap: var(--space-6); align-content: start; }
+  .studio__col { display: grid; gap: var(--space-3); justify-items: start; }
+  .studio__list { display: grid; gap: 0.35em; }
+  .studio__list li { display: flex; gap: 0.9em; align-items: baseline; font-size: var(--fs-body); }
+  .studio__list li:last-child { display: flex; }
+  @media (min-width: 900px) {
+    .studio__text { max-width: 24ch; }
+    .studio__grid { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--grid-gap); row-gap: var(--space-8); }
+    .studio__media--a { grid-column: 1 / 5; grid-row: 1 / 3; }
+    .studio__cols { grid-column: 6 / -1; grid-row: 1; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .studio__media--b { grid-column: 7 / -1; grid-row: 2; margin-top: var(--space-6); }
+  }
+</style>

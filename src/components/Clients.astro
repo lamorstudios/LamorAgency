@@ -2,9 +2,20 @@
 import SectionLabel from '@/components/SectionLabel.astro';
 import { clients } from '@/data/clients';
 interface Props { index?: string; compact?: boolean }
-const { index = '03', compact = false } = Astro.props;
+const { index = '05', compact = false } = Astro.props;
 const images = import.meta.glob<{ default: ImageMetadata }>('/src/assets/brand/clients/*.{svg,png,jpg,webp}');
 const resolved = await Promise.all(clients.map(async (c) => ({ ...c, img: c.logo && images[c.logo] ? (await images[c.logo]()).default : undefined })));
+/* PLACEHOLDER: neutrale Marken-Zeichen (keine echten Logos). Werden durch Kundenlogos aus clients.ts ersetzt. */
+const marks = [
+  '<circle cx="24" cy="24" r="14" fill="none" stroke="currentColor" stroke-width="2.5"/><circle cx="24" cy="24" r="4" fill="currentColor"/>',
+  '<rect x="9" y="9" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.5"/><rect x="18" y="18" width="12" height="12" fill="currentColor"/>',
+  '<path d="M24 8 L42 40 H6 Z" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>',
+  '<rect x="8" y="12" width="6" height="24" fill="currentColor"/><rect x="21" y="12" width="6" height="24" fill="currentColor"/><rect x="34" y="12" width="6" height="24" fill="currentColor"/>',
+  '<path d="M24 6 L40 15 V33 L24 42 L8 33 V15 Z" fill="none" stroke="currentColor" stroke-width="2.5"/>',
+  '<circle cx="14" cy="24" r="5" fill="currentColor"/><circle cx="24" cy="24" r="5" fill="currentColor"/><circle cx="34" cy="24" r="5" fill="currentColor"/>',
+  '<path d="M6 30 C 12 18, 18 18, 24 30 S 36 42, 42 30" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>',
+  '<path d="M10 10 L38 38 M38 10 L10 38" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>',
+];
 ---
 <section class={`clients ${compact ? 'section--tight' : 'section'}`} aria-labelledby="clients-title">
   <div class="container">
@@ -14,8 +25,10 @@ const resolved = await Promise.all(clients.map(async (c) => ({ ...c, img: c.logo
   <div class="clients__marquee" data-reveal="fade">
     <ul role="list" class="clients__track">
       {[...resolved, ...resolved].map((c, i) => (
-        <li class="clients__logo" aria-hidden={i >= resolved.length ? 'true' : undefined}>
-          {c.img ? <img src={c.img.src} width={c.img.width} height={c.img.height} alt={c.name} loading="lazy" decoding="async" /> : <span class="clients__placeholder t-label">{c.name}</span>}
+        <li class="clients__logo" aria-hidden={i >= resolved.length ? 'true' : undefined} data-placeholder={c.img ? undefined : 'CLIENT LOGO'}>
+          {c.img
+            ? <img src={c.img.src} width={c.img.width} height={c.img.height} alt={c.name} loading="lazy" decoding="async" />
+            : <span class="clients__mark" aria-label={c.name}><svg viewBox="0 0 48 48" width="40" height="40" aria-hidden="true" set:html={marks[i % marks.length]} /><span class="clients__word t-label">Client {String((i % resolved.length) + 1).padStart(2, '0')}</span></span>}
         </li>
       ))}
     </ul>
@@ -24,12 +37,13 @@ const resolved = await Promise.all(clients.map(async (c) => ({ ...c, img: c.logo
 
 <style>
   .clients__marquee { overflow: hidden; border-block: 1px solid var(--line); }
-  .clients__track { display: flex; width: max-content; animation: clients-marquee 45s linear infinite; }
+  .clients__track { display: flex; width: max-content; animation: clients-marquee 48s linear infinite; }
   .clients__marquee:hover .clients__track { animation-play-state: paused; }
-  .clients__logo { display: grid; place-items: center; width: clamp(11rem, 22vw, 18rem); height: clamp(6rem, 10vw, 9rem); padding: var(--space-5); border-right: 1px solid var(--line); filter: grayscale(1); opacity: 0.75; transition: opacity var(--dur-base), filter var(--dur-base); }
-  .clients__logo:hover { opacity: 1; filter: none; }
-  .clients__logo img { max-height: 100%; width: auto; object-fit: contain; }
-  .clients__placeholder { color: var(--fg-muted); text-align: center; }
+  .clients__logo { display: grid; place-items: center; width: clamp(11rem, 22vw, 18rem); height: clamp(6rem, 10vw, 9rem); padding: var(--space-5); border-right: 1px solid var(--line); opacity: 0.55; transition: opacity var(--dur-base), color var(--dur-base); }
+  .clients__logo:hover { opacity: 1; color: var(--c-accent); }
+  .clients__logo img { max-height: 100%; width: auto; object-fit: contain; filter: grayscale(1); }
+  .clients__mark { display: flex; align-items: center; gap: 0.9em; }
+  .clients__word { letter-spacing: var(--ls-wider); }
   @keyframes clients-marquee { to { transform: translateX(-50%); } }
   @media (prefers-reduced-motion: reduce) {
     .clients__track { animation: none; width: 100%; flex-wrap: wrap; }

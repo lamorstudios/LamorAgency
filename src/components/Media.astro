@@ -3,6 +3,7 @@
  * Media – rendert Bild (AVIF/WebP + srcset), Video oder klar erkennbaren Placeholder.
  * Bilder: src = '/src/assets/…' (wird über import.meta.glob aufgelöst und optimiert).
  * Videos: src = '/media/…' (aus /public), poster optional.
+ * PLACEHOLDER: ohne src wird eine temporäre Media-Surface (.ph) gerendert, gekennzeichnet über data-placeholder.
  */
 import { Picture } from 'astro:assets';
 
@@ -26,6 +27,7 @@ interface Props {
   parallax?: boolean; // dezente Parallax-Bewegung
   autoplay?: boolean; // Video: bei Sichtbarkeit abspielen
   ratio?: MediaData['ratio'];
+  surface?: number; // 1–8: Look der temporären Media-Surface (Placeholder)
 }
 const {
   media,
@@ -38,6 +40,7 @@ const {
   parallax = false,
   autoplay = true,
   ratio,
+  surface,
 } = Astro.props;
 
 const images = import.meta.glob<{ default: ImageMetadata }>('/src/assets/**/*.{jpg,jpeg,png,webp,avif}');
@@ -47,6 +50,9 @@ if (type === 'image' && media.src && images[media.src]) image = (await images[me
 const posters = media.poster && images[media.poster] ? (await images[media.poster]()).default : undefined;
 const r = ratio ?? media.ratio ?? 'wide';
 const ratioVar = `var(--ratio-${r})`;
+// Surface-Variante deterministisch aus Label/Alt ableiten, falls nicht gesetzt
+const seedStr = `${media.label ?? ''}${media.alt ?? ''}${r}`;
+const seed = surface ?? ((Array.from(seedStr).reduce((a, c) => a + c.charCodeAt(0), 0) % 8) + 1);
 const classes = ['media', hover && 'media--hover', reveal && 'media--reveal', parallax && 'media--parallax', className].filter(Boolean).join(' ');
 ---
 <div class={classes} style={`--ratio:${ratioVar}`} data-parallax={parallax ? '' : undefined}>
@@ -75,14 +81,12 @@ const classes = ['media', hover && 'media--hover', reveal && 'media--reveal', pa
     ></video>
   )}
   {(type === 'placeholder' || (type === 'image' && !image) || (type === 'video' && !media.src)) && (
-    <div class="placeholder" role="img" aria-label={media.alt || media.label || 'Platzhalter'}>
-      <span class="placeholder__label">{media.label ?? '[MEDIA]'}</span>
-    </div>
+    <div class={`ph ph--${seed}`} role="img" aria-label={media.alt || media.label || 'Platzhalter-Medium'} data-placeholder={media.label ?? 'MEDIA'}></div>
   )}
 </div>
 {media.caption && <p class="t-small t-muted media__caption">{media.caption}</p>}
 
 <style>
   .media__caption { margin-top: var(--space-3); }
-  .media--parallax > :global(img), .media--parallax > :global(picture), .media--parallax > :global(video), .media--parallax > :global(.placeholder) { inset: -12% 0; height: 124%; will-change: transform; }
+  .media--parallax > :global(img), .media--parallax > :global(picture), .media--parallax > :global(video), .media--parallax > :global(.ph) { inset: -12% 0; height: 124%; will-change: transform; }
 </style>

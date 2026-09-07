@@ -1,18 +1,18 @@
 ---
-title: "[EXISTING BLOG POST 02]"
-description: "[EXISTING TEXT] Meta Description des bestehenden Artikels."
+title: "Blog-Artikel 02"  # PLACEHOLDER – bestehenden Artikel übernehmen
+description: "Wird durch den bestehenden Artikel inklusive Meta Description ersetzt."
 date: 2026-02-15
-category: "[CATEGORY]"
-cover: { type: placeholder, label: "[POST IMAGE]", ratio: wide }
+category: "Insights"
+cover: { type: placeholder, label: "POST IMAGE", ratio: wide }
 placeholder: true
 ---
 
-[EXISTING TEXT] Der bestehende Blogartikel wird hier 1:1 übernommen, inklusive Überschriften, Bildern und interner Verlinkung.
+Der bestehende Blogartikel wird hier 1:1 übernommen, inklusive Überschriften, Bildern und interner Verlinkung.
 
 ## Zwischenüberschrift
 
-[EXISTING TEXT]
+Text folgt.
 
 ## Zwischenüberschrift
 
-[EXISTING TEXT]
+Text folgt.
