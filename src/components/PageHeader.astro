@@ -5,7 +5,7 @@ const { kicker, index, title, titleLines, lead, meta, size = 'display', class: c
 ---
 <header class={`page-head container ${className}`}>
   <p class="t-label page-head__kicker" data-reveal="fade">
-    {index && <span class="t-num t-muted">{index}</span>}
+    <span class="page-head__mark" aria-hidden="true"></span>
     <span>{kicker}</span>
   </p>
   <h1 class={`page-head__title ${size === 'display' ? 't-display' : 't-h1'}`}>
@@ -21,11 +21,13 @@ const { kicker, index, title, titleLines, lead, meta, size = 'display', class: c
 </header>
 
 <style>
-  .page-head { padding-top: calc(var(--header-h) + var(--space-8)); padding-bottom: var(--space-8); display: grid; gap: var(--space-6); }
-  .page-head__kicker { display: flex; gap: 1.5em; }
+  .page-head { padding-top: calc(var(--header-h) + var(--space-9)); padding-bottom: var(--space-8); display: grid; gap: var(--space-5); }
+  .page-head__kicker { display: inline-flex; align-items: center; gap: 0.7em; color: var(--fg-muted); }
+  .page-head__mark { width: 0.45rem; height: 0.45rem; border-radius: 50%; background: var(--c-accent); }
   .page-head__title { text-wrap: balance; }
   .page-head__row { display: grid; gap: var(--space-5); align-items: end; }
   .page-head__lead { max-width: 30ch; }
+  .page-head__title { margin-left: -0.04em; }
   @media (min-width: 900px) {
     .page-head__row { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
     .page-head__meta { text-align: right; }

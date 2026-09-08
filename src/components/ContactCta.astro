@@ -3,13 +3,14 @@ import Words from '@/components/Words.astro';
 import Button from '@/components/Button.astro';
 import { site } from '@/data/site';
 interface Props { index?: string }
-const { index = '04' } = Astro.props;
 ---
-<section class="cta section" data-theme="dark" aria-labelledby="cta-title">
+<section class="cta" data-theme="dark" data-bg="dark" aria-labelledby="cta-title">
   <div class="container">
-    <p class="t-label cta__kicker" data-reveal="fade"><span class="t-num t-muted">{index}</span> <span>Contact</span></p>
-    <h2 class="t-display cta__title" id="cta-title"><Words lines={["Let's create", 'something.']} /></h2>
-    <div class="cta__row" data-reveal style="--reveal-delay:250ms">
+    <h2 class="t-hero cta__title" id="cta-title">
+      <span class="cta__l1"><Words text="Let's create" /></span>
+      <span class="cta__l2"><Words text="something." delay={140} /></span>
+    </h2>
+    <div class="cta__row" data-reveal style="--reveal-delay:280ms">
       <div class="cta__contact">
         <a href={`mailto:${site.email}`} class="cta__mail t-h3 link">{site.email}</a>
         <a href={site.phoneHref} class="t-body link">{site.phone}</a>
@@ -20,11 +21,12 @@ const { index = '04' } = Astro.props;
 </section>
 
 <style>
-  .cta { background: var(--c-ink); color: var(--c-paper); }
-  .cta__kicker { display: flex; gap: 1.5em; margin-bottom: var(--space-7); }
-  @media (min-width: 768px) { .cta__title :global(.line:nth-child(2)) { padding-left: 10vw; } }
-  .cta__row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: var(--space-6); margin-top: var(--space-8); padding-top: var(--space-6); border-top: 1px solid var(--c-ink-3); }
-  .cta__contact { display: grid; gap: var(--space-3); justify-items: start; }
+  .cta { color: var(--c-paper); padding-block: var(--space-10) var(--space-9); overflow: hidden; }
+  .cta__title { display: grid; }
+  .cta__l2 { padding-left: 10vw; }
+  .cta__row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: var(--space-6); margin-top: var(--space-8); }
+  .cta__contact { display: grid; gap: var(--space-2); justify-items: start; }
   .cta__mail { overflow-wrap: anywhere; }
   .cta__contact .link { min-height: 44px; display: inline-flex; align-items: center; }
+  @media (max-width: 767px) { .cta__l2 { padding-left: 0; } }
 </style>

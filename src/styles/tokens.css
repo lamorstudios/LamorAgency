@@ -7,9 +7,9 @@
   --c-ink: #0a0a0a;          /* Primär dunkel  */
   --c-ink-2: #161616;        /* Dunkle Fläche 2 */
   --c-ink-3: #262626;        /* Linien auf dunkel */
-  --c-paper: #f2f0eb;        /* Primär hell (warmes Off-White) */
-  --c-paper-2: #e7e4dd;      /* Helle Fläche 2 */
-  --c-paper-3: #d6d2c9;      /* Linien auf hell */
+  --c-paper: #f3f2ee;        /* Primär hell (Off-White) */
+  --c-paper-2: #e8e6e0;      /* Helle Fläche 2 */
+  --c-paper-3: #d3d0c8;      /* Linien auf hell */
   --c-grey: #66665f;         /* Sekundärtext auf hell (≥ 4.5:1 auf Paper) */
   --c-grey-dark: #9a9a95;    /* Sekundärtext auf dunkel (≥ 7:1 auf Ink) */
   --c-accent: #3157ff;       /* LAMOR Electric / Cobalt Blue – zentral änderbar */
@@ -26,38 +26,48 @@
   --placeholder-bg: var(--c-paper-2);
   --placeholder-fg: var(--c-grey);
 
-  /* ---------- Typography */
-  --font-display: 'LAMOR Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  --font-body: 'LAMOR Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  /* ---------- Typography
+     Eine Familie, drei Rollen. Die Breitenachse (font-stretch) macht den
+     Unterschied zwischen Kampagnen-Headline, Fließtext und Auszeichnung. */
+  --font-display: 'Archivo Variable', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-body: 'Archivo Variable', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 
-  /* Fluid type scale (min @ 320px → max @ 1920px) */
-  --fs-hero: clamp(3.25rem, 1rem + 9.2vw, 12rem);
-  --fs-display: clamp(2.75rem, 1rem + 7.5vw, 8.5rem);
-  --fs-h1: clamp(2.5rem, 1.25rem + 5vw, 6.5rem);
-  --fs-h2: clamp(2rem, 1rem + 3.6vw, 4.5rem);
-  --fs-h3: clamp(1.5rem, 1rem + 1.6vw, 2.5rem);
-  --fs-h4: clamp(1.125rem, 1rem + 0.6vw, 1.5rem);
-  --fs-lead: clamp(1.125rem, 1rem + 0.9vw, 1.75rem);
-  --fs-body: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
-  --fs-small: 0.875rem;
-  --fs-label: 0.75rem;
+  /* Breiten */
+  --wd-mega: 118%;   /* Kampagnen-Headlines */
+  --wd-wide: 108%;   /* große Zwischenüberschriften */
+  --wd-normal: 100%; /* Fließtext */
+  --wd-tight: 90%;   /* Auszeichnungen, Eyebrows */
 
-  --lh-tight: 0.92;
-  --lh-snug: 1.05;
+  /* Fluid type scale – bewusst großer Abstand zwischen Groß und Klein */
+  --fs-mega: clamp(4rem, 1rem + 15vw, 20rem);
+  --fs-hero: clamp(3rem, 0.9rem + 9.6vw, 12.5rem);
+  --fs-display: clamp(2.6rem, 1rem + 7vw, 8rem);
+  --fs-h1: clamp(2.4rem, 1.2rem + 4.8vw, 6rem);
+  --fs-h2: clamp(1.9rem, 1rem + 3.4vw, 4.2rem);
+  --fs-h3: clamp(1.4rem, 1rem + 1.5vw, 2.4rem);
+  --fs-h4: clamp(1.1rem, 1rem + 0.5vw, 1.4rem);
+  --fs-lead: clamp(1.15rem, 1rem + 1vw, 1.9rem);
+  --fs-body: clamp(1rem, 0.95rem + 0.3vw, 1.15rem);
+  --fs-small: 0.9rem;
+  --fs-eyebrow: clamp(0.72rem, 0.68rem + 0.15vw, 0.82rem);
+
+  --lh-tight: 0.86;
+  --lh-snug: 1.02;
   --lh-normal: 1.5;
-  --lh-relaxed: 1.65;
+  --lh-relaxed: 1.6;
 
+  --ls-mega: -0.045em;
   --ls-tight: -0.035em;
-  --ls-snug: -0.02em;
+  --ls-snug: -0.018em;
   --ls-normal: 0;
-  --ls-wide: 0.12em;
-  --ls-wider: 0.18em;
+  --ls-wide: 0.1em;
+  --ls-wider: 0.16em;
 
   --fw-regular: 400;
   --fw-medium: 500;
+  --fw-semi: 600;
   --fw-bold: 700;
-  --fw-display: 700;        /* Headlines bewusst schwer (RELOAD-Richtung) */
+  --fw-display: 800;
 
   /* ---------- Spacing (fluid) */
   --space-1: 0.25rem;
@@ -74,7 +84,7 @@
   --section-y: var(--space-9);
   --gutter: clamp(1.25rem, 0.5rem + 3vw, 4rem);
   --container-max: 1920px;
-  --measure: 62ch;
+  --measure: 58ch;
 
   /* ---------- Grid */
   --grid-cols: 12;
@@ -102,7 +112,7 @@
   --z-intro: 400;
 
   /* ---------- Header */
-  --header-h: 4.5rem;
+  --header-h: 4.75rem;
 
   /* ---------- Media aspect ratios */
   --ratio-wide: 16 / 9;

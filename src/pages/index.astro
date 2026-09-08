@@ -9,7 +9,7 @@ import ServicesList from '@/components/ServicesList.astro';
 import SectionLabel from '@/components/SectionLabel.astro';
 import Clients from '@/components/Clients.astro';
 import ContactCta from '@/components/ContactCta.astro';
-import Button from '@/components/Button.astro';
+import ArrowLink from '@/components/ArrowLink.astro';
 import { site } from '@/data/site';
 ---
 <BaseLayout
@@ -27,26 +27,26 @@ import { site } from '@/data/site';
   <section class="home-services section" data-theme="light" data-bg="light" aria-labelledby="services-title">
     <div class="container">
       <div class="home-services__head">
-        <SectionLabel index="04" label="Services" />
-        <h2 class="t-h2 home-services__title" id="services-title" data-reveal>Alles aus einem Studio.<br /><span class="t-muted">Von der Idee bis zum Feed.</span></h2>
+        <SectionLabel label="Leistungen" />
+        <h2 class="t-say home-services__title" id="services-title" data-reveal>Neun Disziplinen,<br />ein Studio.</h2>
       </div>
       <ServicesList mode="compact" />
       <div class="home-services__more" data-reveal>
-        <Button href="/services/" label="Alle Leistungen" variant="ghost" arrow="right" />
+        <ArrowLink href="/services/" label="Alle Leistungen im Detail" />
       </div>
     </div>
   </section>
 
   <div data-theme="light" data-bg="light">
-    <Clients index="05" />
+    <Clients />
   </div>
 
-  <ContactCta index="06" />
+  <ContactCta />
 </BaseLayout>
 
 <style>
-  .home-services { color: var(--c-ink); }
+  .home-services { color: var(--c-ink); padding-block: var(--space-10) var(--space-9); }
   .home-services__head { margin-bottom: var(--space-8); }
-  .home-services__title { max-width: 18ch; }
+  .home-services__title { max-width: 14ch; }
   .home-services__more { margin-top: var(--space-8); }
 </style>

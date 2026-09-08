@@ -2,52 +2,43 @@
 import SectionLabel from '@/components/SectionLabel.astro';
 import { clients } from '@/data/clients';
 interface Props { index?: string; compact?: boolean }
-const { index = '05', compact = false } = Astro.props;
+const { compact = false } = Astro.props;
 const images = import.meta.glob<{ default: ImageMetadata }>('/src/assets/brand/clients/*.{svg,png,jpg,webp}');
 const resolved = await Promise.all(clients.map(async (c) => ({ ...c, img: c.logo && images[c.logo] ? (await images[c.logo]()).default : undefined })));
-/* PLACEHOLDER: neutrale Marken-Zeichen (keine echten Logos). Werden durch Kundenlogos aus clients.ts ersetzt. */
-const marks = [
-  '<circle cx="24" cy="24" r="14" fill="none" stroke="currentColor" stroke-width="2.5"/><circle cx="24" cy="24" r="4" fill="currentColor"/>',
-  '<rect x="9" y="9" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.5"/><rect x="18" y="18" width="12" height="12" fill="currentColor"/>',
-  '<path d="M24 8 L42 40 H6 Z" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>',
-  '<rect x="8" y="12" width="6" height="24" fill="currentColor"/><rect x="21" y="12" width="6" height="24" fill="currentColor"/><rect x="34" y="12" width="6" height="24" fill="currentColor"/>',
-  '<path d="M24 6 L40 15 V33 L24 42 L8 33 V15 Z" fill="none" stroke="currentColor" stroke-width="2.5"/>',
-  '<circle cx="14" cy="24" r="5" fill="currentColor"/><circle cx="24" cy="24" r="5" fill="currentColor"/><circle cx="34" cy="24" r="5" fill="currentColor"/>',
-  '<path d="M6 30 C 12 18, 18 18, 24 30 S 36 42, 42 30" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>',
-  '<path d="M10 10 L38 38 M38 10 L10 38" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>',
-];
+/* PLACEHOLDER: Namen laufen als Wortmarken-Wand, bis echte Logos in clients.ts stehen. */
+const widths = [118, 92, 108, 76, 125, 100, 88, 115];
+const weights = [800, 500, 700, 600, 800, 500, 700, 600];
 ---
-<section class={`clients ${compact ? 'section--tight' : 'section'}`} aria-labelledby="clients-title">
+<section class={`clients ${compact ? 'section--tight' : ''}`} aria-labelledby="clients-title">
   <div class="container">
-    <SectionLabel index={index} label="Selected Clients" />
+    <SectionLabel label="Ausgewählte Kunden" />
     <h2 class="visually-hidden" id="clients-title">Ausgewählte Kunden</h2>
   </div>
   <div class="clients__marquee" data-reveal="fade">
-    <ul role="list" class="clients__track">
+    <div class="clients__track">
       {[...resolved, ...resolved].map((c, i) => (
-        <li class="clients__logo" aria-hidden={i >= resolved.length ? 'true' : undefined} data-placeholder={c.img ? undefined : 'CLIENT LOGO'}>
+        <span class="clients__item" aria-hidden={i >= resolved.length ? 'true' : undefined} data-placeholder={c.img ? undefined : 'CLIENT LOGO'}>
           {c.img
             ? <img src={c.img.src} width={c.img.width} height={c.img.height} alt={c.name} loading="lazy" decoding="async" />
-            : <span class="clients__mark" aria-label={c.name}><svg viewBox="0 0 48 48" width="40" height="40" aria-hidden="true" set:html={marks[i % marks.length]} /><span class="clients__word t-label">Client {String((i % resolved.length) + 1).padStart(2, '0')}</span></span>}
-        </li>
+            : <span class="clients__word" style={`font-stretch:${widths[i % 8]}%;font-weight:${weights[i % 8]}`}>{c.name}</span>}
+        </span>
       ))}
-    </ul>
+    </div>
   </div>
 </section>
 
 <style>
-  .clients__marquee { overflow: hidden; border-block: 1px solid var(--line); }
-  .clients__track { display: flex; width: max-content; animation: clients-marquee 48s linear infinite; }
+  .clients { padding-block: var(--space-8); }
+  .clients__marquee { overflow: hidden; }
+  .clients__track { display: flex; align-items: center; gap: clamp(2rem, 5vw, 5rem); width: max-content; animation: clients-marquee 55s linear infinite; }
   .clients__marquee:hover .clients__track { animation-play-state: paused; }
-  .clients__logo { display: grid; place-items: center; width: clamp(11rem, 22vw, 18rem); height: clamp(6rem, 10vw, 9rem); padding: var(--space-5); border-right: 1px solid var(--line); opacity: 0.55; transition: opacity var(--dur-base), color var(--dur-base); }
-  .clients__logo:hover { opacity: 1; color: var(--c-accent); }
-  .clients__logo img { max-height: 100%; width: auto; object-fit: contain; filter: grayscale(1); }
-  .clients__mark { display: flex; align-items: center; gap: 0.9em; }
-  .clients__word { letter-spacing: var(--ls-wider); }
+  .clients__item { display: inline-flex; align-items: center; opacity: 0.4; transition: opacity var(--dur-base), color var(--dur-base); }
+  .clients__item:hover { opacity: 1; color: var(--c-accent); }
+  .clients__word { font-family: var(--font-display); font-size: clamp(1.6rem, 1rem + 2.6vw, 3.4rem); line-height: 1; letter-spacing: var(--ls-tight); text-transform: uppercase; white-space: nowrap; }
+  .clients__item img { max-height: clamp(2.2rem, 4vw, 3.4rem); width: auto; object-fit: contain; filter: grayscale(1); }
   @keyframes clients-marquee { to { transform: translateX(-50%); } }
   @media (prefers-reduced-motion: reduce) {
-    .clients__track { animation: none; width: 100%; flex-wrap: wrap; }
-    .clients__logo[aria-hidden='true'] { display: none; }
-    .clients__logo { width: 50%; border-bottom: 1px solid var(--line); }
+    .clients__track { animation: none; width: 100%; flex-wrap: wrap; padding-inline: var(--gutter); }
+    .clients__item[aria-hidden='true'] { display: none; }
   }
 </style>

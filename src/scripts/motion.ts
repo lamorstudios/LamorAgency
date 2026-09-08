@@ -91,24 +91,44 @@ function statement() {
   });
 }
 
-const BG: Record<string, string> = { dark: '#0a0a0a', light: '#f2f0eb', accent: '#3157ff' };
+const BG: Record<string, string> = { dark: '#0a0a0a', light: '#f3f2ee', accent: '#3157ff' };
+/* Sections malen ihren Grund selbst. Der Body übernimmt nur die Farbe der Fläche,
+   die gerade oben steht – damit Overscroll und Adressleiste nicht aus dem Bild fallen. */
 function sectionTransitions() {
   const sections = document.querySelectorAll<HTMLElement>('[data-bg]');
   if (!sections.length) { document.body.style.removeProperty('background-color'); return; }
-  const css = getComputedStyle(document.documentElement);
-  BG.dark = css.getPropertyValue('--c-ink').trim() || BG.dark;
-  BG.light = css.getPropertyValue('--c-paper').trim() || BG.light;
-  BG.accent = css.getPropertyValue('--c-accent').trim() || BG.accent;
-  const apply = (key: string, instant = false) => {
-    const color = BG[key] ?? BG.dark;
-    if (instant || reduced()) { gsap.set(document.body, { backgroundColor: color }); return; }
-    gsap.to(document.body, { backgroundColor: color, duration: 0.8, ease: 'power2.inOut', overwrite: true });
-  };
-  apply(sections[0].dataset.bg!, true);
+  const set = (key: string) => { document.body.style.backgroundColor = BG[key] ?? BG.dark; };
+  set(sections[0].dataset.bg!);
   sections.forEach((sec) => {
-    ScrollTrigger.create({ trigger: sec, start: 'top 60%', end: 'bottom 60%', onEnter: () => apply(sec.dataset.bg!), onEnterBack: () => apply(sec.dataset.bg!) });
+    ScrollTrigger.create({ trigger: sec, start: 'top 50%', end: 'bottom 50%', onEnter: () => set(sec.dataset.bg!), onEnterBack: () => set(sec.dataset.bg!) });
   });
   cleanups.push(() => document.body.style.removeProperty('background-color'));
+}
+
+/* Medium öffnet sich beim Scrollen bis über die volle Breite (Film-Reveal) */
+function takeover() {
+  document.querySelectorAll<HTMLElement>('[data-takeover]').forEach((el) => {
+    if (reduced()) { el.style.clipPath = 'inset(0 0)'; return; }
+    const wide = matchMedia('(min-width: 900px)').matches;
+    const from = wide ? 'inset(4svh 12vw)' : 'inset(0 8vw)';
+    gsap.fromTo(el, { clipPath: from }, {
+      clipPath: 'inset(0svh 0vw)', ease: 'none',
+      scrollTrigger: { trigger: el, start: 'top 85%', end: 'center 58%', scrub: 0.7 },
+    });
+  });
+}
+
+/* Zeilen bewegen sich beim Scrollen gegeneinander – Typo schiebt sich hinter Medien */
+function drift() {
+  if (reduced()) return;
+  document.querySelectorAll<HTMLElement>('[data-drift]').forEach((el) => {
+    const amount = parseFloat(el.dataset.drift || '0');
+    if (!amount) return;
+    gsap.fromTo(el, { xPercent: -amount }, {
+      xPercent: amount, ease: 'none',
+      scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: 0.8 },
+    });
+  });
 }
 
 function featured() {
@@ -133,8 +153,8 @@ function heroScroll() {
   if (!hero) return;
   const title = hero.querySelector<HTMLElement>('[data-hero-title]');
   const media = hero.querySelector<HTMLElement>('[data-hero-media]');
-  if (title) gsap.to(title, { yPercent: 18, opacity: 0.2, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.5 } });
-  if (media) gsap.to(media, { yPercent: -12, scale: 1.06, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.5 } });
+  if (title) gsap.to(title, { yPercent: -14, opacity: 0, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.5 } });
+  if (media) gsap.to(media, { scale: 1.14, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.5 } });
 }
 
 function magnetic() {
@@ -179,7 +199,7 @@ function anchors() {
 }
 
 export function init() {
-  reveal(); header(); videos(); hoverVideos(); parallax(); sectionTransitions(); statement(); featured(); heroScroll(); magnetic(); anchors();
+  reveal(); header(); videos(); hoverVideos(); parallax(); sectionTransitions(); statement(); featured(); takeover(); drift(); heroScroll(); magnetic(); anchors();
   requestAnimationFrame(() => ScrollTrigger.refresh());
 }
 

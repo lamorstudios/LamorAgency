@@ -1,45 +1,39 @@
 ---
 import { site } from '@/data/site';
-/** Brand Statement – Sticky Scroll: Zeilen erscheinen mit dem Scrollen, Fläche wäscht sich in Electric Blue. */
-const words = ['Creativity', 'Film', 'Design', 'Branding', 'Culture', 'Social', 'Quality', 'Confidence'];
+/** Marken-Moment: der Claim übernimmt beim Scrollen die komplette Fläche in Electric Blue. */
 ---
-<section class="statement" data-theme="dark" data-bg="dark" data-statement aria-label="Markenstatement">
+<section class="statement" data-theme="dark" data-bg="dark" data-statement aria-label="Markenclaim">
   <div class="statement__sticky">
     <div class="statement__wash" data-statement-wash aria-hidden="true"></div>
     <div class="container statement__content">
-      <p class="t-label statement__kicker" data-reveal="fade">{site.name} <span class="t-muted">— {site.address.city}</span></p>
       <p class="statement__text t-hero" aria-label={site.claim}>
-        <span class="statement__line" data-statement-line aria-hidden="true">Feel the</span>
-        <span class="statement__line statement__line--indent" data-statement-line aria-hidden="true">brand,</span>
-        <span class="statement__line" data-statement-line aria-hidden="true">not the ad.</span>
+        <span class="statement__line" data-statement-line aria-hidden="true">Feel</span>
+        <span class="statement__line statement__line--b" data-statement-line aria-hidden="true">the brand,</span>
+        <span class="statement__line statement__line--c" data-statement-line aria-hidden="true">not the ad.</span>
       </p>
-    </div>
-    <div class="statement__marquee" aria-hidden="true">
-      <div class="statement__track">
-        {[...words, ...words].map((w) => <span class="t-h3">{w}<i>✦</i></span>)}
-      </div>
+      <p class="statement__sig t-label" data-statement-line aria-hidden="true">{site.name} — {site.address.city}</p>
     </div>
   </div>
 </section>
 
 <style>
-  .statement { position: relative; color: var(--c-paper); height: 260svh; }
-  .statement__sticky { position: sticky; top: 0; height: 100svh; display: grid; grid-template-rows: 1fr auto; overflow: hidden; }
+  .statement { position: relative; color: var(--c-paper); height: 280svh; }
+  .statement__sticky { position: sticky; top: 0; height: 100svh; display: grid; align-content: center; overflow: hidden; }
   .statement__wash { position: absolute; inset: 0; background: var(--c-accent); clip-path: inset(100% 0 0 0); will-change: clip-path; }
-  .statement__content { position: relative; display: grid; align-content: center; gap: var(--space-6); }
-  .statement__text { display: grid; }
+  .statement__content { position: relative; display: grid; gap: var(--space-5); }
+  .statement__text { display: grid; font-size: clamp(2.6rem, 10.2vw, 9rem); line-height: 0.88; }
   .statement__line { display: block; will-change: transform, opacity; }
-  .statement__line--indent { padding-left: 18vw; }
-  .statement__marquee { position: relative; overflow: hidden; border-top: 1px solid rgba(255,255,255,0.18); padding-block: var(--space-4); }
-  .statement__track { display: flex; gap: 1.5em; width: max-content; animation: marquee 40s linear infinite; text-transform: uppercase; letter-spacing: var(--ls-snug); }
-  .statement__track span { display: inline-flex; gap: 1.5em; white-space: nowrap; }
-  .statement__track i { font-style: normal; opacity: 0.6; font-size: 0.6em; align-self: center; }
-  @keyframes marquee { to { transform: translateX(-50%); } }
-  @media (max-width: 899px) { .statement { height: 220svh; } }
+  .statement__line--b { padding-left: 14vw; }
+  .statement__line--c { padding-left: 4vw; }
+  .statement__sig { color: rgba(255,255,255,0.75); }
+  @media (max-width: 899px) {
+    .statement { height: 240svh; }
+    .statement__line--b { padding-left: 6vw; }
+    .statement__line--c { padding-left: 2vw; }
+  }
   @media (prefers-reduced-motion: reduce) {
     .statement { height: auto; }
     .statement__sticky { position: relative; height: auto; padding-block: var(--space-10); }
     .statement__wash { clip-path: none; }
-    .statement__track { animation: none; flex-wrap: wrap; width: auto; }
   }
 </style>

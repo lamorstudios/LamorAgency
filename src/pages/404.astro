@@ -4,8 +4,8 @@ import Words from '@/components/Words.astro';
 import Button from '@/components/Button.astro';
 ---
 <BaseLayout title="Seite nicht gefunden" description="Diese Seite existiert nicht (mehr)." theme="dark" noindex>
-  <section class="nf container" data-theme="dark">
-    <p class="t-label t-muted" data-reveal="fade">404</p>
+  <section class="nf container" data-theme="dark" data-bg="dark">
+    <p class="t-label t-muted" data-reveal="fade">Fehler 404</p>
     <h1 class="t-display"><Words lines={['Nothing', 'to see here.']} /></h1>
     <p class="t-lead measure" data-reveal style="--reveal-delay:200ms">Die Seite wurde verschoben oder existiert nicht. Vielleicht findest du hier, was du suchst:</p>
     <div class="nf__actions" data-reveal style="--reveal-delay:300ms">

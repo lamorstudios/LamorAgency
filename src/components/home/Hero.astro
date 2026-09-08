@@ -2,49 +2,39 @@
 import Words from '@/components/Words.astro';
 import Media from '@/components/Media.astro';
 import { site } from '@/data/site';
-import { services } from '@/data/services';
 /**
- * Hero – Fullscreen, Claim extrem groß, Showreel-Fläche (temporäre Surface).
- * Showreel einsetzen: showreel = { type: 'video', src: '/media/showreel.mp4', poster: '/src/assets/brand/showreel-poster.jpg', alt: 'LAMOR Showreel' }
+ * Hero – Einstieg wie in eine Kampagne: fullscreen Showreel als Grund,
+ * Claim in Kampagnentypografie darüber, eine Zeile läuft hinter dem Medium durch.
+ * Showreel einsetzen: type: 'video', src: '/media/showreel.mp4', poster: '…'
  */
 const showreel = { type: 'placeholder' as const, label: 'SHOWREEL / HERO VIDEO', alt: 'LAMOR AGENCY Showreel', ratio: 'wide' as const };
-const band = [...services.map((s) => s.title), 'München', 'Feel the brand, not the ad.'];
 ---
 <section class="hero" data-hero data-theme="dark" data-bg="dark" aria-labelledby="hero-title">
+  <div class="hero__bg" data-hero-media>
+    <Media media={showreel} priority autoplay surface={1} sizes="100vw" />
+    <div class="hero__veil" aria-hidden="true"></div>
+  </div>
+
   <div class="hero__inner container">
-    <div class="hero__top">
-      <p class="t-label hero__kicker" data-reveal="fade">
-        <span class="hero__dot" aria-hidden="true"></span>
-        <span>Creative Studio</span>
-        <span class="t-muted">— {site.address.city}</span>
-      </p>
-      <p class="t-label hero__kicker hero__kicker--right hide-mobile" data-reveal="fade" style="--reveal-delay:120ms">
-        <span>Social Media · Film · Branding · Design</span>
-      </p>
-    </div>
+    <p class="hero__credit t-label" data-reveal="fade">
+      Creative Studio <span class="t-muted">— {site.address.city}</span>
+    </p>
 
-    <div class="hero__media" data-hero-media data-reveal="fade" style="--reveal-delay:200ms">
-      <div class="hero__media-clip" data-hero-clip>
-        <Media media={showreel} priority hover={false} autoplay surface={1} />
-      </div>
-      <p class="hero__media-tag t-label" aria-hidden="true">
-        <span class="hero__rec"></span>
-        <span>Showreel</span>
-        <span class="t-num" data-timecode>00:00:00:00</span>
-      </p>
-    </div>
-
-    <h1 class="hero__title t-hero" id="hero-title" data-hero-title>
-      <Words lines={['Feel the brand,']} class="hero__l1" />
-      <Words lines={['not the ad.']} class="hero__l2 t-outline" delay={220} />
+    <h1 class="hero__title" id="hero-title" data-hero-title>
+      <span class="hero__l1 t-hero"><Words text="Feel the" /></span>
+      <span class="hero__l2 t-hero"><Words text="brand," delay={120} /></span>
+      <span class="hero__l3 t-hero t-outline"><Words text="not the ad." delay={240} /></span>
     </h1>
 
-    <div class="hero__bottom">
-      <p class="hero__intro t-body" data-reveal="fade" style="--reveal-delay:900ms">
-        Social Media, Film, Branding und Design aus einem Studio.
-        <span class="t-muted">Für Marken, die man fühlt statt überspringt.</span>
+    <div class="hero__foot">
+      <p class="hero__intro t-lead" data-reveal="fade" style="--reveal-delay:760ms">
+        Social Media, Film, Branding und Design aus einem Studio in {site.address.city}.
       </p>
-      <a href="#studio" class="hero__scroll t-label" data-reveal="fade" style="--reveal-delay:1000ms" aria-label="Weiter scrollen">
+      <p class="hero__reel t-label" data-reveal="fade" style="--reveal-delay:820ms">
+        <span class="hero__reel-mark" aria-hidden="true"></span>
+        <span>Showreel</span>
+      </p>
+      <a href="#studio" class="hero__scroll t-label" data-reveal="fade" style="--reveal-delay:880ms">
         <span>Scroll</span>
         <span class="hero__scroll-line" aria-hidden="true"></span>
       </a>
@@ -53,77 +43,57 @@ const band = [...services.map((s) => s.title), 'München', 'Feel the brand, not 
 
   <div class="hero__band" aria-hidden="true">
     <div class="hero__band-track">
-      {[...band, ...band].map((w) => <span>{w}<i>✦</i></span>)}
+      {[0, 1].map(() => (
+        <span>Social Media <i>/</i> Content <i>/</i> Film <i>/</i> Fotografie <i>/</i> Branding <i>/</i> Design <i>/</i> Creative Direction <i>/</i></span>
+      ))}
     </div>
   </div>
 </section>
 
 <style>
-  .hero { position: relative; color: var(--c-paper); overflow: hidden; }
-  .hero__inner {
-    position: relative; min-height: 100svh;
-    display: grid; grid-template-rows: auto 1fr auto auto; gap: var(--space-6);
-    padding-top: calc(var(--header-h) + var(--space-4)); padding-bottom: var(--space-7);
-  }
-  .hero__top { display: flex; justify-content: space-between; gap: var(--space-4); }
-  .hero__kicker { display: flex; align-items: center; gap: 0.6em; flex-wrap: wrap; }
-  .hero__dot { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--c-accent); box-shadow: 0 0 0 0 color-mix(in srgb, var(--c-accent) 60%, transparent); animation: hero-pulse 2.4s ease-out infinite; }
-  @keyframes hero-pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--c-accent) 60%, transparent); } 100% { box-shadow: 0 0 0 0.75rem transparent; } }
-  .hero__media { position: relative; width: 100%; align-self: start; }
-  .hero__media-clip { clip-path: inset(100% 0 0 0); transform: scale(1.06); transition: clip-path 1.3s var(--ease-expo) 0.15s, transform 1.6s var(--ease-out) 0.15s; }
-  .hero__media-clip.is-inview, [data-reveal].is-inview .hero__media-clip { clip-path: inset(0 0 0 0); transform: none; }
-  .hero__media :global(.media) { --ratio: 16 / 9; }
-  .hero__media-tag { position: absolute; left: var(--space-4); bottom: var(--space-4); display: inline-flex; align-items: center; gap: 0.7em; padding: 0.55em 0.8em; background: rgba(5,5,5,0.6); backdrop-filter: blur(8px); color: #fff; }
-  .hero__rec { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--c-accent); animation: rec 1.2s steps(2, end) infinite; }
-  @keyframes rec { 50% { opacity: 0.25; } }
-  .hero__title { position: relative; z-index: 1; margin-top: auto; }
-  .hero__l2 { display: block; }
-  .hero__bottom { display: flex; justify-content: space-between; align-items: end; gap: var(--space-6); }
-  .hero__intro { max-width: 30rem; }
-  .hero__intro .t-muted { display: block; }
-  .hero__scroll { display: inline-flex; align-items: center; gap: 0.75em; min-height: 44px; flex-shrink: 0; }
-  .hero__scroll-line { width: 3rem; height: 1px; background: currentColor; position: relative; overflow: hidden; }
-  .hero__scroll-line::after { content: ''; position: absolute; inset: 0; background: var(--c-accent); transform: translateX(-100%); animation: scroll-line 1.8s var(--ease-in-out) infinite; }
-  @keyframes scroll-line { 0% { transform: translateX(-100%); } 50% { transform: translateX(0); } 100% { transform: translateX(100%); } }
+  .hero { position: relative; color: var(--c-paper); overflow: hidden; background: #050505; }
+  .hero__bg { position: absolute; inset: 0; z-index: 0; }
+  .hero__bg :global(.media) { position: absolute; inset: 0; height: 100%; aspect-ratio: auto; }
+  .hero__bg :global(.media > *) { height: 100%; }
+  .hero__veil { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(5,5,5,0.5) 0%, rgba(5,5,5,0.06) 34%, rgba(5,5,5,0.34) 72%, rgba(5,5,5,0.72) 100%); }
 
-  /* Akzent-Band als Übergang */
-  .hero__band { position: relative; z-index: 1; background: var(--c-accent); color: #fff; overflow: hidden; padding-block: 0.7rem; }
-  .hero__band-track { display: flex; width: max-content; gap: 2em; animation: band 38s linear infinite; font-family: var(--font-mono); font-size: var(--fs-label); letter-spacing: var(--ls-wider); text-transform: uppercase; }
-  .hero__band-track span { display: inline-flex; gap: 2em; white-space: nowrap; }
-  .hero__band-track i { font-style: normal; opacity: 0.7; }
+  .hero__inner {
+    position: relative; z-index: 2;
+    min-height: 100svh;
+    display: grid; grid-template-rows: auto 1fr auto;
+    padding-top: calc(var(--header-h) + var(--space-5));
+    padding-bottom: var(--space-6);
+  }
+  .hero__credit { align-self: start; }
+  .hero__title { align-self: center; display: grid; margin-block: var(--space-7); }
+  .hero__l2 { padding-left: 6vw; }
+  .hero__l3 { padding-left: 0; }
+  .hero__title { margin-left: -0.03em; }
+  .hero__foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: var(--space-4) var(--space-5); }
+  .hero__reel { order: 3; }
+  .hero__intro { max-width: 26ch; }
+  .hero__reel { display: inline-flex; align-items: center; gap: 0.65em; }
+  .hero__reel-mark { width: 0; height: 0; border-style: solid; border-width: 0.36rem 0 0.36rem 0.58rem; border-color: transparent transparent transparent var(--c-accent); }
+  .hero__scroll { display: inline-flex; align-items: center; gap: 0.75em; min-height: 44px; }
+  .hero__scroll-line { width: 3.5rem; height: 1px; background: rgba(255,255,255,0.5); position: relative; overflow: hidden; }
+  .hero__scroll-line::after { content: ''; position: absolute; inset: 0; background: var(--c-accent); transform: translateX(-100%); animation: scroll-line 2.2s var(--ease-in-out) infinite; }
+  @keyframes scroll-line { 0% { transform: translateX(-100%); } 55% { transform: translateX(0); } 100% { transform: translateX(100%); } }
+
+  /* Laufband als Übergang zur nächsten Fläche */
+  .hero__band { position: relative; z-index: 2; background: var(--c-accent); color: #fff; overflow: hidden; padding-block: 0.55em; }
+  .hero__band-track { display: flex; width: max-content; animation: band 46s linear infinite; }
+  .hero__band-track span { display: inline-flex; gap: 0.55em; white-space: nowrap; padding-right: 0.55em; font-family: var(--font-display); font-size: clamp(0.95rem, 0.6rem + 1vw, 1.5rem); font-weight: var(--fw-semi); font-stretch: var(--wd-wide); letter-spacing: var(--ls-snug); text-transform: uppercase; }
+  .hero__band-track i { font-style: normal; opacity: 0.55; }
   @keyframes band { to { transform: translateX(-50%); } }
 
   @media (min-width: 900px) {
-    .hero__inner { grid-template-rows: auto 1fr auto auto; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--grid-gap); }
-    .hero__top { grid-column: 1 / -1; }
-    .hero__media { grid-column: 7 / -1; grid-row: 2; margin-top: var(--space-2); max-width: 46rem; justify-self: end; width: 100%; }
-    .hero__title { grid-column: 1 / -1; grid-row: 3; margin-top: calc(-1 * var(--space-9)); }
-    .hero__l2 { padding-left: 16vw; }
-    .hero__bottom { grid-column: 1 / -1; grid-row: 4; }
+    .hero__reel { order: 0; }
+    .hero__l1 { padding-left: 0; }
+    .hero__l2 { padding-left: 14vw; }
+    .hero__l3 { padding-left: 5vw; }
+    .hero__intro { max-width: 32ch; }
   }
-  @media (min-width: 900px) and (max-height: 820px) { .hero__media { max-width: 34rem; } }
   @media (prefers-reduced-motion: reduce) {
-    .hero__scroll-line::after, .hero__band-track, .hero__dot, .hero__rec { animation: none; }
-    .hero__media-clip { clip-path: none; transform: none; transition: none; }
+    .hero__band-track, .hero__scroll-line::after { animation: none; }
   }
 </style>
-
-<script>
-  // Laufender Timecode im Showreel-Tag (rein dekorativ)
-  let raf = 0;
-  function initTimecode() {
-    const el = document.querySelector<HTMLElement>('[data-timecode]');
-    cancelAnimationFrame(raf);
-    if (!el || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const start = performance.now();
-    const tick = (now: number) => {
-      const t = (now - start) / 1000; const f = Math.floor((t % 1) * 25);
-      const s = Math.floor(t) % 60, m = Math.floor(t / 60) % 60, h = Math.floor(t / 3600);
-      el.textContent = [h, m, s, f].map((n) => String(n).padStart(2, '0')).join(':');
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-  }
-  document.addEventListener('astro:page-load', initTimecode);
-  document.addEventListener('astro:before-swap', () => cancelAnimationFrame(raf));
-</script>

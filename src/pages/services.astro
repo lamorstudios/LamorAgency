@@ -9,20 +9,20 @@ import { services } from '@/data/services';
 import { breadcrumb } from '@/lib/schema';
 ---
 <BaseLayout title="Leistungen – Social Media, Film, Branding, Design" description={`Leistungen von LAMOR AGENCY ${site.address.city}: ${services.map((s) => s.title).join(', ')}.`} jsonLd={[breadcrumb([{ name: 'Services', path: '/services/' }])]}>
-  <PageHeader kicker="Services" index="03" title="Services" titleLines={['What we', 'do.']} lead="Acht Disziplinen, ein Studio. Von der Idee über die Produktion bis zur Veröffentlichung." meta={`${services.length} Leistungen · ${site.address.city}`} />
+  <PageHeader kicker="Leistungen" title="Services" titleLines={['What we', 'do.']} lead="Neun Disziplinen, ein Studio. Von der Idee über die Produktion bis zur Veröffentlichung." />
 
-  <section class="container section section--flush-top" aria-label="Leistungen im Detail">
+  <section class="container section section--flush-top" data-bg="light" aria-label="Leistungen im Detail">
     <ServicesList mode="full" headingLevel="h2" />
   </section>
 
-  <section class="services-claim section" data-theme="dark" aria-label="Markenclaim">
+  <section class="services-claim section" data-theme="dark" data-bg="dark" aria-label="Markenclaim">
     <div class="container">
-      <p class="t-label t-muted" data-reveal="fade">{site.name}</p>
+      <p class="t-label t-muted" data-reveal="fade">{site.name} — {site.address.city}</p>
       <p class="t-display services-claim__text"><Words lines={site.claimLines as unknown as string[]} /></p>
     </div>
   </section>
 
-  <ContactCta index="04" />
+  <ContactCta />
 </BaseLayout>
 
 <style>

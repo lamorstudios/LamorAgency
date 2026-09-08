@@ -11,7 +11,7 @@ const [featured, ...rest] = posts;
 const categories = [...new Set(posts.map((p) => p.data.category))];
 ---
 <BaseLayout title="Blog – Social Media, Content & Branding Insights" description="Blog von LAMOR AGENCY München: Insights zu Social Media Marketing, Content Creation, Videoproduktion, Branding und Design." jsonLd={[breadcrumb([{ name: 'Blog', path: '/blog/' }])]}>
-  <PageHeader kicker="Blog" index="04" title="Blog" titleLines={['Notes on', 'brand & culture.']} lead="Gedanken, Insights und Erfahrungen aus Social Media, Film, Branding und Design." meta={`${posts.length} Artikel · ${categories.join(' · ')}`} />
+  <PageHeader kicker="Journal" title="Blog" titleLines={['Notes on', 'brand & culture.']} lead="Gedanken, Insights und Erfahrungen aus Social Media, Film, Branding und Design." meta={categories.join(' · ')} />
 
   {featured && (
     <section class="blog-featured container" aria-label="Neuester Artikel">
@@ -48,7 +48,7 @@ const categories = [...new Set(posts.map((p) => p.data.category))];
     </ul>
   </section>
 
-  <ContactCta index="05" />
+  <ContactCta />
 </BaseLayout>
 
 <style>

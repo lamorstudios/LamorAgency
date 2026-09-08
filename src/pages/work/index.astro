@@ -9,18 +9,15 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
 const categories = [...new Set(projects.map((p) => p.data.category))];
 ---
 <BaseLayout title="Work – Portfolio" description="Ausgewählte Projekte von LAMOR AGENCY: Social Media, Film, Fotografie, Branding, Grafikdesign und Webdesign aus München." jsonLd={[breadcrumb([{ name: 'Work', path: '/work/' }])]}>
-  <PageHeader kicker="Work" index="01" title="Work" titleLines={['Selected', 'work.']} lead="Ausgewählte Projekte aus Social Media, Film, Fotografie, Branding und Design." meta={`${projects.length} Projekte`}>
-    <ul role="list" class="work-cats t-label" data-reveal="fade" style="--reveal-delay:400ms">
-      {categories.map((c) => <li>{c}</li>)}
-    </ul>
+  <PageHeader kicker="Work" title="Work" titleLines={['Selected', 'work.']} lead="Ausgewählte Projekte aus Social Media, Film, Fotografie, Branding und Design.">
+    <p class="work-cats t-label" data-reveal="fade" style="--reveal-delay:400ms">{categories.join(' · ')}</p>
   </PageHeader>
   <section class="container section section--flush-top" aria-label="Alle Projekte">
     <WorkGrid projects={projects} />
   </section>
-  <ContactCta index="02" />
+  <ContactCta />
 </BaseLayout>
 
 <style>
-  .work-cats { display: flex; flex-wrap: wrap; gap: 0.5em 1.5em; padding-top: var(--space-5); border-top: 1px solid var(--line); }
-  .work-cats li { color: var(--fg-muted); }
+  .work-cats { color: var(--fg-muted); }
 </style>

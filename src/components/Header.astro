@@ -37,7 +37,6 @@ const isActive = (href: string) => norm(href) === '/' ? path === '/' : path.star
         {mainNav.map((item, i) => (
           <li class="nav__item" style={`--i:${i}`}>
             <a href={item.href} class="nav__link" aria-current={isActive(item.href) ? 'page' : undefined}>
-              <span class="nav__index t-label t-num">{item.index}</span>
               <span class="nav__label">{item.label}</span>
             </a>
           </li>
@@ -75,11 +74,12 @@ const isActive = (href: string) => norm(href) === '/' ? path === '/' : path.star
   }
   .header.is-scrolled .header__inner { height: calc(var(--header-h) - 0.75rem); }
   .header__logo { display: inline-flex; align-items: center; min-height: 44px; }
-  .header__wordmark { font-family: var(--font-display); font-weight: var(--fw-bold); letter-spacing: var(--ls-snug); font-size: 1.25rem; text-transform: uppercase; }
+  .header__wordmark { font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: var(--wd-mega); letter-spacing: var(--ls-tight); font-size: 1.4rem; text-transform: uppercase; }
   .header__wordmark sup { font-size: 0.5em; vertical-align: top; margin-left: 0.1em; font-weight: var(--fw-regular); }
   .header__nav { display: none; }
   .header__nav ul { display: flex; gap: clamp(1.25rem, 2.5vw, 2.75rem); }
-  .header__link { font-family: var(--font-mono); font-size: var(--fs-label); letter-spacing: var(--ls-wide); text-transform: uppercase; padding-block: 0.5rem; }
+  .header__link { font-family: var(--font-body); font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight); letter-spacing: var(--ls-wide); text-transform: uppercase; padding-block: 0.5rem; }
+  .header__nav ul { gap: clamp(1.1rem, 2.2vw, 2.4rem); }
   .header__link.link--active::after { background: var(--c-accent); }
   .header__actions { display: flex; align-items: center; gap: var(--space-4); }
   .header__cta { display: none; --btn-fg: #fff; border-color: #fff; }
@@ -107,12 +107,11 @@ const isActive = (href: string) => norm(href) === '/' ? path === '/' : path.star
   .nav.is-open { visibility: visible; clip-path: inset(0 0 0 0); transition: clip-path var(--dur-slow) var(--ease-expo), visibility 0s; }
   .nav__inner { min-height: 100%; display: grid; align-content: space-between; gap: var(--space-8); padding-top: calc(var(--header-h) + var(--space-6)); padding-bottom: var(--space-7); }
   .nav__list { display: grid; }
-  .nav__item { border-top: 1px solid var(--c-ink-3); }
-  .nav__item:last-child { border-bottom: 1px solid var(--c-ink-3); }
-  .nav__link { display: flex; align-items: baseline; gap: var(--space-4); padding-block: clamp(0.75rem, 2.5vw, 1.25rem); font-family: var(--font-display); font-size: clamp(2.5rem, 10vw, 5.5rem); line-height: 1; letter-spacing: var(--ls-tight); text-transform: uppercase; font-weight: var(--fw-medium); transition: color var(--dur-fast); }
+  .nav__item + .nav__item { border-top: 1px solid rgba(255,255,255,0.12); }
+  .nav__link { display: flex; align-items: baseline; gap: var(--space-4); padding-block: clamp(0.7rem, 2.4vw, 1.2rem); font-family: var(--font-display); font-size: clamp(2.6rem, 11vw, 5.5rem); line-height: 0.98; letter-spacing: var(--ls-tight); text-transform: uppercase; font-weight: var(--fw-display); font-stretch: var(--wd-mega); transition: color var(--dur-fast), transform var(--dur-base) var(--ease-out); }
+  @media (hover: hover) { .nav__link:hover { transform: translateX(0.15em); } }
   .nav__link[aria-current='page'] { color: var(--c-grey-dark); }
   .nav__link:hover { color: var(--c-accent); }
-  .nav__index { color: var(--c-grey-dark); min-width: 2ch; }
   .nav__meta { display: grid; gap: var(--space-6); grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); }
   .nav__block { display: grid; gap: var(--space-2); align-content: start; }
   .nav__meta-link { font-size: var(--fs-body); min-height: 44px; display: inline-flex; align-items: center; }

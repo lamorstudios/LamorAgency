@@ -1,31 +1,44 @@
 ---
 import { getCollection } from 'astro:content';
-import WorkGrid from '@/components/WorkGrid.astro';
-import SectionLabel from '@/components/SectionLabel.astro';
-import Button from '@/components/Button.astro';
+import WorkAct from '@/components/WorkAct.astro';
+import ArrowLink from '@/components/ArrowLink.astro';
 const projects = (await getCollection('projects')).filter((p) => p.data.featured).sort((a, b) => a.data.order - b.data.order).slice(0, 6);
+const [a, b, c, d, e, f] = projects;
 ---
-<section class="work section" id="work" data-theme="light" aria-labelledby="work-title">
-  <div class="container">
-    <div class="work__head">
-      <SectionLabel index="01" label="Selected Work" />
-      <h2 class="t-h2 work__title" id="work-title">
-        <span class="visually-hidden">Ausgewählte Arbeiten</span>
-        <span aria-hidden="true" data-reveal>Work that people<br />actually feel.</span>
-      </h2>
-    </div>
+<section class="work" id="work" data-theme="light" data-bg="light" aria-labelledby="work-title">
+  <div class="container work__head">
+    <h2 class="t-say work__title" id="work-title" data-reveal>Arbeiten, die man<br />fühlt statt überspringt.</h2>
+    <p class="t-label work__meta" data-reveal="fade">Selected Work</p>
+  </div>
 
-    <WorkGrid projects={projects} />
+  {a && <WorkAct project={a} index={0} variant="takeover" priority />}
+  {b && <WorkAct project={b} index={1} variant="offset" />}
 
-    <div class="work__more" data-reveal>
-      <Button href="/work/" label="Alle Projekte" variant="ghost" arrow="right" />
-    </div>
+  <div class="container work__pair">
+    {c && <WorkAct project={c} index={2} variant="portrait" />}
+    {d && <WorkAct project={d} index={3} variant="portrait" />}
+  </div>
+
+  {e && <WorkAct project={e} index={4} variant="accent" />}
+  {f && <WorkAct project={f} index={5} variant="wide" />}
+
+  <div class="container work__more" data-reveal>
+    <ArrowLink href="/work/" label="Alle Projekte ansehen" />
   </div>
 </section>
 
 <style>
-  .work { background: var(--c-paper); color: var(--c-ink); }
-  .work__head { margin-bottom: var(--space-8); }
-  .work__title { max-width: 16ch; }
-  .work__more { display: flex; justify-content: center; margin-top: var(--space-9); }
+  .work { color: var(--c-ink); padding-block: var(--space-9) var(--space-8); overflow: hidden; }
+  .work__head { display: grid; gap: var(--space-4); margin-bottom: var(--space-8); }
+  .work__title { max-width: 18ch; }
+  .work__meta { color: var(--fg-muted); }
+  .work__pair { display: grid; gap: var(--space-6); }
+  .work__more { margin-top: var(--space-8); }
+  @media (min-width: 768px) {
+    .work__head { grid-template-columns: 1fr auto; align-items: end; }
+    .work__meta { text-align: right; }
+    .work__pair { grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--grid-gap); align-items: start; }
+    .work__pair > :global(.act:first-child) { grid-column: 1 / 6; }
+    .work__pair > :global(.act:last-child) { grid-column: 7 / 12; margin-top: var(--space-9); }
+  }
 </style>

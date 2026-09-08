@@ -1,16 +1,14 @@
 ---
-interface Props { index?: string; label: string; class?: string; rule?: boolean }
-const { index, label, class: className = '', rule = true } = Astro.props;
+/** Auszeichnung über einer Section – Credit-Zeile, keine Nummerierung, keine Linie. */
+interface Props { label: string; class?: string; align?: 'start' | 'end'; index?: string; rule?: boolean }
+const { label, class: className = '', align = 'start' } = Astro.props;
 ---
-<div class={`section-label ${className}`} data-reveal="fade">
-  <p class="t-label">
-    {index && <span class="section-label__index t-num">{index}</span>}
-    <span>{label}</span>
-  </p>
-  {rule && <div class="rule" aria-hidden="true"></div>}
-</div>
+<p class={`section-label t-label ${align === 'end' ? 'section-label--end' : ''} ${className}`} data-reveal="fade">
+  <span class="section-label__mark" aria-hidden="true"></span>
+  <span>{label}</span>
+</p>
 <style>
-  .section-label { display: grid; gap: var(--space-4); margin-bottom: var(--space-7); }
-  .section-label p { display: flex; gap: 1.5em; }
-  .section-label__index { color: var(--fg-muted); }
+  .section-label { display: inline-flex; align-items: center; gap: 0.7em; color: var(--fg-muted); margin-bottom: var(--space-5); }
+  .section-label--end { justify-self: end; }
+  .section-label__mark { width: 0.45rem; height: 0.45rem; background: var(--c-accent); border-radius: 50%; flex-shrink: 0; }
 </style>

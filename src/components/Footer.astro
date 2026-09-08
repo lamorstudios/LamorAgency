@@ -6,7 +6,7 @@ const year = new Date().getFullYear();
 <footer class="footer" data-theme="dark">
   <div class="container">
     <div class="footer__top">
-      <p class="footer__claim t-h3" data-reveal>Neues Projekt, neue Marke, neuer Content?<br /><span class="t-muted">Wir freuen uns auf den Austausch.</span></p>
+      <p class="footer__claim t-h3" data-reveal>Neues Projekt, neue Marke,<br />neuer Content?</p>
       <a href="/contact/" class="btn footer__cta" data-magnetic>
         <span>Projekt anfragen</span>
         <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
@@ -51,7 +51,7 @@ const year = new Date().getFullYear();
 
   <div class="container footer__bottom">
     <p class="t-label t-muted">© <span data-year>{year}</span> {site.name}. {site.address.city}.</p>
-    <p class="t-label t-muted">Creative Studio · Social Media · Film · Branding · Design</p>
+    <p class="t-label t-muted hide-mobile">Creative Studio · Social Media · Film · Branding · Design</p>
     <a href="#top" class="t-label footer__totop link">Nach oben ↑</a>
   </div>
 </footer>
@@ -64,12 +64,13 @@ const year = new Date().getFullYear();
   .footer__cta::before { background: var(--c-ink); }
   .footer__cta:hover { color: var(--c-paper); }
   .footer__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-7) var(--grid-gap); padding-block: var(--space-8); }
+  .footer__list a { font-size: var(--fs-body); }
   .footer__col { display: grid; gap: var(--space-4); align-content: start; }
   .footer__list { display: grid; gap: var(--space-2); }
   .footer__list a { display: inline-flex; min-height: 44px; align-items: center; }
   .footer__list .link::after { bottom: 0.6em; }
   .footer__address address { font-style: normal; color: var(--c-grey-dark); line-height: 1.5; padding-top: 0.5rem; }
-  .footer__wordmark { padding-inline: var(--gutter); line-height: 0.78; font-family: var(--font-display); font-weight: var(--fw-bold); letter-spacing: var(--ls-tight); text-transform: uppercase; font-size: clamp(5rem, 22vw, 26rem); color: var(--c-paper); user-select: none; transform: translateY(0.06em); }
+  .footer__wordmark { padding-inline: var(--gutter); line-height: 0.74; font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: var(--wd-mega); letter-spacing: -0.05em; text-transform: uppercase; font-size: clamp(5.5rem, 24vw, 30rem); color: var(--c-paper); user-select: none; transform: translateY(0.07em); }
   .footer__wordmark sup { font-size: 0.16em; vertical-align: top; margin-left: 0.05em; font-weight: var(--fw-regular); position: relative; top: 0.35em; }
   .footer__bottom { display: flex; flex-wrap: wrap; gap: var(--space-4) var(--space-7); justify-content: space-between; padding-block: var(--space-5); border-top: 1px solid var(--c-ink-3); }
   .footer__totop { min-height: 44px; display: inline-flex; align-items: center; }

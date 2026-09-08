@@ -5,7 +5,6 @@ import Media from '@/components/Media.astro';
 import Words from '@/components/Words.astro';
 import ArrowLink from '@/components/ArrowLink.astro';
 import { breadcrumb, creativeWork } from '@/lib/schema';
-import { pad } from '@/lib/utils';
 
 export async function getStaticPaths() {
   const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
@@ -29,8 +28,7 @@ const meta = [
     <header class="case__head container">
       <p class="t-label case__kicker" data-reveal="fade">
         <a href="/work/" class="link">Work</a>
-        <span class="t-muted">— {pad(index + 1)}</span>
-        <span class="t-muted">{d.category}</span>
+        <span class="t-muted">— {d.category}</span>
       </p>
       <h1 class="t-display case__title"><Words text={d.title} /></h1>
       <p class="t-lead case__summary" data-reveal style="--reveal-delay:250ms">{d.summary}</p>
@@ -63,7 +61,7 @@ const meta = [
     <nav class="case__next" aria-label="Nächstes Projekt">
       <a href={`/work/${next.id}/`} class="case__next-link" data-cursor="Next">
         <div class="container case__next-inner">
-          <p class="t-label t-muted" data-reveal="fade">Next project — {pad(((index + 1) % total) + 1)}</p>
+          <p class="t-label t-muted" data-reveal="fade">Nächstes Projekt</p>
           <p class="t-display case__next-title" data-reveal>{next.data.title}</p>
           <p class="t-label" data-reveal="fade">{next.data.client} · {next.data.category}</p>
         </div>
@@ -85,12 +83,14 @@ const meta = [
   @media (min-width: 768px) { .case__hero :global(.media) { --ratio: 21 / 9; } }
   .case__body { display: grid; gap: var(--space-8); padding-block: var(--space-9); }
   .case__meta { display: grid; gap: var(--space-4); align-content: start; }
-  .case__meta-row { display: grid; gap: var(--space-1); padding-bottom: var(--space-4); border-bottom: 1px solid var(--line); }
+  .case__meta-row { display: grid; gap: var(--space-1); padding-bottom: var(--space-4); }
+  .case__meta-row dt { color: var(--fg-muted); }
   .case__gallery { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--grid-gap); padding-bottom: var(--space-9); }
   .case__fig { grid-column: 1 / -1; }
   .case__fig--portrait, .case__fig--square { grid-column: span 6; }
   .case__fig figcaption { margin-top: var(--space-3); }
   .case__next { border-top: 1px solid var(--line); }
+  .case__next-title { text-transform: uppercase; }
   .case__next-link { display: block; }
   .case__next-inner { display: grid; gap: var(--space-4); padding-block: var(--space-8); }
   .case__next-title { transition: transform var(--dur-slow) var(--ease-out); }
