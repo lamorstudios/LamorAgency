@@ -95,10 +95,14 @@ const BG: Record<string, string> = { dark: '#0a0a0a', light: '#f3f2ee', accent: 
 /* Sections malen ihren Grund selbst. Der Body übernimmt nur die Farbe der Fläche,
    die gerade oben steht – damit Overscroll und Adressleiste nicht aus dem Bild fallen. */
 function sectionTransitions() {
-  const sections = document.querySelectorAll<HTMLElement>('[data-bg]');
-  if (!sections.length) { document.body.style.removeProperty('background-color'); return; }
+  document.body.style.removeProperty('background-color');
+  const sections = Array.from(document.querySelectorAll<HTMLElement>('[data-bg]'));
+  // Nur Seiten, die direkt oben mit einer eigenen Fläche beginnen, färben den Body mit.
+  // Sonst behält der Body die Seitenfarbe – sonst steht dunkler Text auf dunklem Grund.
+  const first = sections[0];
+  if (!first || first.getBoundingClientRect().top + window.scrollY > 4) return;
   const set = (key: string) => { document.body.style.backgroundColor = BG[key] ?? BG.dark; };
-  set(sections[0].dataset.bg!);
+  set(first.dataset.bg!);
   sections.forEach((sec) => {
     ScrollTrigger.create({ trigger: sec, start: 'top 50%', end: 'bottom 50%', onEnter: () => set(sec.dataset.bg!), onEnterBack: () => set(sec.dataset.bg!) });
   });
