@@ -105,7 +105,7 @@ export const websitePricing: WebsitePackage[] = [
       'Deployment und technische Einrichtung',
     ],
     highlighted: true,
-    cta: { label: 'Business-Website anfragen', href: '/webdesign-muenchen/#anfrage' },
+    cta: { label: 'Business anfragen', href: '/webdesign-muenchen/#anfrage' },
   },
   {
     id: 'premium',

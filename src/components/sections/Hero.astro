@@ -85,7 +85,15 @@ const proof = [stats[0], stats[1], stats[3]];
     @keyframes hero-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.45; transform: scale(0.8); } }
   }
 
-  .hero__title { margin-block: var(--space-2) var(--space-4); max-width: 16ch; }
+  .hero__title {
+    /* Eigene Groesse statt --fs-hero: das laengste Wort ("UEBERSIEHT.")
+       muss in jeder Breite in den Container passen. */
+    font-size: clamp(2.4rem, 0.5rem + 7.4vw, 9rem);
+    margin-block: var(--space-2) var(--space-4);
+    max-width: 16ch;
+  }
+  /* Schmale Geraete: normale Laufweite, sonst wird der Versalsatz zu breit. */
+  @media (max-width: 600px) { .hero__title { font-stretch: var(--wd-normal); } }
 
   /* Lead und CTA stehen nebeneinander, sobald Platz da ist. */
   .hero__meta { display: grid; gap: var(--space-6); align-items: end; }
