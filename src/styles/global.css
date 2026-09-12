@@ -398,6 +398,87 @@ a:hover .media--hover > img, a:hover .media--hover > picture img, a:hover .media
 .drift { will-change: transform; }
 
 
+
+/* ==========================================================================
+   EDITORIAL-TYPOGRAFIE
+   Die Groteske traegt, die Serif setzt Akzente. Das Zusammenspiel macht den
+   Unterschied zwischen "Interface" und "Magazin" – deshalb steht die Serif
+   nie im Fliesstext, sondern nur dort, wo ein Wort Haltung zeigen soll.
+   ========================================================================== */
+.t-serif {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-stretch: normal;
+  text-transform: none;
+  letter-spacing: -0.01em;
+}
+/* Der kursive Einwurf mitten in einer Versal-Headline – die Signaturgeste. */
+.t-serif-i {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-stretch: normal;
+  text-transform: none;
+  letter-spacing: -0.015em;
+  /* Die Serif hat eine kleinere x-Hoehe als Archivo: leicht hochskalieren,
+     damit beide Schriften optisch gleich gross wirken. */
+  font-size: 1.12em;
+  line-height: 0.9;
+}
+
+/* Versal-Groteske, so breit und schwer wie die Achse hergibt. */
+.t-wall {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-stretch: 125%;
+  text-transform: uppercase;
+  letter-spacing: -0.045em;
+  line-height: 0.82;
+  text-wrap: balance;
+}
+
+/* ==========================================================================
+   LAUFBAND
+   Eine Reihe, zweimal im Markup, wandert endlos. Ohne JS, damit sie auch
+   dann laeuft, wenn das Motion-Modul nicht startet. Bei Reduced Motion
+   steht sie still und laesst sich stattdessen antippen und schieben.
+   ========================================================================== */
+.marquee {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+.marquee__row {
+  display: flex;
+  align-items: center;
+  flex: none;
+  gap: var(--marquee-gap, clamp(2rem, 5vw, 5rem));
+  padding-right: var(--marquee-gap, clamp(2rem, 5vw, 5rem));
+  margin: 0;
+  list-style: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .marquee__row { animation: marquee-run var(--marquee-speed, 40s) linear infinite; }
+  .marquee--reverse .marquee__row { animation-direction: reverse; }
+  .marquee:hover .marquee__row { animation-play-state: paused; }
+  @keyframes marquee-run { to { transform: translateX(-100%); } }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee { overflow-x: auto; scrollbar-width: none; }
+  .marquee::-webkit-scrollbar { display: none; }
+}
+
+/* Randlose Flaeche, die den Container verlaesst – ohne 100vw-Trick,
+   damit auf Seiten mit Scrollbar kein horizontaler Ueberlauf entsteht. */
+.edge {
+  margin-inline: calc(-1 * var(--gutter));
+}
+
+/* Feine Linie als Section-Trenner, laeuft beim Scrollen auf. */
+.hairline { height: 1px; background: var(--line); transform-origin: left; }
+.js .hairline { transform: scaleX(0); transition: transform 1.2s var(--ease-expo); }
+.js .hairline.is-inview { transform: scaleX(1); }
+
 /* ==========================================================================
    FORMULARE
    Global, weil mehrere Formulare dieselbe Darstellung teilen

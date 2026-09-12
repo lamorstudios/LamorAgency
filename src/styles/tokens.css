@@ -3,18 +3,26 @@
    Alle globalen Werte leben hier. Keine Einzelwerte in Components streuen.
    ========================================================================== */
 :root {
-  /* ---------- Brand Colors (austauschbar – bestehende LAMOR-Farben eintragen) */
-  --c-ink: #0a0a0a;          /* Primär dunkel  */
-  --c-ink-2: #161616;        /* Dunkle Fläche 2 */
-  --c-ink-3: #262626;        /* Linien auf dunkel */
-  --c-paper: #f3f2ee;        /* Primär hell (Off-White) */
-  --c-paper-2: #e8e6e0;      /* Helle Fläche 2 */
-  --c-paper-3: #d3d0c8;      /* Linien auf hell */
-  --c-grey: #66665f;         /* Sekundärtext auf hell (≥ 4.5:1 auf Paper) */
-  --c-grey-dark: #9a9a95;    /* Sekundärtext auf dunkel (≥ 7:1 auf Ink) */
-  --c-accent: #3157ff;       /* LAMOR Electric / Cobalt Blue – zentral änderbar */
-  --c-accent-deep: #1f3fd6;  /* dunklere Stufe für Verläufe */
-  --c-accent-ink: #ffffff;   /* Text auf Akzent */
+  /* ---------- Brand Colors
+     Kein Neutralgrau, kein Reinweiss: die ganze Palette ist warm getönt.
+     Schwarz zieht ins Bräunliche, Weiss ist Knochenpapier. Das nimmt der
+     Seite den kühlen Interface-Charakter und gibt ihr Filmlabor-Anmutung. */
+  --c-ink: #0b0a09;          /* warmes Nahschwarz – Primärgrund */
+  --c-ink-2: #141210;        /* abgesetzte dunkle Fläche */
+  --c-ink-3: #2a2622;        /* Linien auf dunkel */
+  --c-paper: #f2ede4;        /* warmes Off-White (Knochen/Papier) */
+  --c-paper-2: #e6dfd2;      /* zweite helle Fläche */
+  --c-paper-3: #d2c9b8;      /* Linien auf hell */
+  --c-grey: #6b6459;         /* Sekundärtext auf hell (4.6:1 auf Paper) */
+  --c-grey-dark: #9c9488;    /* Sekundärtext auf dunkel (6.6:1 auf Ink) */
+
+  /* Ein einziger Akzent – Signalrot wie Filmvorspann und Klappe.
+     Bewusst sparsam: Punkt, Linie, ein Wort. Nie als Fläche hinter Text.
+     An genau dieser Stelle änderbar, wirkt überall. */
+  --c-accent: #e5432b;
+  --c-accent-on-dark: #ff5c3d; /* aufgehellt für Labels auf dunklem Grund */
+  --c-accent-deep: #b8321e;
+  --c-accent-ink: #ffffff;
   --c-white: #ffffff;
 
   /* Semantische Rollen (werden pro Theme umgeschaltet) */
@@ -31,6 +39,8 @@
      Unterschied zwischen Kampagnen-Headline, Fließtext und Auszeichnung. */
   --font-display: 'Archivo Variable', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   --font-body: 'Archivo Variable', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  /* Kontraststimme: nur für Auszeichnungen, nie für Fliesstext. */
+  --font-serif: 'Instrument Serif', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
 
   /* Breiten */
   --wd-mega: 118%;   /* Kampagnen-Headlines */
@@ -39,9 +49,9 @@
   --wd-tight: 90%;   /* Auszeichnungen, Eyebrows */
 
   /* Fluid type scale – bewusst großer Abstand zwischen Groß und Klein */
-  --fs-mega: clamp(4rem, 1rem + 15vw, 20rem);
+  --fs-mega: clamp(4.5rem, 0.5rem + 19vw, 26rem);
   --fs-hero: clamp(3rem, 0.9rem + 9.6vw, 12.5rem);
-  --fs-display: clamp(2.6rem, 1rem + 7vw, 8rem);
+  --fs-display: clamp(2.8rem, 0.8rem + 8vw, 9.5rem);
   --fs-h1: clamp(2.4rem, 1.2rem + 4.8vw, 6rem);
   --fs-h2: clamp(1.9rem, 1rem + 3.4vw, 4.2rem);
   --fs-h3: clamp(1.4rem, 1rem + 1.5vw, 2.4rem);

@@ -167,7 +167,7 @@ function hoverVideos() {
   });
 }
 
-const BG: Record<string, string> = { dark: '#0a0a0a', light: '#f3f2ee', accent: '#3157ff' };
+const BG: Record<string, string> = { dark: '#0b0a09', light: '#f2ede4', accent: '#e5432b' };
 /**
  * Sections malen ihren Grund selbst. Der Body übernimmt nur die Farbe der
  * Fläche, die gerade oben steht – damit Overscroll und Adressleiste nicht aus

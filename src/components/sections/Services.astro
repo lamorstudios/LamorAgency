@@ -1,8 +1,14 @@
 ---
 /**
- * Leistungen – sechs Disziplinen, ein Studio.
- * Zeilenlayout wie in einem Magazin-Inhaltsverzeichnis; bei Hover schiebt sich
- * die Medienvorschau ein (nur Desktop, nur mit feinem Zeiger).
+ * Leistungen – randlose Bänder statt Karten.
+ *
+ * Jede Disziplin ist eine Zeile über die volle Breite. Beim Überfahren kippt
+ * das ganze Band von Tinte auf Papier, die Nummer füllt sich, der Name rückt
+ * an und ein Medienausschnitt klappt auf. Gerade und ungerade Zeilen spiegeln
+ * ihre Anordnung, damit kein Raster-Eindruck entsteht.
+ *
+ * Auf Touch-Geräten gibt es keinen Hover: dort steht das Medium fest neben
+ * dem Namen, die Zeile bleibt vollständig lesbar.
  */
 import Media from '@/components/Media.astro';
 import Words from '@/components/Words.astro';
@@ -12,111 +18,161 @@ import { services } from '@/data/services';
 interface Props { showAll?: boolean; heading?: string }
 const { showAll = false, heading = 'Sechs Disziplinen, ein Studio.' } = Astro.props;
 ---
-<section class="svc section" data-theme="dark" data-bg="dark" aria-labelledby="svc-title">
-  <div class="container">
-    <div class="svc__head">
-      <p class="t-label svc__label" data-reveal="fade">Leistungen</p>
-      <h2 class="t-say svc__title" id="svc-title"><Words text={heading} /></h2>
-      <p class="t-lead t-muted svc__lead" data-reveal style="--reveal-delay:140ms">
-        Alles, was eine Marke sichtbar macht – aus einer Hand, in einem Look.
-      </p>
-    </div>
-
-    <ul class="svc__list" role="list">
-      {services.map((s, i) => (
-        <li class="svc__row" data-reveal style={`--reveal-delay:${i * 60}ms`} data-hover-video>
-          <a class="svc__link" href={`/services/#${s.slug}`} aria-label={`${s.title} – Leistungen ansehen`}>
-            <span class="svc__index t-label">{s.index}</span>
-            <span class="svc__name">{s.title}</span>
-            <span class="svc__short t-body">{s.short}</span>
-            <span class="svc__arrow" aria-hidden="true">
-              <svg viewBox="0 0 16 16" fill="none"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
-            </span>
-          </a>
-          <span class="svc__preview no-touch-only" aria-hidden="true">
-            <Media media={s.media} ratio="portrait" sizes="220px" widths={[220, 440]} />
-          </span>
-          {showAll && (
-            <ul class="svc__tags" role="list">
-              {s.items.map((t) => <li class="svc__tag t-label">{t}</li>)}
-            </ul>
-          )}
-        </li>
-      ))}
-    </ul>
-
-    {!showAll && (
-      <div class="svc__more" data-reveal>
-        <ArrowLink href="/services/" label="Alle Leistungen im Detail" />
-      </div>
-    )}
+<section class="sv" data-theme="dark" data-bg="dark" aria-labelledby="svc-title">
+  <div class="container sv__head">
+    <p class="t-label sv__label">Leistungen</p>
+    <h2 class="sv__title" id="svc-title">
+      <Words text="Sechs Disziplinen," />
+      <span class="sv__title-em t-serif-i">ein Studio.</span>
+    </h2>
   </div>
+
+  <ul class="sv__list" role="list">
+    {services.map((s, i) => (
+      <li class={`sv__band ${i % 2 === 1 ? 'sv__band--flip' : ''}`} data-hover-video>
+        <a class="sv__link container" href={`/services/#${s.slug}`}>
+          <span class="sv__num" aria-hidden="true">{s.index}</span>
+
+          <span class="sv__body">
+            <span class="sv__name">{s.title}</span>
+            <span class="sv__short">{s.short}</span>
+            {showAll && (
+              <span class="sv__items">
+                {s.items.map((t) => <span class="sv__chip t-label">{t}</span>)}
+              </span>
+            )}
+          </span>
+
+          <span class="sv__media" aria-hidden="true">
+            <Media media={s.media} ratio="portrait" sizes="(min-width: 1024px) 18vw, 34vw" widths={[280, 560]} />
+          </span>
+
+          <span class="sv__go" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+          </span>
+        </a>
+      </li>
+    ))}
+  </ul>
+
+  {!showAll && (
+    <div class="container sv__more">
+      <ArrowLink href="/services/" label="Alle Leistungen im Detail" />
+    </div>
+  )}
 </section>
 
 <style>
-  .svc__head { display: grid; gap: var(--space-4); margin-bottom: var(--space-8); }
-  .svc__label { color: var(--c-accent); }
-  .svc__title { max-width: 16ch; }
-  .svc__lead { max-width: 46ch; }
+  .sv { padding-block: var(--space-9) var(--space-8); overflow: clip; }
 
-  .svc__list { display: grid; border-top: 1px solid var(--line); }
-  .svc__row { position: relative; border-bottom: 1px solid var(--line); }
-
-  .svc__link {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    grid-template-areas: 'index name arrow' '. short .';
-    align-items: baseline;
-    gap: 0.5rem var(--space-4);
-    padding-block: clamp(1.25rem, 3vw, 2.25rem);
-    transition: color var(--dur-base) var(--ease-out);
-  }
-  .svc__index { grid-area: index; color: var(--fg-muted); padding-top: 0.5em; }
-  .svc__name {
-    grid-area: name;
+  .sv__head { display: grid; gap: var(--space-4); margin-bottom: clamp(2.5rem, 6vw, 5rem); }
+  .sv__label { color: var(--c-accent-on-dark); }
+  .sv__title {
     font-family: var(--font-display);
-    font-weight: var(--fw-display);
-    font-stretch: var(--wd-wide);
-    font-size: clamp(1.75rem, 1rem + 4vw, 4rem);
-    line-height: 0.95;
-    letter-spacing: var(--ls-tight);
+    font-weight: 900;
+    font-stretch: 118%;
     text-transform: uppercase;
+    font-size: clamp(2rem, 0.6rem + 6vw, 6rem);
+    line-height: 0.92;
+    letter-spacing: -0.04em;
+    max-width: 15ch;
   }
-  .svc__short { grid-area: short; color: var(--fg-muted); max-width: 48ch; }
-  .svc__arrow { grid-area: arrow; align-self: center; width: 1.25rem; color: var(--fg-muted); transition: transform var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out); }
-  .svc__arrow svg { width: 100%; height: auto; }
+  .sv__title-em { display: block; color: var(--c-accent-on-dark); }
 
-  @media (hover: hover) and (pointer: fine) {
-    .svc__row:hover .svc__name { color: var(--c-accent); }
-    .svc__row:hover .svc__arrow { transform: translate(0.3em, -0.3em); color: var(--c-accent); }
+  /* ---------- Band ---------- */
+  .sv__list { display: grid; border-top: 1px solid var(--line); }
+  .sv__band {
+    border-bottom: 1px solid var(--line);
+    transition: background var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out);
   }
-  .svc__link:focus-visible { outline-offset: -2px; }
 
-  /* Medienvorschau – nur dort, wo wirklich gehovert werden kann. */
-  .svc__preview {
-    position: absolute;
-    top: 50%;
-    right: clamp(3rem, 10vw, 9rem);
-    width: clamp(140px, 14vw, 220px);
-    transform: translateY(-50%) scale(0.92);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
-    z-index: 2;
+  .sv__link {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas: 'num body' 'media body';
+    align-items: start;
+    column-gap: clamp(0.9rem, 2.5vw, 2rem);
+    row-gap: var(--space-3);
+    padding-block: clamp(1.25rem, 3vw, 2.5rem);
   }
-  @media (hover: hover) and (pointer: fine) and (min-width: 1024px) {
-    .svc__row:hover .svc__preview { opacity: 1; transform: translateY(-50%) scale(1); }
+
+  /* Nummer: konturiert, füllt sich beim Überfahren. */
+  .sv__num {
+    grid-area: num;
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-stretch: 125%;
+    font-size: clamp(2rem, 1rem + 4.5vw, 5.5rem);
+    line-height: 0.8;
+    letter-spacing: -0.05em;
+    color: transparent;
+    -webkit-text-stroke: 1px var(--fg-muted);
+    transition: color var(--dur-base) var(--ease-out), -webkit-text-stroke-color var(--dur-base) var(--ease-out);
   }
-  @media (prefers-reduced-motion: reduce) { .svc__preview { transition: none; } }
 
-  /* Vollansicht auf /services/ */
-  .svc__tags { display: flex; flex-wrap: wrap; gap: 0.5rem; padding-bottom: clamp(1.25rem, 3vw, 2rem); }
-  .svc__tag { padding: 0.5em 0.9em; border: 1px solid var(--line); border-radius: var(--radius-pill); color: var(--fg-muted); }
-
-  .svc__more { margin-top: var(--space-7); }
-
-  @media (min-width: 768px) {
-    .svc__link { grid-template-columns: auto minmax(0, 9fr) minmax(0, 11fr) auto; grid-template-areas: 'index name short arrow'; align-items: center; }
-    .svc__short { padding-right: var(--space-6); }
+  .sv__body { grid-area: body; display: grid; gap: var(--space-2); min-width: 0; }
+  .sv__name {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-stretch: 112%;
+    text-transform: uppercase;
+    font-size: clamp(1.6rem, 0.7rem + 4.4vw, 4.75rem);
+    line-height: 0.94;
+    letter-spacing: -0.04em;
+    transition: transform var(--dur-base) var(--ease-out);
   }
+  .sv__short { font-size: var(--fs-small); line-height: 1.5; color: var(--fg-muted); max-width: 46ch; }
+
+  .sv__items { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: var(--space-3); }
+  .sv__chip { padding: 0.45em 0.8em; border: 1px solid var(--line); border-radius: var(--radius-pill); color: var(--fg-muted); }
+
+  /* Medium: auf Touch fest sichtbar, auf Zeigergeräten erst beim Hover. */
+  .sv__media { grid-area: media; width: clamp(4.5rem, 22vw, 7rem); }
+  .sv__go { display: none; }
+
+  @media (min-width: 1024px) {
+    /* Name und Beschreibung stehen nebeneinander wie in einem
+       Inhaltsverzeichnis – so traegt die Zeile die volle Breite, statt
+       rechts eine tote Flaeche zu lassen. */
+    .sv__link {
+      grid-template-columns: auto minmax(0, 1fr) minmax(0, 20rem) auto auto;
+      grid-template-areas: 'num name short media go';
+      align-items: center;
+      column-gap: clamp(1.5rem, 3.5vw, 3.5rem);
+    }
+    .sv__body { display: contents; }
+    .sv__name { grid-area: name; }
+    .sv__short { grid-area: short; margin: 0; }
+    .sv__media {
+      width: clamp(7rem, 13vw, 11rem);
+      opacity: 0;
+      clip-path: inset(0 0 100% 0);
+      transform: translateY(0.75rem);
+      transition: opacity var(--dur-base) var(--ease-out), clip-path var(--dur-slow) var(--ease-expo), transform var(--dur-slow) var(--ease-out);
+    }
+    .sv__go { display: block; width: 1.5rem; color: var(--fg-muted); transition: transform var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out); }
+    .sv__go svg { width: 100%; height: auto; }
+
+    /* Ungerade Zeilen tauschen Nummer und Medium – der Textblock bleibt
+       stehen, damit die Leserichtung erhalten bleibt. */
+    .sv__band--flip .sv__link { grid-template-areas: 'media name short num go'; }
+
+    /* Der Kipppunkt: das ganze Band invertiert. */
+    @media (hover: hover) and (pointer: fine) {
+      .sv__band:hover { background: var(--c-paper); color: var(--c-ink); }
+      .sv__band:hover .sv__num { color: var(--c-accent); -webkit-text-stroke-color: transparent; }
+      .sv__band:hover .sv__short { color: var(--c-grey); }
+      .sv__band:hover .sv__name { transform: translateX(0.3em); }
+      .sv__band:hover .sv__media { opacity: 1; clip-path: inset(0 0 0 0); transform: none; }
+      .sv__band:hover .sv__go { transform: translate(0.3em, -0.3em); color: var(--c-accent); }
+      .sv__band:hover .sv__chip { border-color: var(--c-paper-3); color: var(--c-grey); }
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sv__media { transition: none; }
+    .sv__name { transition: none; }
+  }
+
+  .sv__more { margin-top: clamp(2rem, 5vw, 3.5rem); }
 </style>
