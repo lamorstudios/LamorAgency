@@ -15,7 +15,8 @@ export const navCta = { label: 'Start a Project', href: '/contact/' };
 
 export const footerNav: NavItem[] = [
   ...mainNav,
-  { index: '07', label: 'Blog', href: '/blog/' },
+  { index: '07', label: 'Webdesign', href: '/webdesign-muenchen/' },
+  { index: '08', label: 'Blog', href: '/blog/' },
 ];
 
 export const legalNav: NavItem[] = [

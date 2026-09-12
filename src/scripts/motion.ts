@@ -1,27 +1,27 @@
 /**
- * LAMOR Motion System
+ * LAMOR Motion System – KERN (ohne GSAP)
  *
  * GRUNDREGEL: Motion ist Zugabe, nie Voraussetzung. Kein Inhalt darf dauerhaft
- * unsichtbar sein, wenn eine Animation nicht startet.
- * Dafür sorgen drei Ebenen:
+ * unsichtbar sein, wenn eine Animation nicht startet. Drei Ebenen sichern das:
  *   1. CSS versteckt nur unter `html.js` (Klasse kommt aus dem Inline-Script).
- *   2. Das Inline-Script nimmt `.js` nach 2.5s wieder weg, falls dieses Modul
- *      nie `data-motion="ready"` setzt (Bundle fehlt, JS-Fehler, altes Gerät).
- *   3. `safetyNet()` unten deckt den Fall ab, dass das Modul zwar läuft, der
- *      IntersectionObserver aber nicht auslöst (der klassische Mobile-Bug).
+ *   2. Das Inline-Script nimmt `.js` nach 2.5s zurück, falls dieses Modul nie
+ *      `data-motion="ready"` setzt (Bundle fehlt, JS-Fehler, altes Gerät).
+ *   3. `safetyNet()` deckt ab, dass das Modul läuft, der IntersectionObserver
+ *      aber nicht auslöst – der klassische Mobile-Bug.
  *
- * GSAP/ScrollTrigger nur für: Parallax, Takeover, Drift, Hero-Scroll, Magnetic.
- * Alles respektiert prefers-reduced-motion.
+ * PERFORMANCE: Diese Datei kommt ohne Bibliothek aus. GSAP/ScrollTrigger
+ * (~117 KB) wird in `scroll-fx.ts` ausgelagert und NUR nachgeladen, wenn ein
+ * Gerät die Effekte überhaupt bekommt: feiner Zeiger, kein Reduced Motion,
+ * nicht Mobile – und nur, wenn es auf der Seite passende Elemente gibt.
+ * Mobile Besucher laden davon nichts.
  */
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
 
 const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const finePointer = () => matchMedia('(hover: hover) and (pointer: fine)').matches;
 const isMobile = () => matchMedia('(max-width: 767px)').matches;
+
 let cleanups: Array<() => void> = [];
+export const onCleanup = (fn: () => void) => cleanups.push(fn);
 
 const REVEAL_SELECTOR = '[data-reveal], .words, .rule, .media--reveal';
 
@@ -66,8 +66,6 @@ function reveal() {
 /**
  * Sicherheitsnetz gegen den Mobile-Klassiker: der Observer feuert nicht
  * (falsche Viewport-Höhe durch die Adressleiste, Layout-Shift, Bounce-Scroll).
- * Nach kurzer Zeit wird alles sichtbar gemacht, was ohnehin im Bild steht –
- * und nach längerer Zeit sicherheitshalber der komplette Rest.
  */
 function safetyNet() {
   if (reduced()) return;
@@ -82,8 +80,7 @@ function safetyNet() {
     });
   };
   const t1 = setTimeout(() => sweep(false), 1400);
-  // Letzte Instanz: nach 8s ist jede Reveal-Absicht abgelaufen.
-  const t2 = setTimeout(() => sweep(true), 8000);
+  const t2 = setTimeout(() => sweep(true), 8000); // letzte Instanz
   cleanups.push(() => { clearTimeout(t1); clearTimeout(t2); });
 }
 
@@ -125,11 +122,10 @@ function counters() {
         const start = performance.now();
         const tick = (now: number) => {
           const p = Math.min((now - start) / duration, 1);
-          // easeOutExpo – schnell los, sauber aus.
-          const eased = p === 1 ? 1 : 1 - Math.pow(2, -10 * p);
+          const eased = p === 1 ? 1 : 1 - Math.pow(2, -10 * p); // easeOutExpo
           el.textContent = out(Math.round(target * eased));
           if (p < 1) requestAnimationFrame(tick);
-          else el.textContent = out(target); // Endwert exakt, nie gerundet daneben
+          else el.textContent = out(target); // Endwert exakt
         };
         requestAnimationFrame(tick);
       }
@@ -158,129 +154,6 @@ function videos() {
   cleanups.push(() => io.disconnect());
 }
 
-function parallax() {
-  // Auf Mobile kostet Parallax mehr, als es bringt.
-  if (reduced() || isMobile()) return;
-  document.querySelectorAll<HTMLElement>('[data-parallax]').forEach((wrap) => {
-    const inner = wrap.querySelector<HTMLElement>('img, picture, video, .ph, .placeholder');
-    if (!inner) return;
-    gsap.fromTo(
-      inner,
-      { yPercent: -8 },
-      { yPercent: 8, ease: 'none', scrollTrigger: { trigger: wrap, start: 'top bottom', end: 'bottom top', scrub: 0.6 } },
-    );
-  });
-}
-
-function statement() {
-  if (reduced()) return;
-  document.querySelectorAll<HTMLElement>('[data-statement]').forEach((el) => {
-    const lines = el.querySelectorAll<HTMLElement>('[data-statement-line]');
-    const wash = el.querySelector<HTMLElement>('[data-statement-wash]');
-    if (!lines.length) return;
-    const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: 'top top', end: 'bottom bottom', scrub: 0.6 } });
-    // immediateRender: false → der unsichtbare Ausgangszustand wird erst gesetzt,
-    // wenn die Animation wirklich läuft. Feuert der Trigger nie, bleibt der Text da.
-    tl.fromTo(lines, { yPercent: 110, opacity: 0 }, { yPercent: 0, opacity: 1, ease: 'power2.out', stagger: 0.18, duration: 0.5, immediateRender: false }, 0);
-    if (wash) tl.fromTo(wash, { clipPath: 'inset(100% 0 0 0)' }, { clipPath: 'inset(0% 0 0 0)', ease: 'power2.inOut', duration: 0.45, immediateRender: false }, 0.55);
-    tl.to({}, { duration: 0.1 });
-  });
-}
-
-const BG: Record<string, string> = { dark: '#0a0a0a', light: '#f3f2ee', accent: '#3157ff' };
-/* Sections malen ihren Grund selbst. Der Body übernimmt nur die Farbe der Fläche,
-   die gerade oben steht – damit Overscroll und Adressleiste nicht aus dem Bild fallen. */
-function sectionTransitions() {
-  document.body.style.removeProperty('background-color');
-  const sections = Array.from(document.querySelectorAll<HTMLElement>('[data-bg]'));
-  const first = sections[0];
-  // Nur Seiten, die direkt oben mit einer eigenen Fläche beginnen, färben den Body mit.
-  if (!first || first.getBoundingClientRect().top + window.scrollY > 4) return;
-  const set = (key: string) => { document.body.style.backgroundColor = BG[key] ?? BG.dark; };
-  set(first.dataset.bg!);
-  sections.forEach((sec) => {
-    ScrollTrigger.create({
-      trigger: sec, start: 'top 50%', end: 'bottom 50%',
-      onEnter: () => set(sec.dataset.bg!),
-      onEnterBack: () => set(sec.dataset.bg!),
-    });
-  });
-  cleanups.push(() => document.body.style.removeProperty('background-color'));
-}
-
-/* Medium öffnet sich beim Scrollen bis über die volle Breite (Film-Reveal) */
-function takeover() {
-  document.querySelectorAll<HTMLElement>('[data-takeover]').forEach((el) => {
-    if (reduced()) { el.style.clipPath = 'inset(0 0)'; return; }
-    const wide = matchMedia('(min-width: 900px)').matches;
-    const from = wide ? 'inset(4svh 12vw)' : 'inset(0 6vw)';
-    gsap.fromTo(
-      el,
-      { clipPath: from },
-      { clipPath: 'inset(0svh 0vw)', ease: 'none', scrollTrigger: { trigger: el, start: 'top 85%', end: 'center 58%', scrub: 0.7 } },
-    );
-  });
-}
-
-/* Zeilen bewegen sich beim Scrollen gegeneinander */
-function drift() {
-  if (reduced() || isMobile()) return;
-  document.querySelectorAll<HTMLElement>('[data-drift]').forEach((el) => {
-    const amount = parseFloat(el.dataset.drift || '0');
-    if (!amount) return;
-    gsap.fromTo(el, { xPercent: -amount }, { xPercent: amount, ease: 'none', scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: 0.8 } });
-  });
-}
-
-function featured() {
-  document.querySelectorAll<HTMLElement>('[data-featured]').forEach((root) => {
-    const chapters = root.querySelectorAll<HTMLElement>('[data-feat-chapter]');
-    const medias = root.querySelectorAll<HTMLElement>('[data-feat-media]');
-    const steps = root.querySelectorAll<HTMLElement>('[data-feat-step]');
-    const set = (i: number) => {
-      medias.forEach((m) => m.classList.toggle('is-active', m.dataset.featMedia === String(i)));
-      steps.forEach((st) => st.classList.toggle('is-active', st.dataset.featStep === String(i)));
-    };
-    chapters.forEach((ch, i) => {
-      ScrollTrigger.create({ trigger: ch, start: 'top 55%', end: 'bottom 55%', onEnter: () => set(i), onEnterBack: () => set(i) });
-      if (!reduced()) {
-        gsap.fromTo(
-          ch.children,
-          { y: 40, opacity: 0 },
-          { y: 0, opacity: 1, stagger: 0.08, duration: 0.9, ease: 'power3.out', immediateRender: false, scrollTrigger: { trigger: ch, start: 'top 75%', toggleActions: 'play none none none' } },
-        );
-      }
-    });
-  });
-}
-
-function heroScroll() {
-  if (reduced() || isMobile()) return;
-  const hero = document.querySelector<HTMLElement>('[data-hero]');
-  if (!hero) return;
-  const title = hero.querySelector<HTMLElement>('[data-hero-title]');
-  const media = hero.querySelector<HTMLElement>('[data-hero-media]');
-  if (title) gsap.to(title, { yPercent: -14, opacity: 0, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.5 } });
-  if (media) gsap.to(media, { scale: 1.08, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.5 } });
-}
-
-function magnetic() {
-  if (reduced() || !finePointer()) return;
-  document.querySelectorAll<HTMLElement>('[data-magnetic]').forEach((el) => {
-    const strength = 8;
-    const move = (e: MouseEvent) => {
-      const r = el.getBoundingClientRect();
-      const dx = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);
-      const dy = (e.clientY - (r.top + r.height / 2)) / (r.height / 2);
-      gsap.to(el, { x: dx * strength, y: dy * strength, duration: 0.4, ease: 'power3.out' });
-    };
-    const leave = () => gsap.to(el, { x: 0, y: 0, duration: 0.6, ease: 'elastic.out(1, 0.5)' });
-    el.addEventListener('mousemove', move);
-    el.addEventListener('mouseleave', leave);
-    cleanups.push(() => { el.removeEventListener('mousemove', move); el.removeEventListener('mouseleave', leave); });
-  });
-}
-
 function hoverVideos() {
   if (!finePointer() || reduced()) return;
   document.querySelectorAll<HTMLElement>('[data-hover-video]').forEach((el) => {
@@ -294,8 +167,36 @@ function hoverVideos() {
   });
 }
 
+const BG: Record<string, string> = { dark: '#0a0a0a', light: '#f3f2ee', accent: '#3157ff' };
+/**
+ * Sections malen ihren Grund selbst. Der Body übernimmt nur die Farbe der
+ * Fläche, die gerade oben steht – damit Overscroll und Adressleiste nicht aus
+ * dem Bild fallen. Bewusst ohne ScrollTrigger: ein Observer reicht völlig.
+ */
+function sectionTransitions() {
+  document.body.style.removeProperty('background-color');
+  const sections = Array.from(document.querySelectorAll<HTMLElement>('[data-bg]'));
+  const first = sections[0];
+  // Nur Seiten, die direkt oben mit einer eigenen Fläche beginnen, färben mit.
+  if (!first || first.getBoundingClientRect().top + window.scrollY > 4) return;
+  if (!('IntersectionObserver' in window)) return;
+
+  const set = (key: string) => { document.body.style.backgroundColor = BG[key] ?? BG.dark; };
+  set(first.dataset.bg!);
+
+  // Ein schmaler Streifen auf halber Höhe: Welche Section ihn schneidet,
+  // bestimmt die Hintergrundfarbe.
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) if (e.isIntersecting) set((e.target as HTMLElement).dataset.bg!);
+    },
+    { rootMargin: '-50% 0px -50% 0px', threshold: 0 },
+  );
+  sections.forEach((s) => io.observe(s));
+  cleanups.push(() => { io.disconnect(); document.body.style.removeProperty('background-color'); });
+}
+
 function anchors() {
-  // Sanftes Scrollen zu Ankern – nur für Ziele, die es auf dieser Seite gibt.
   document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach((a) => {
     const href = a.getAttribute('href')!;
     if (href.length < 2) return;
@@ -309,6 +210,25 @@ function anchors() {
   });
 }
 
+/**
+ * GSAP-Effekte nachladen – aber nur, wenn sie auch jemand zu sehen bekommt.
+ * Mobile, Reduced Motion und Touch-Geräte laden die Bibliothek gar nicht erst.
+ */
+const FX_SELECTOR = '[data-parallax], [data-takeover], [data-drift], [data-hero], [data-magnetic], [data-statement], [data-featured]';
+let destroyFx: (() => void) | null = null;
+
+async function loadScrollFx() {
+  if (reduced() || isMobile() || !finePointer()) return;
+  if (!document.querySelector(FX_SELECTOR)) return;
+  try {
+    const fx = await import('./scroll-fx');
+    destroyFx = fx.initScrollFx();
+  } catch {
+    // Bibliothek nicht ladbar: die Seite funktioniert unverändert weiter,
+    // nur ohne Parallax und Magnetic.
+  }
+}
+
 export function init() {
   // Signal an den Watchdog im <head>: das Motion-System läuft.
   document.documentElement.setAttribute('data-motion', 'ready');
@@ -319,26 +239,20 @@ export function init() {
   counters();
   videos();
   hoverVideos();
-  parallax();
   sectionTransitions();
-  statement();
-  featured();
-  takeover();
-  drift();
-  heroScroll();
-  magnetic();
   anchors();
 
-  requestAnimationFrame(() => ScrollTrigger.refresh());
+  // Nach dem ersten Rendern, damit die Effekte nichts blockieren.
+  if ('requestIdleCallback' in window) (window as any).requestIdleCallback(loadScrollFx, { timeout: 1200 });
+  else setTimeout(loadScrollFx, 200);
 }
 
 export function destroy() {
   cleanups.forEach((fn) => fn());
   cleanups = [];
-  ScrollTrigger.getAll().forEach((st) => st.kill());
-  gsap.globalTimeline.clear();
+  destroyFx?.();
+  destroyFx = null;
 }
 
 document.addEventListener('astro:page-load', init);
 document.addEventListener('astro:before-swap', destroy);
-window.addEventListener('load', () => ScrollTrigger.refresh());

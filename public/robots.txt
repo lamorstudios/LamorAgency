@@ -1,5 +1,69 @@
+# ============================================================================
+# LAMOR AGENCY – robots.txt
+# Suchmaschinen sind ausdruecklich willkommen. Geblockt werden nur
+# SEO-Scraper mit hohem Traffic-Anteil und ohne Nutzen fuer die Sichtbarkeit.
+# ============================================================================
+
 User-agent: *
 Allow: /
 Disallow: /404
+# Typische WordPress-Scanner-Pfade: existieren hier nicht und werden
+# zusaetzlich in netlify.toml mit 410 abgefangen.
+Disallow: /wp-admin/
+Disallow: /wp-content/
+Disallow: /wp-includes/
+Disallow: /wp-login.php
+Disallow: /xmlrpc.php
+Disallow: /wordpress/
+Disallow: /ai1ec/
+
+# ---------------------------------------------------------------------------
+# Aggressive SEO-/Marketing-Crawler. Blockieren kostet keine Sichtbarkeit bei
+# Google, Bing & Co. – diese Bots betreiben keine Suchmaschine.
+# ---------------------------------------------------------------------------
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: BLEXBot
+Disallow: /
+
+User-agent: DataForSeoBot
+Disallow: /
+
+User-agent: PetalBot
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: serpstatbot
+Disallow: /
+
+User-agent: ZoominfoBot
+Disallow: /
+
+# ---------------------------------------------------------------------------
+# KI-Crawler: bewusst NICHT geblockt, damit LAMOR in KI-Antworten auftauchen
+# kann. Wenn das nicht gewuenscht ist, die folgenden Zeilen einkommentieren:
+# User-agent: GPTBot
+# Disallow: /
+# User-agent: ClaudeBot
+# Disallow: /
+# User-agent: CCBot
+# Disallow: /
+# User-agent: PerplexityBot
+# Disallow: /
+# User-agent: Google-Extended
+# Disallow: /
+# ---------------------------------------------------------------------------
 
 Sitemap: https://www.lamoragency.de/sitemap-index.xml

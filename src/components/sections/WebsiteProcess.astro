@@ -1,0 +1,65 @@
+---
+/**
+ * Ablauf eines Website-Projekts. Schritte zentral in
+ * src/data/website-pricing.ts (websiteProcess).
+ */
+import Words from '@/components/Words.astro';
+import { websiteProcess } from '@/data/website-pricing';
+---
+<section class="wpc section" data-theme="dark" data-bg="dark" aria-labelledby="wpc-title">
+  <div class="container">
+    <div class="wpc__head">
+      <p class="t-label wpc__label" data-reveal="fade">Ablauf</p>
+      <h2 class="t-display wpc__title" id="wpc-title"><Words lines={['So entsteht', 'deine Website.']} /></h2>
+      <p class="t-body t-muted wpc__lead" data-reveal style="--reveal-delay:160ms">
+        Du weißt zu jedem Zeitpunkt, woran wir gerade arbeiten und was als Nächstes
+        von dir gebraucht wird.
+      </p>
+    </div>
+
+    <ol class="wpc__steps" role="list">
+      {websiteProcess.map((s, i) => (
+        <li class={`wpc__step ${s.optional ? 'wpc__step--optional' : ''}`} data-reveal style={`--reveal-delay:${i * 70}ms`}>
+          <span class="wpc__index">{s.index}</span>
+          <h3 class="wpc__name t-h4">
+            {s.title}
+            {s.optional && <span class="wpc__tag t-label">optional</span>}
+          </h3>
+          <p class="wpc__text t-small t-muted">{s.text}</p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .wpc__head { display: grid; gap: var(--space-4); margin-bottom: var(--space-8); }
+  .wpc__label { color: var(--c-accent); }
+  .wpc__title { max-width: 14ch; }
+  .wpc__lead { max-width: 48ch; }
+
+  .wpc__steps { display: grid; gap: var(--space-5); }
+  @media (min-width: 620px) { .wpc__steps { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-6) var(--space-5); } }
+  @media (min-width: 1100px) { .wpc__steps { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+  .wpc__step {
+    display: grid;
+    gap: 0.4rem;
+    align-content: start;
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--line);
+  }
+  .wpc__index {
+    font-family: var(--font-display);
+    font-weight: var(--fw-display);
+    font-stretch: var(--wd-mega);
+    font-size: clamp(1.75rem, 1.2rem + 2.2vw, 3rem);
+    line-height: 0.9;
+    letter-spacing: var(--ls-mega);
+    color: var(--c-accent);
+  }
+  .wpc__step--optional .wpc__index { color: var(--fg-muted); }
+  .wpc__name { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.6em; }
+  .wpc__tag { color: var(--fg-muted); }
+  .wpc__text { max-width: 40ch; }
+</style>

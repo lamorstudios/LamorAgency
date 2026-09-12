@@ -1,0 +1,103 @@
+---
+/**
+ * Hero der Website-Landingpage.
+ * Für bezahlten Traffic gebaut: In den ersten Sekunden muss klar sein, WAS es
+ * gibt, WAS es ungefähr kostet und WO man anfragt. Deshalb steht der
+ * Preisanker direkt neben dem CTA – nicht erst weit unten auf der Seite.
+ */
+import Media from '@/components/Media.astro';
+import Words from '@/components/Words.astro';
+import { site } from '@/data/site';
+import { websiteEntryPrice, websiteEntryMonthly, euro } from '@/data/website-pricing';
+---
+<section class="wh" data-hero data-theme="dark" data-bg="dark" aria-labelledby="wh-title">
+  <div class="container wh__inner">
+    <div class="wh__text">
+      <p class="wh__eyebrow t-label" data-reveal="fade">
+        <span class="wh__dot" aria-hidden="true"></span>
+        Webdesign · {site.address.city}
+      </p>
+
+      <h1 class="wh__title t-hero" id="wh-title" data-hero-title>
+        <Words lines={['Websites, die nicht', 'nur gut aussehen.']} />
+      </h1>
+
+      <p class="wh__lead t-lead" data-reveal style="--reveal-delay:200ms">
+        LAMOR entwickelt moderne Websites für Unternehmen, die professionell auftreten
+        und mehr Anfragen bekommen wollen. Individuell gestaltet, schnell, mobil zuerst.
+      </p>
+
+      <div class="wh__actions" data-reveal style="--reveal-delay:280ms">
+        <a href="#anfrage" class="btn" data-magnetic>
+          <span>Website anfragen</span>
+          <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+        </a>
+        <a href="#pakete" class="btn btn--ghost" data-magnetic>
+          <span>Preise ansehen</span>
+          <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8H14M14 8L9 3M14 8L9 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+        </a>
+      </div>
+
+      <!-- Preisanker: früh, deutlich und richtig eingeordnet. -->
+      <div class="wh__anchor" data-reveal style="--reveal-delay:360ms">
+        <p class="wh__anchor-main">
+          Websites <strong>ab {euro(websiteEntryPrice)}</strong>
+          <span class="wh__anchor-unit">einmalig</span>
+        </p>
+        <p class="wh__anchor-sub t-small">
+          Betreuung optional ab {euro(websiteEntryMonthly)} / Monat – die Website selbst
+          ist ein einmaliges Projekt, kein Abo.
+        </p>
+      </div>
+    </div>
+
+    <div class="wh__media" data-hero-media data-reveal="fade" style="--reveal-delay:320ms">
+      <Media
+        media={{ type: 'placeholder', alt: 'Website von LAMOR AGENCY auf Desktop und Smartphone', label: '[WEBDESIGN] Website-Mockup' }}
+        ratio="portrait"
+        priority
+        sizes="(min-width: 1024px) 42vw, 100vw"
+      />
+    </div>
+  </div>
+</section>
+
+<style>
+  .wh {
+    background: var(--c-ink);
+    color: var(--c-paper);
+    padding-top: calc(var(--header-h) + clamp(2rem, 7vh, 5.5rem));
+    padding-bottom: var(--space-9);
+    overflow: clip;
+  }
+  .wh__inner { display: grid; gap: var(--space-7); align-items: center; }
+  @media (min-width: 1024px) {
+    .wh__inner { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--space-8); }
+  }
+
+  .wh__eyebrow { display: inline-flex; align-items: center; gap: 0.7em; color: var(--c-grey-dark); }
+  .wh__dot { width: 0.45rem; height: 0.45rem; border-radius: 50%; background: var(--c-accent); flex-shrink: 0; }
+
+  .wh__title { margin-block: var(--space-3) var(--space-5); max-width: 15ch; }
+  .wh__lead { max-width: 46ch; color: var(--c-grey-dark); }
+
+  .wh__actions { display: flex; flex-wrap: wrap; gap: var(--space-4); margin-top: var(--space-6); }
+
+  .wh__anchor {
+    margin-top: var(--space-6);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--c-ink-3);
+    display: grid;
+    gap: 0.4rem;
+  }
+  .wh__anchor-main {
+    font-family: var(--font-display);
+    font-weight: var(--fw-medium);
+    font-size: clamp(1.15rem, 1rem + 1.1vw, 1.75rem);
+    line-height: 1.1;
+    letter-spacing: var(--ls-snug);
+  }
+  .wh__anchor-main strong { font-weight: var(--fw-display); font-stretch: var(--wd-wide); color: var(--c-accent); }
+  .wh__anchor-unit { color: var(--c-grey-dark); font-size: 0.7em; margin-left: 0.4em; text-transform: uppercase; letter-spacing: var(--ls-wide); }
+  .wh__anchor-sub { color: var(--c-grey-dark); max-width: 48ch; }
+</style>

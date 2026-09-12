@@ -1,0 +1,184 @@
+---
+/**
+ * Sales-Landingpage für das Website-Produkt.
+ * Läuft eigenständig: Wer über eine Meta Ad nur wegen einer Website kommt,
+ * muss nichts über die übrigen Leistungen wissen, um anfragen zu können.
+ *
+ * Aufbau: Hero → Trust → Problem/Lösung → Beispiele → Vorteile → Prozess →
+ * Pakete → Website+Content → Referenzen → FAQ → Formular → finaler CTA.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import WebsiteHero from '@/components/sections/WebsiteHero.astro';
+import Clients from '@/components/sections/Clients.astro';
+import WebsiteProblem from '@/components/sections/WebsiteProblem.astro';
+import WebsiteProcess from '@/components/sections/WebsiteProcess.astro';
+import WebsitePricing from '@/components/sections/WebsitePricing.astro';
+import WebsiteContentUsp from '@/components/sections/WebsiteContentUsp.astro';
+import WebsiteLeadForm from '@/components/sections/WebsiteLeadForm.astro';
+import Testimonials from '@/components/sections/Testimonials.astro';
+import Faq from '@/components/sections/Faq.astro';
+import Media from '@/components/Media.astro';
+import Words from '@/components/Words.astro';
+import { site } from '@/data/site';
+import { websiteFaqs } from '@/data/faq';
+import { websiteEntryPrice, websiteEntryMonthly, euro, websitePricing } from '@/data/website-pricing';
+import { breadcrumb, faqPage, websiteServiceSchema } from '@/lib/schema';
+
+const benefits = [
+  { title: 'Individuell statt Baukasten', text: 'Kein Template. Layout, Typografie und Bildsprache entstehen für deine Marke.' },
+  { title: 'Mobile zuerst gebaut', text: 'Die meisten Besucher kommen vom Handy. Genau dort wird zuerst getestet, nicht zuletzt.' },
+  { title: 'Auf Anfragen ausgelegt', text: 'Klare Nutzerführung, sichtbare Kontaktwege, Formular und WhatsApp direkt erreichbar.' },
+  { title: 'Schnell geladen', text: 'Optimierte Bilder, sauberer Code, kurze Ladezeiten – auch im Mobilfunknetz.' },
+  { title: 'Rechtlich sauber', text: 'Impressum, Datenschutz und DSGVO-Basics sind eingebunden, nicht nachträglich angeflickt.' },
+  { title: 'Content auf Wunsch inklusive', text: 'Fotos und Videos produzieren wir selbst – du musst nichts dazukaufen.' },
+];
+
+const examples = [
+  { label: '[WEBDESIGN] Beispiel Gastronomie', alt: 'Website-Beispiel Gastronomie', ratio: 'portrait' as const, caption: 'Gastronomie · Onepage' },
+  { label: '[WEBDESIGN] Beispiel Dienstleister', alt: 'Website-Beispiel Dienstleister', ratio: 'portrait' as const, caption: 'Dienstleister · Business' },
+  { label: '[WEBDESIGN] Beispiel Marke', alt: 'Website-Beispiel Markenauftritt', ratio: 'portrait' as const, caption: 'Marke · Premium' },
+];
+
+const description = `Webdesign aus ${site.address.city}: individuelle Websites ab ${euro(websiteEntryPrice)} einmalig, Betreuung optional ab ${euro(websiteEntryMonthly)} pro Monat. Inklusive Foto- und Videoproduktion aus einer Hand.`;
+---
+<BaseLayout
+  title="Webdesign München – individuelle Websites ab 1.490 €"
+  description={description}
+  theme="dark"
+  jsonLd={[
+    breadcrumb([{ name: 'Webdesign München', path: '/webdesign-muenchen/' }]),
+    websiteServiceSchema(),
+    faqPage(websiteFaqs),
+  ]}
+>
+  <WebsiteHero />
+  <Clients label="Vertrauen uns" title="Marken, für die wir bereits gearbeitet haben." />
+  <WebsiteProblem />
+
+  <!-- Website-Beispiele -->
+  <section class="wx section" data-theme="dark" data-bg="dark" aria-labelledby="wx-title">
+    <div class="container">
+      <div class="wx__head">
+        <p class="t-label wx__label" data-reveal="fade">Beispiele</p>
+        <h2 class="t-say wx__title" id="wx-title"><Words text="So sehen unsere Websites aus." /></h2>
+      </div>
+      <ul class="wx__grid" role="list">
+        {examples.map((ex, i) => (
+          <li class="wx__item" data-reveal style={`--reveal-delay:${i * 110}ms`}>
+            <Media
+              media={{ type: 'placeholder', alt: ex.alt, label: ex.label }}
+              ratio={ex.ratio}
+              hover
+              reveal
+              sizes="(min-width: 900px) 32vw, 100vw"
+            />
+            <p class="t-label t-muted wx__caption">{ex.caption}</p>
+          </li>
+        ))}
+      </ul>
+      <p class="t-small t-muted wx__note" data-reveal="fade">
+        Jedes Projekt wird individuell gestaltet – die Beispiele zeigen den Aufbau, nicht eine Vorlage.
+      </p>
+    </div>
+  </section>
+
+  <!-- Vorteile -->
+  <section class="wv section" data-theme="light" data-bg="light" aria-labelledby="wv-title">
+    <div class="container">
+      <div class="wv__head">
+        <p class="t-label wv__label" data-reveal="fade">Vorteile</p>
+        <h2 class="t-say wv__title" id="wv-title"><Words text="Was du dafür bekommst." /></h2>
+      </div>
+      <ul class="wv__grid" role="list">
+        {benefits.map((b, i) => (
+          <li class="wv__card" data-reveal style={`--reveal-delay:${i * 70}ms`}>
+            <span class="wv__num t-label">{String(i + 1).padStart(2, '0')}</span>
+            <h3 class="t-h4 wv__card-title">{b.title}</h3>
+            <p class="t-small t-muted">{b.text}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <WebsiteProcess />
+  <WebsitePricing />
+  <WebsiteContentUsp />
+  <Testimonials />
+
+  <Faq
+    id="website-faq"
+    items={websiteFaqs}
+    label="Häufige Fragen"
+    heading="Was Kunden vor dem Start wissen wollen."
+    lead="Noch eine Frage offen? Stell sie einfach direkt im Formular – wir antworten persönlich."
+  />
+
+  <WebsiteLeadForm />
+
+  <!-- Finaler CTA -->
+  <section class="wf section" data-theme="dark" data-bg="dark" aria-labelledby="wf-title">
+    <div class="container wf__inner">
+      <h2 class="t-hero wf__title" id="wf-title">
+        <Words lines={['Bereit für eine', 'Website, die wirkt?']} />
+      </h2>
+      <p class="t-lead wf__lead" data-reveal style="--reveal-delay:200ms">
+        {websitePricing.length} Pakete, ein klarer Preis, ein Ansprechpartner.
+        Schreib uns – die Einschätzung kostet nichts.
+      </p>
+      <div class="wf__actions" data-reveal style="--reveal-delay:280ms">
+        <a href="#anfrage" class="btn" data-magnetic>
+          <span>Website anfragen</span>
+          <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+        </a>
+        <a href={site.whatsapp} class="btn btn--ghost" target="_blank" rel="noopener noreferrer">
+          <span>WhatsApp</span>
+          <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+        </a>
+      </div>
+      <p class="t-label t-muted wf__meta" data-reveal="fade" style="--reveal-delay:340ms">
+        <a href={`mailto:${site.email}`} class="link">{site.email}</a>
+        <span aria-hidden="true">·</span>
+        <a href={site.phoneHref} class="link">{site.phone}</a>
+        <span aria-hidden="true">·</span>
+        <span>{site.address.city}</span>
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* Beispiele */
+  .wx__head { display: grid; gap: var(--space-3); margin-bottom: var(--space-7); }
+  .wx__label { color: var(--c-accent); }
+  .wx__title { max-width: 18ch; }
+  .wx__grid { display: grid; gap: var(--space-6) var(--grid-gap); }
+  @media (min-width: 700px) { .wx__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .wx__caption { margin-top: var(--space-3); }
+  .wx__note { margin-top: var(--space-6); max-width: 56ch; }
+
+  /* Vorteile */
+  .wv__head { display: grid; gap: var(--space-3); margin-bottom: var(--space-7); }
+  .wv__label { color: var(--c-accent); }
+  .wv__title { max-width: 18ch; }
+  .wv__grid { display: grid; gap: var(--space-5); }
+  @media (min-width: 620px) { .wv__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 1024px) { .wv__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .wv__card {
+    display: grid; gap: 0.4rem; align-content: start;
+    padding: clamp(1.25rem, 2.5vw, 1.75rem);
+    border: 1px solid var(--line);
+    background: var(--bg);
+    transition: border-color var(--dur-base) var(--ease-out);
+  }
+  @media (hover: hover) { .wv__card:hover { border-color: var(--fg); } }
+  .wv__num { color: var(--c-accent); }
+  .wv__card-title { margin-top: var(--space-2); }
+
+  /* Finaler CTA */
+  .wf__inner { display: grid; gap: var(--space-5); }
+  .wf__title { max-width: 14ch; }
+  .wf__lead { max-width: 44ch; color: var(--c-grey-dark); }
+  .wf__actions { display: flex; flex-wrap: wrap; gap: var(--space-4); margin-top: var(--space-3); }
+  .wf__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6em 1em; margin-top: var(--space-4); }
+</style>

@@ -10,25 +10,35 @@
  */
 import Words from '@/components/Words.astro';
 import ArrowLink from '@/components/ArrowLink.astro';
-import { faqs } from '@/data/faq';
-import { packages, priceLine } from '@/data/pricing';
+import { faqs, type FaqItem } from '@/data/faq';
+import { resolveFaqTokens } from '@/lib/faq';
 
-// Günstigstes monatliches Paket als Einstiegspreis im FAQ-Text.
-const cheapest = packages
-  .filter((p) => p.monthly.amount !== null)
-  .sort((a, b) => (a.monthly.amount as number) - (b.monthly.amount as number))[0];
-const entry = cheapest ? priceLine(cheapest.monthly) : 'auf Anfrage';
+interface Props {
+  /** Eigene Fragenliste – ohne Angabe die allgemeinen LAMOR-FAQ. */
+  items?: FaqItem[];
+  heading?: string;
+  label?: string;
+  lead?: string;
+  /** Eindeutige id, falls mehrere FAQ-Blöcke auf einer Seite stehen. */
+  id?: string;
+}
+const {
+  items: given,
+  heading = 'Fragen, die uns oft gestellt werden.',
+  label = 'FAQ',
+  lead = 'Etwas nicht dabei? Schreib uns – wir antworten direkt und ohne Verkaufsgespräch.',
+  id = 'faq',
+} = Astro.props;
 
-const items = faqs.map((f) => ({ ...f, a: f.a.replace(/\{\{PREIS_START\}\}/g, entry) }));
+// Preis-Platzhalter zentral auflösen (siehe src/lib/faq.ts).
+const items = resolveFaqTokens(given ?? faqs);
 ---
-<section class="faq section" data-theme="light" data-bg="light" aria-labelledby="faq-title">
+<section class="faq section" id={id} data-theme="light" data-bg="light" aria-labelledby={`${id}-title`}>
   <div class="container faq__inner">
     <div class="faq__head">
-      <p class="t-label faq__label" data-reveal="fade">FAQ</p>
-      <h2 class="t-say faq__title" id="faq-title"><Words text="Fragen, die uns oft gestellt werden." /></h2>
-      <p class="t-body t-muted faq__lead" data-reveal style="--reveal-delay:140ms">
-        Etwas nicht dabei? Schreib uns – wir antworten direkt und ohne Verkaufsgespräch.
-      </p>
+      <p class="t-label faq__label" data-reveal="fade">{label}</p>
+      <h2 class="t-say faq__title" id={`${id}-title`}><Words text={heading} /></h2>
+      <p class="t-body t-muted faq__lead" data-reveal style="--reveal-delay:140ms">{lead}</p>
       <div class="faq__head-cta" data-reveal="fade" style="--reveal-delay:220ms">
         <ArrowLink href="/contact/" label="Frage stellen" />
       </div>
@@ -36,7 +46,7 @@ const items = faqs.map((f) => ({ ...f, a: f.a.replace(/\{\{PREIS_START\}\}/g, en
 
     <div class="faq__list">
       {items.map((f, i) => (
-        <details class="faq__item" name="faq" data-reveal style={`--reveal-delay:${Math.min(i * 50, 300)}ms`}>
+        <details class="faq__item" name={id} data-reveal style={`--reveal-delay:${Math.min(i * 50, 300)}ms`}>
           <summary class="faq__q">
             <span class="faq__q-text">{f.q}</span>
             <span class="faq__icon" aria-hidden="true"></span>

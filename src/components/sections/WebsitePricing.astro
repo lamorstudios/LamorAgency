@@ -1,0 +1,188 @@
+---
+/**
+ * Website-Pakete. Alle Beträge kommen aus src/data/website-pricing.ts.
+ *
+ * Darstellungsregel: Der EINMALIGE Erstellungspreis ist die Hauptzahl.
+ * Die optionale Betreuung steht klar getrennt darunter, damit niemand denkt,
+ * der monatliche Betrag würde die Website finanzieren.
+ */
+import Words from '@/components/Words.astro';
+import { websitePricing, websiteBundles, websitePriceLine, monthlyLine, euro } from '@/data/website-pricing';
+import { priceNote } from '@/data/pricing';
+---
+<section class="wp section" id="pakete" data-theme="light" data-bg="light" aria-labelledby="wp-title">
+  <div class="container">
+    <div class="wp__head">
+      <p class="t-label wp__label" data-reveal="fade">Website-Pakete</p>
+      <h2 class="t-say wp__title" id="wp-title"><Words text="Was deine Website kostet." /></h2>
+      <p class="t-lead t-muted wp__lead" data-reveal style="--reveal-delay:140ms">
+        Die Website ist ein einmaliges Projekt. Die monatliche Betreuung ist optional
+        und übernimmt danach Hosting, Wartung und kleine Änderungen.
+      </p>
+    </div>
+
+    <ul class="wp__grid" role="list">
+      {websitePricing.map((p, i) => (
+        <li class={`wp__card ${p.highlighted ? 'wp__card--featured' : ''}`} data-reveal style={`--reveal-delay:${i * 90}ms`}>
+          {p.highlighted && <span class="wp__badge t-label">{p.label}</span>}
+          <header class="wp__card-head">
+            {!p.highlighted && <span class="wp__card-label t-label">{p.label}</span>}
+            <h3 class="wp__name">{p.name}</h3>
+            <p class="wp__desc t-small">{p.description}</p>
+          </header>
+
+          <div class="wp__price">
+            <p class="wp__once">
+              <span class="wp__once-value">{websitePriceLine(p)}</span>
+              <span class="wp__once-unit t-label">einmalig</span>
+            </p>
+            {p.priceNote && <p class="wp__price-note t-small t-muted">{p.priceNote}</p>}
+            <p class="wp__monthly t-small">
+              {monthlyLine(p.monthlyPrice)
+                ? <>Betreuung optional: <span class="wp__monthly-value">{monthlyLine(p.monthlyPrice)}</span></>
+                : <span class="t-muted">Betreuung auf Anfrage</span>}
+            </p>
+          </div>
+
+          <div class="wp__body">
+            <p class="wp__for-label t-label t-muted">Passend für</p>
+            <p class="wp__for t-small">{p.for.join(' · ')}</p>
+            <ul class="wp__features" role="list">
+              {p.features.map((f) => (
+                <li class="wp__feature">
+                  <svg class="wp__check" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 6.5L4.8 9L10 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"/></svg>
+                  <span>{f}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <a href={p.cta.href} class={`btn wp__cta ${p.highlighted ? '' : 'btn--ghost'}`}>
+            <span>{p.cta.label}</span>
+            <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <p class="wp__note t-small t-muted" data-reveal="fade">
+      {priceNote} Die Website-Erstellung ist ein einmaliges Projekt – der monatliche
+      Betrag ist ausschließlich optionale Betreuung.
+    </p>
+
+    <div class="wp__bundles">
+      <h3 class="t-h3 wp__bundles-title" data-reveal>Zwei Wege, die sich fast immer lohnen.</h3>
+      <ul class="wp__bundle-grid" role="list">
+        {websiteBundles.map((b, i) => (
+          <li class="wp__bundle" data-reveal style={`--reveal-delay:${i * 110}ms`}>
+            <p class="t-label wp__bundle-name">{b.name}</p>
+            <h4 class="wp__bundle-head t-h3">{b.headline}</h4>
+            <p class="t-small t-muted wp__bundle-text">{b.description}</p>
+            <ul class="wp__bundle-items" role="list">
+              {b.includes.map((inc) => <li class="wp__bundle-item t-label">{inc}</li>)}
+            </ul>
+            <p class="wp__bundle-price">
+              {b.price !== null
+                ? <span class="wp__bundle-value">{b.priceFrom ? 'ab ' : ''}{euro(b.price)}</span>
+                : <span class="wp__bundle-value">Auf Anfrage</span>}
+              {b.priceNote && <span class="t-small t-muted wp__bundle-note">{b.priceNote}</span>}
+            </p>
+            <a href={b.cta.href} class="btn btn--ghost wp__bundle-cta">
+              <span>{b.cta.label}</span>
+              <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .wp__head { display: grid; gap: var(--space-4); margin-bottom: var(--space-8); }
+  .wp__label { color: var(--c-accent); }
+  .wp__title { max-width: 18ch; }
+  .wp__lead { max-width: 52ch; }
+
+  .wp__grid { display: grid; gap: var(--space-5); align-items: stretch; }
+  @media (min-width: 700px) { .wp__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); } }
+  @media (min-width: 1200px) { .wp__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+  .wp__card {
+    position: relative;
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    gap: var(--space-5);
+    padding: clamp(1.4rem, 3vw, 2rem);
+    border: 1px solid var(--line);
+    background: var(--c-paper);
+    transition: border-color var(--dur-base) var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) { .wp__card:hover { border-color: var(--fg); } }
+
+  .wp__card--featured { background: var(--c-ink); color: var(--c-paper); border-color: var(--c-ink); }
+  .wp__card--featured .wp__feature { border-color: var(--c-ink-3); }
+  .wp__card--featured .wp__price { border-color: var(--c-ink-3); }
+  .wp__card--featured .wp__desc, .wp__card--featured .t-muted { color: var(--c-grey-dark); }
+  .wp__card--featured .wp__cta { --btn-bg: var(--c-paper); --btn-fg: var(--c-ink); border-color: var(--c-paper); }
+
+  .wp__badge {
+    position: absolute; top: 0; left: clamp(1.4rem, 3vw, 2rem);
+    transform: translateY(-50%);
+    padding: 0.5em 0.9em; background: var(--c-accent); color: #fff; border-radius: var(--radius-pill);
+  }
+
+  .wp__card-head { display: grid; gap: var(--space-2); }
+  .wp__card-label { color: var(--fg-muted); }
+  .wp__name {
+    font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: var(--wd-wide);
+    font-size: clamp(1.15rem, 1rem + 0.9vw, 1.6rem); line-height: 1.05;
+    letter-spacing: var(--ls-tight); text-transform: uppercase;
+    overflow-wrap: break-word;
+  }
+  .wp__desc { color: var(--fg-muted); }
+
+  .wp__price { display: grid; gap: 0.35rem; padding-block: var(--space-4); border-block: 1px solid var(--line); }
+  .wp__once { display: grid; gap: 0.15rem; margin: 0; }
+  .wp__once-value {
+    font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: var(--wd-wide);
+    font-size: clamp(1.6rem, 1.1rem + 1.7vw, 2.4rem); line-height: 1.05;
+    letter-spacing: var(--ls-tight); font-variant-numeric: tabular-nums;
+  }
+  .wp__once-unit { color: var(--fg-muted); }
+  .wp__monthly-value { font-weight: var(--fw-semi); }
+
+  .wp__body { display: grid; gap: var(--space-3); align-content: start; }
+  .wp__for { color: var(--fg-muted); }
+  .wp__features { display: grid; margin-top: var(--space-2); }
+  .wp__feature { display: flex; align-items: flex-start; gap: 0.6em; padding-block: 0.5rem; border-top: 1px solid var(--line); font-size: var(--fs-small); }
+  .wp__feature:first-child { border-top: 0; }
+  .wp__check { width: 0.8rem; height: 0.8rem; margin-top: 0.35em; flex-shrink: 0; color: var(--c-accent); }
+
+  .wp__cta { width: 100%; justify-content: space-between; }
+  .wp__note { margin-top: var(--space-5); max-width: 70ch; }
+
+  /* ---------- Bundles */
+  .wp__bundles { margin-top: var(--space-9); padding-top: var(--space-8); border-top: 1px solid var(--line); }
+  .wp__bundles-title { max-width: 20ch; margin-bottom: var(--space-6); }
+  .wp__bundle-grid { display: grid; gap: var(--space-5); }
+  @media (min-width: 900px) { .wp__bundle-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .wp__bundle {
+    display: grid; align-content: start; gap: var(--space-3);
+    padding: clamp(1.4rem, 3vw, 2.25rem);
+    border: 1px solid var(--line);
+    background: var(--bg);
+  }
+  .wp__bundle-name { color: var(--c-accent); }
+  .wp__bundle-head { max-width: 22ch; }
+  .wp__bundle-text { max-width: 52ch; }
+  .wp__bundle-items { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: var(--space-2); }
+  .wp__bundle-item { padding: 0.45em 0.85em; border: 1px solid var(--line); border-radius: var(--radius-pill); color: var(--fg-muted); }
+  .wp__bundle-price { display: grid; gap: 0.2rem; margin-top: var(--space-3); }
+  .wp__bundle-value {
+    font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: var(--wd-wide);
+    font-size: clamp(1.4rem, 1rem + 1.4vw, 2rem); line-height: 1.05;
+    letter-spacing: var(--ls-tight); font-variant-numeric: tabular-nums;
+  }
+  .wp__bundle-cta { justify-self: start; margin-top: var(--space-3); }
+</style>

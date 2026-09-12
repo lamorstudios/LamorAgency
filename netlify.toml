@@ -5,14 +5,16 @@
 [build.environment]
   NODE_VERSION = "22"
 
-# Sicherheits- und Cache-Header
+# ============================================================================
+# SICHERHEITS- UND CACHE-HEADER
+# ============================================================================
 [[headers]]
   for = "/*"
   [headers.values]
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), interest-cohort=()"
 
 [[headers]]
   for = "/_astro/*"
@@ -23,19 +25,146 @@
   for = "/fonts/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+    Access-Control-Allow-Origin = "*"
 
 [[headers]]
   for = "/media/*"
   [headers.values]
     Cache-Control = "public, max-age=604800"
 
-# Redirects von alten Wix-URLs -> neue URLs.
-# Die Wix-URLs werden nach der Prüfung der Live-Site ergänzt (Beispiel):
-# [[redirects]]
-#   from = "/contact-1"
-#   to = "/contact/"
-#   status = 301
+# ============================================================================
+# BOT- / BANDBREITENSCHUTZ
+# ----------------------------------------------------------------------------
+# WordPress-Scanner klopfen dauerhaft an Pfade, die es hier nie geben wird.
+# Ohne diese Regeln bekaemen sie die vollstaendige 404-Seite inklusive CSS,
+# Fonts und JS ausgeliefert. Stattdessen: winzige 410-Antwort (~40 Bytes).
+# `force = true` ist noetig, damit die Regel vor dem Static-Handler greift.
+# ============================================================================
+[[redirects]]
+  from = "/wp-login.php"
+  to = "/blocked.html"
+  status = 410
+  force = true
+
+[[redirects]]
+  from = "/wp-login"
+  to = "/blocked.html"
+  status = 410
+  force = true
+
+[[redirects]]
+  from = "/xmlrpc.php"
+  to = "/blocked.html"
+  status = 410
+  force = true
+
+[[redirects]]
+  from = "/wp-admin/*"
+  to = "/blocked.html"
+  status = 410
+  force = true
+
+[[redirects]]
+  from = "/wp-content/*"
+  to = "/blocked.html"
+  status = 410
+  force = true
+
+[[redirects]]
+  from = "/wp-includes/*"
+  to = "/blocked.html"
+  status = 410
+  force = true
+
+[[redirects]]
+  from = "/wordpress/*"
+  to = "/blocked.html"
+  status = 410
+  force = true
+
+[[redirects]]
+  from = "/wp/*"
+  to = "/blocked.html"
+  status = 410
+  force = true
+
+[[redirects]]
+  from = "/ai1ec/*"
+  to = "/blocked.html"
+  status = 410
+  force = true
+
+# Haeufig gescannte Konfigurations- und Admin-Pfade
+[[redirects]]
+  from = "/.env"
+  to = "/blocked.html"
+  status = 410
+  force = true
+
+[[redirects]]
+  from = "/.git/*"
+  to = "/blocked.html"
+  status = 410
+  force = true
+
+[[redirects]]
+  from = "/vendor/*"
+  to = "/blocked.html"
+  status = 410
+  force = true
+
+[[redirects]]
+  from = "/administrator/*"
+  to = "/blocked.html"
+  status = 410
+  force = true
+
+[[redirects]]
+  from = "/phpmyadmin/*"
+  to = "/blocked.html"
+  status = 410
+  force = true
+
+# WordPress-Permalinks der Form /?page_id=123
+[[redirects]]
+  from = "/"
+  to = "/blocked.html"
+  status = 410
+  force = true
+  query = { page_id = ":id" }
+
+# ============================================================================
+# REDIRECTS
+# ----------------------------------------------------------------------------
+# Alte Wix-URLs hier ergaenzen, sobald die Liste der bestehenden Adressen
+# vorliegt (z. B. aus der Google Search Console). Alle Ziele mit Trailing Slash.
+# ============================================================================
 [[redirects]]
   from = "/contact-1"
   to = "/contact/"
+  status = 301
+
+[[redirects]]
+  from = "/about"
+  to = "/agency/"
+  status = 301
+
+[[redirects]]
+  from = "/about/"
+  to = "/agency/"
+  status = 301
+
+[[redirects]]
+  from = "/models-talents"
+  to = "/models/"
+  status = 301
+
+[[redirects]]
+  from = "/webdesign"
+  to = "/webdesign-muenchen/"
+  status = 301
+
+[[redirects]]
+  from = "/website-erstellen-lassen"
+  to = "/webdesign-muenchen/"
   status = 301

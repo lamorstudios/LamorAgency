@@ -10,6 +10,7 @@ import Clients from '@/components/sections/Clients.astro';
 import Comparison from '@/components/sections/Comparison.astro';
 import Services from '@/components/sections/Services.astro';
 import Showreel from '@/components/sections/Showreel.astro';
+import WebsiteTeaser from '@/components/sections/WebsiteTeaser.astro';
 import SelectedWork from '@/components/home/SelectedWork.astro';
 import Process from '@/components/sections/Process.astro';
 import ModelsTeaser from '@/components/sections/ModelsTeaser.astro';
@@ -20,18 +21,19 @@ import Pricing from '@/components/sections/Pricing.astro';
 import Faq from '@/components/sections/Faq.astro';
 import ContactCta from '@/components/ContactCta.astro';
 import { site } from '@/data/site';
-import { faqPage, offerCatalog } from '@/lib/schema';
+import { offerCatalog } from '@/lib/schema';
 ---
 <BaseLayout
   title={`Werbeagentur München | Video, Social Media & Branding – ${site.name}`}
   description="LAMOR AGENCY aus München: Videoproduktion, Fotografie, Social Media, Webdesign, Branding und eigene Models. Über 500 Mio. Aufrufe auf unsere Arbeit. Jetzt Projekt anfragen."
   theme="dark"
-  jsonLd={[faqPage(), offerCatalog()]}
+  jsonLd={[offerCatalog()]}
 >
   <Hero />
   <Clients />
   <Comparison />
   <Services />
+  <WebsiteTeaser />
   <Showreel />
   <SelectedWork />
   <Process />

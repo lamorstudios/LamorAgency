@@ -4,13 +4,13 @@ import Words from '@/components/Words.astro';
 import ContactForm from '@/components/ContactForm.astro';
 import Faq from '@/components/sections/Faq.astro';
 import { site, social } from '@/data/site';
-import { breadcrumb, faqPage } from '@/lib/schema';
+import { breadcrumb } from '@/lib/schema';
 ---
 <BaseLayout
   title="Kontakt – Projekt anfragen"
   description={`Projekt bei LAMOR AGENCY in ${site.address.city} anfragen: Video, Fotografie, Social Media, Webdesign, Branding und Models. ${site.email} · ${site.phone}`}
   theme="dark"
-  jsonLd={[breadcrumb([{ name: 'Kontakt', path: '/contact/' }]), faqPage()]}
+  jsonLd={[breadcrumb([{ name: 'Kontakt', path: '/contact/' }])]}
 >
   <section class="contact" data-theme="dark" data-bg="dark">
     <header class="contact__head container">
