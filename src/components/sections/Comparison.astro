@@ -1,0 +1,92 @@
+---
+/**
+ * Problem → Lösung. Der Kontrast trägt den Block, nicht die Textmenge.
+ * Inhalte zentral in src/data/comparison.ts.
+ */
+import Words from '@/components/Words.astro';
+import { comparison } from '@/data/comparison';
+---
+<section class="cmp section" data-theme="light" data-bg="light" aria-labelledby="cmp-title">
+  <div class="container">
+    <div class="cmp__head">
+      <p class="t-label cmp__label" data-reveal="fade">Problem → Lösung</p>
+      <h2 class="t-say cmp__title" id="cmp-title">
+        <Words text={comparison.headline} />
+      </h2>
+      <p class="t-lead t-muted cmp__lead" data-reveal style="--reveal-delay:160ms">{comparison.lead}</p>
+    </div>
+
+    <div class="cmp__cards">
+      <article class="cmp__card cmp__card--before" data-reveal>
+        <header class="cmp__card-head">
+          <span class="cmp__icon cmp__icon--before" aria-hidden="true"></span>
+          <h3 class="t-h4">{comparison.before.label}</h3>
+        </header>
+        <ul role="list" class="cmp__list">
+          {comparison.before.items.map((i) => <li class="cmp__item">{i}</li>)}
+        </ul>
+      </article>
+
+      <p class="cmp__vs" aria-hidden="true"><span>vs.</span></p>
+
+      <article class="cmp__card cmp__card--after" data-reveal style="--reveal-delay:120ms">
+        <header class="cmp__card-head">
+          <span class="cmp__icon cmp__icon--after" aria-hidden="true"></span>
+          <h3 class="t-h4">{comparison.after.label}</h3>
+        </header>
+        <ul role="list" class="cmp__list">
+          {comparison.after.items.map((i) => <li class="cmp__item">{i}</li>)}
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cmp__head { display: grid; gap: var(--space-4); margin-bottom: var(--space-8); }
+  .cmp__label { color: var(--c-accent); }
+  .cmp__title { max-width: 18ch; }
+  .cmp__lead { max-width: 52ch; }
+
+  .cmp__cards { display: grid; gap: var(--space-5); align-items: stretch; }
+  .cmp__card {
+    display: grid;
+    align-content: start;
+    gap: var(--space-5);
+    padding: clamp(1.5rem, 3.5vw, 3rem);
+    border: 1px solid var(--line);
+    background: var(--c-paper);
+  }
+  /* "Mit LAMOR" ist die Antwort – dunkle Fläche, damit die Hierarchie stimmt. */
+  .cmp__card--after { background: var(--c-ink); color: var(--c-paper); border-color: var(--c-ink); }
+  .cmp__card--after .cmp__item { border-color: var(--c-ink-3); }
+
+  .cmp__card-head { display: flex; align-items: center; gap: var(--space-3); }
+  .cmp__icon { width: 1.25rem; height: 1.25rem; border-radius: 50%; flex-shrink: 0; position: relative; }
+  .cmp__icon--before { border: 1px solid currentColor; opacity: 0.4; }
+  .cmp__icon--before::after { content: ''; position: absolute; inset: 45% 20%; border-top: 1px solid currentColor; }
+  .cmp__icon--after { background: var(--c-accent); }
+  .cmp__icon--after::after { content: ''; position: absolute; inset: 0; background: no-repeat center / 0.6rem url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none'><path d='M2 6.5L4.8 9L10 3' stroke='white' stroke-width='2' stroke-linecap='square'/></svg>"); }
+
+  .cmp__list { display: grid; }
+  .cmp__item { padding-block: var(--space-4); border-top: 1px solid var(--line); font-size: var(--fs-body); }
+  .cmp__item:first-child { border-top: 0; padding-top: 0; }
+  .cmp__card--before .cmp__item { color: var(--fg-muted); }
+
+  .cmp__vs {
+    display: grid;
+    place-items: center;
+    font-family: var(--font-display);
+    font-size: var(--fs-eyebrow);
+    font-weight: var(--fw-semi);
+    letter-spacing: var(--ls-wider);
+    text-transform: uppercase;
+    color: var(--fg-muted);
+  }
+  .cmp__vs span { display: grid; place-items: center; width: 3.25rem; height: 3.25rem; border: 1px solid var(--line); border-radius: 50%; background: var(--bg); }
+
+  @media (min-width: 900px) {
+    .cmp__cards { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: var(--space-4); }
+    .cmp__vs { align-self: center; }
+  }
+</style>

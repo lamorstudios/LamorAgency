@@ -1,12 +1,12 @@
 ---
-import { mainNav, legalNav } from '@/data/navigation';
+import { footerNav, legalNav } from '@/data/navigation';
 import { site, social } from '@/data/site';
 const year = new Date().getFullYear();
 ---
 <footer class="footer" data-theme="dark">
   <div class="container">
     <div class="footer__top">
-      <p class="footer__claim t-h3" data-reveal>Neues Projekt, neue Marke,<br />neuer Content?</p>
+      <p class="footer__claim t-h3" data-reveal>Neue Marke, neuer Content,<br />neuer Auftritt?</p>
       <a href="/contact/" class="btn footer__cta" data-magnetic>
         <span>Projekt anfragen</span>
         <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
@@ -17,7 +17,7 @@ const year = new Date().getFullYear();
       <div class="footer__col">
         <p class="t-label t-muted">Navigation</p>
         <ul role="list" class="footer__list">
-          {mainNav.map((i) => <li><a href={i.href} class="link">{i.label}</a></li>)}
+          {footerNav.map((i) => <li><a href={i.href} class="link">{i.label}</a></li>)}
         </ul>
       </div>
       <div class="footer__col">
@@ -51,7 +51,7 @@ const year = new Date().getFullYear();
 
   <div class="container footer__bottom">
     <p class="t-label t-muted">© <span data-year>{year}</span> {site.name}. {site.address.city}.</p>
-    <p class="t-label t-muted hide-mobile">Creative Studio · Social Media · Film · Branding · Design</p>
+    <p class="t-label t-muted hide-mobile">Video · Fotografie · Social Media · Webdesign · Branding · Models</p>
     <a href="#top" class="t-label footer__totop link">Nach oben ↑</a>
   </div>
 </footer>

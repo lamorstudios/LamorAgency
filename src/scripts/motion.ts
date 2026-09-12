@@ -1,10 +1,17 @@
 /**
  * LAMOR Motion System
- * - Reveal-Observer (CSS-getrieben, JS setzt .is-inview)
- * - Header Scroll-State
- * - Video-Autoplay bei Sichtbarkeit (spart Bandbreite)
- * - GSAP/ScrollTrigger nur für: Parallax, Statement-Scale, Magnetic CTA
- * Alles respektiert prefers-reduced-motion und wird bei View Transitions sauber neu initialisiert.
+ *
+ * GRUNDREGEL: Motion ist Zugabe, nie Voraussetzung. Kein Inhalt darf dauerhaft
+ * unsichtbar sein, wenn eine Animation nicht startet.
+ * Dafür sorgen drei Ebenen:
+ *   1. CSS versteckt nur unter `html.js` (Klasse kommt aus dem Inline-Script).
+ *   2. Das Inline-Script nimmt `.js` nach 2.5s wieder weg, falls dieses Modul
+ *      nie `data-motion="ready"` setzt (Bundle fehlt, JS-Fehler, altes Gerät).
+ *   3. `safetyNet()` unten deckt den Fall ab, dass das Modul zwar läuft, der
+ *      IntersectionObserver aber nicht auslöst (der klassische Mobile-Bug).
+ *
+ * GSAP/ScrollTrigger nur für: Parallax, Takeover, Drift, Hero-Scroll, Magnetic.
+ * Alles respektiert prefers-reduced-motion.
  */
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -13,10 +20,14 @@ gsap.registerPlugin(ScrollTrigger);
 
 const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const finePointer = () => matchMedia('(hover: hover) and (pointer: fine)').matches;
+const isMobile = () => matchMedia('(max-width: 767px)').matches;
 let cleanups: Array<() => void> = [];
 
+const REVEAL_SELECTOR = '[data-reveal], .words, .rule, .media--reveal';
+
 function reveal() {
-  const targets = document.querySelectorAll<HTMLElement>('[data-reveal], .words, .rule, .media--reveal');
+  const targets = document.querySelectorAll<HTMLElement>(REVEAL_SELECTOR);
+
   // Läuft die Brand-Intro, starten Hero-Reveals erst danach.
   if (document.documentElement.hasAttribute('data-intro')) {
     document.querySelectorAll<HTMLElement>('[data-hero] [data-reveal], [data-hero] .words').forEach((t) => {
@@ -24,29 +35,69 @@ function reveal() {
       t.style.setProperty('--reveal-delay', `${base + 950}ms`);
     });
   }
-  if (reduced() || !('IntersectionObserver' in window)) { targets.forEach((t) => t.classList.add('is-inview')); return; }
-  // clip-path-geclippte Elemente (.media--reveal) melden keine Intersection → Elternelement beobachten.
+
+  if (reduced() || !('IntersectionObserver' in window)) {
+    targets.forEach((t) => t.classList.add('is-inview'));
+    return;
+  }
+
+  // clip-path-geclippte Elemente (.media--reveal) melden keine Intersection
+  // → stattdessen das Elternelement beobachten.
   const proxies = new Map<Element, HTMLElement[]>();
   targets.forEach((t) => {
     const key = t.classList.contains('media--reveal') && t.parentElement ? t.parentElement : t;
     proxies.set(key, [...(proxies.get(key) ?? []), t]);
   });
-  const io = new IntersectionObserver((entries) => {
-    for (const e of entries) if (e.isIntersecting) { proxies.get(e.target)?.forEach((t) => t.classList.add('is-inview')); io.unobserve(e.target); }
-  }, { rootMargin: '0px 0px -10% 0px', threshold: 0.05 });
+
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        proxies.get(e.target)?.forEach((t) => t.classList.add('is-inview'));
+        io.unobserve(e.target);
+      }
+    },
+    { rootMargin: '0px 0px -10% 0px', threshold: 0.05 },
+  );
   proxies.forEach((_, key) => io.observe(key));
   cleanups.push(() => io.disconnect());
+}
+
+/**
+ * Sicherheitsnetz gegen den Mobile-Klassiker: der Observer feuert nicht
+ * (falsche Viewport-Höhe durch die Adressleiste, Layout-Shift, Bounce-Scroll).
+ * Nach kurzer Zeit wird alles sichtbar gemacht, was ohnehin im Bild steht –
+ * und nach längerer Zeit sicherheitshalber der komplette Rest.
+ */
+function safetyNet() {
+  if (reduced()) return;
+  const inViewport = (el: Element) => {
+    const r = el.getBoundingClientRect();
+    return r.top < innerHeight * 1.1 && r.bottom > 0;
+  };
+  const sweep = (all: boolean) => {
+    document.querySelectorAll<HTMLElement>(REVEAL_SELECTOR).forEach((el) => {
+      if (el.classList.contains('is-inview')) return;
+      if (all || inViewport(el)) el.classList.add('is-inview');
+    });
+  };
+  const t1 = setTimeout(() => sweep(false), 1400);
+  // Letzte Instanz: nach 8s ist jede Reveal-Absicht abgelaufen.
+  const t2 = setTimeout(() => sweep(true), 8000);
+  cleanups.push(() => { clearTimeout(t1); clearTimeout(t2); });
 }
 
 function header() {
   const el = document.querySelector<HTMLElement>('[data-header]');
   if (!el) return;
-  let last = window.scrollY, ticking = false;
+  let last = window.scrollY;
+  let ticking = false;
   const update = () => {
     const y = window.scrollY;
     el.classList.toggle('is-scrolled', y > 24);
     el.classList.toggle('is-hidden', y > 320 && y > last && !document.body.classList.contains('nav-open'));
-    last = y; ticking = false;
+    last = y;
+    ticking = false;
   };
   const onScroll = () => { if (!ticking) { requestAnimationFrame(update); ticking = true; } };
   update();
@@ -54,27 +105,70 @@ function header() {
   cleanups.push(() => window.removeEventListener('scroll', onScroll));
 }
 
+/** Zähler-Animation. Der Endwert steht im Markup – das hier ist reine Zugabe. */
+function counters() {
+  const els = document.querySelectorAll<HTMLElement>('[data-count]');
+  if (!els.length || reduced() || !('IntersectionObserver' in window)) return;
+
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        const el = e.target as HTMLElement;
+        io.unobserve(el);
+        const target = Number(el.dataset.count);
+        if (!Number.isFinite(target)) continue;
+        const grouped = el.hasAttribute('data-grouped');
+        const fmt = new Intl.NumberFormat('de-DE');
+        const out = (n: number) => (grouped ? fmt.format(n) : String(n));
+        const duration = 1400;
+        const start = performance.now();
+        const tick = (now: number) => {
+          const p = Math.min((now - start) / duration, 1);
+          // easeOutExpo – schnell los, sauber aus.
+          const eased = p === 1 ? 1 : 1 - Math.pow(2, -10 * p);
+          el.textContent = out(Math.round(target * eased));
+          if (p < 1) requestAnimationFrame(tick);
+          else el.textContent = out(target); // Endwert exakt, nie gerundet daneben
+        };
+        requestAnimationFrame(tick);
+      }
+    },
+    { threshold: 0.4 },
+  );
+  els.forEach((el) => io.observe(el));
+  cleanups.push(() => io.disconnect());
+}
+
 function videos() {
   const vids = document.querySelectorAll<HTMLVideoElement>('video[data-autoplay]');
   if (!vids.length) return;
   const saveData = (navigator as any).connection?.saveData;
-  const io = new IntersectionObserver((entries) => {
-    for (const e of entries) {
-      const v = e.target as HTMLVideoElement;
-      if (e.isIntersecting && !saveData && !reduced()) { v.play().catch(() => {}); }
-      else v.pause();
-    }
-  }, { rootMargin: '10% 0px', threshold: 0.2 });
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        const v = e.target as HTMLVideoElement;
+        if (e.isIntersecting && !saveData && !reduced()) v.play().catch(() => {});
+        else v.pause();
+      }
+    },
+    { rootMargin: '10% 0px', threshold: 0.2 },
+  );
   vids.forEach((v) => io.observe(v));
   cleanups.push(() => io.disconnect());
 }
 
 function parallax() {
-  if (reduced()) return;
+  // Auf Mobile kostet Parallax mehr, als es bringt.
+  if (reduced() || isMobile()) return;
   document.querySelectorAll<HTMLElement>('[data-parallax]').forEach((wrap) => {
-    const inner = wrap.querySelector<HTMLElement>('img, picture, video, .placeholder');
+    const inner = wrap.querySelector<HTMLElement>('img, picture, video, .ph, .placeholder');
     if (!inner) return;
-    gsap.fromTo(inner, { yPercent: -8 }, { yPercent: 8, ease: 'none', scrollTrigger: { trigger: wrap, start: 'top bottom', end: 'bottom top', scrub: 0.6 } });
+    gsap.fromTo(
+      inner,
+      { yPercent: -8 },
+      { yPercent: 8, ease: 'none', scrollTrigger: { trigger: wrap, start: 'top bottom', end: 'bottom top', scrub: 0.6 } },
+    );
   });
 }
 
@@ -85,8 +179,10 @@ function statement() {
     const wash = el.querySelector<HTMLElement>('[data-statement-wash]');
     if (!lines.length) return;
     const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: 'top top', end: 'bottom bottom', scrub: 0.6 } });
-    tl.fromTo(lines, { yPercent: 110, opacity: 0 }, { yPercent: 0, opacity: 1, ease: 'power2.out', stagger: 0.18, duration: 0.5 }, 0);
-    if (wash) tl.fromTo(wash, { clipPath: 'inset(100% 0 0 0)' }, { clipPath: 'inset(0% 0 0 0)', ease: 'power2.inOut', duration: 0.45 }, 0.55);
+    // immediateRender: false → der unsichtbare Ausgangszustand wird erst gesetzt,
+    // wenn die Animation wirklich läuft. Feuert der Trigger nie, bleibt der Text da.
+    tl.fromTo(lines, { yPercent: 110, opacity: 0 }, { yPercent: 0, opacity: 1, ease: 'power2.out', stagger: 0.18, duration: 0.5, immediateRender: false }, 0);
+    if (wash) tl.fromTo(wash, { clipPath: 'inset(100% 0 0 0)' }, { clipPath: 'inset(0% 0 0 0)', ease: 'power2.inOut', duration: 0.45, immediateRender: false }, 0.55);
     tl.to({}, { duration: 0.1 });
   });
 }
@@ -97,14 +193,17 @@ const BG: Record<string, string> = { dark: '#0a0a0a', light: '#f3f2ee', accent: 
 function sectionTransitions() {
   document.body.style.removeProperty('background-color');
   const sections = Array.from(document.querySelectorAll<HTMLElement>('[data-bg]'));
-  // Nur Seiten, die direkt oben mit einer eigenen Fläche beginnen, färben den Body mit.
-  // Sonst behält der Body die Seitenfarbe – sonst steht dunkler Text auf dunklem Grund.
   const first = sections[0];
+  // Nur Seiten, die direkt oben mit einer eigenen Fläche beginnen, färben den Body mit.
   if (!first || first.getBoundingClientRect().top + window.scrollY > 4) return;
   const set = (key: string) => { document.body.style.backgroundColor = BG[key] ?? BG.dark; };
   set(first.dataset.bg!);
   sections.forEach((sec) => {
-    ScrollTrigger.create({ trigger: sec, start: 'top 50%', end: 'bottom 50%', onEnter: () => set(sec.dataset.bg!), onEnterBack: () => set(sec.dataset.bg!) });
+    ScrollTrigger.create({
+      trigger: sec, start: 'top 50%', end: 'bottom 50%',
+      onEnter: () => set(sec.dataset.bg!),
+      onEnterBack: () => set(sec.dataset.bg!),
+    });
   });
   cleanups.push(() => document.body.style.removeProperty('background-color'));
 }
@@ -114,24 +213,22 @@ function takeover() {
   document.querySelectorAll<HTMLElement>('[data-takeover]').forEach((el) => {
     if (reduced()) { el.style.clipPath = 'inset(0 0)'; return; }
     const wide = matchMedia('(min-width: 900px)').matches;
-    const from = wide ? 'inset(4svh 12vw)' : 'inset(0 8vw)';
-    gsap.fromTo(el, { clipPath: from }, {
-      clipPath: 'inset(0svh 0vw)', ease: 'none',
-      scrollTrigger: { trigger: el, start: 'top 85%', end: 'center 58%', scrub: 0.7 },
-    });
+    const from = wide ? 'inset(4svh 12vw)' : 'inset(0 6vw)';
+    gsap.fromTo(
+      el,
+      { clipPath: from },
+      { clipPath: 'inset(0svh 0vw)', ease: 'none', scrollTrigger: { trigger: el, start: 'top 85%', end: 'center 58%', scrub: 0.7 } },
+    );
   });
 }
 
-/* Zeilen bewegen sich beim Scrollen gegeneinander – Typo schiebt sich hinter Medien */
+/* Zeilen bewegen sich beim Scrollen gegeneinander */
 function drift() {
-  if (reduced()) return;
+  if (reduced() || isMobile()) return;
   document.querySelectorAll<HTMLElement>('[data-drift]').forEach((el) => {
     const amount = parseFloat(el.dataset.drift || '0');
     if (!amount) return;
-    gsap.fromTo(el, { xPercent: -amount }, {
-      xPercent: amount, ease: 'none',
-      scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: 0.8 },
-    });
+    gsap.fromTo(el, { xPercent: -amount }, { xPercent: amount, ease: 'none', scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: 0.8 } });
   });
 }
 
@@ -146,19 +243,25 @@ function featured() {
     };
     chapters.forEach((ch, i) => {
       ScrollTrigger.create({ trigger: ch, start: 'top 55%', end: 'bottom 55%', onEnter: () => set(i), onEnterBack: () => set(i) });
-      if (!reduced()) gsap.fromTo(ch.children, { y: 40, opacity: 0 }, { y: 0, opacity: 1, stagger: 0.08, duration: 0.9, ease: 'power3.out', scrollTrigger: { trigger: ch, start: 'top 75%', toggleActions: 'play none none reverse' } });
+      if (!reduced()) {
+        gsap.fromTo(
+          ch.children,
+          { y: 40, opacity: 0 },
+          { y: 0, opacity: 1, stagger: 0.08, duration: 0.9, ease: 'power3.out', immediateRender: false, scrollTrigger: { trigger: ch, start: 'top 75%', toggleActions: 'play none none none' } },
+        );
+      }
     });
   });
 }
 
 function heroScroll() {
-  if (reduced()) return;
+  if (reduced() || isMobile()) return;
   const hero = document.querySelector<HTMLElement>('[data-hero]');
   if (!hero) return;
   const title = hero.querySelector<HTMLElement>('[data-hero-title]');
   const media = hero.querySelector<HTMLElement>('[data-hero-media]');
   if (title) gsap.to(title, { yPercent: -14, opacity: 0, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.5 } });
-  if (media) gsap.to(media, { scale: 1.14, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.5 } });
+  if (media) gsap.to(media, { scale: 1.08, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.5 } });
 }
 
 function magnetic() {
@@ -172,7 +275,8 @@ function magnetic() {
       gsap.to(el, { x: dx * strength, y: dy * strength, duration: 0.4, ease: 'power3.out' });
     };
     const leave = () => gsap.to(el, { x: 0, y: 0, duration: 0.6, ease: 'elastic.out(1, 0.5)' });
-    el.addEventListener('mousemove', move); el.addEventListener('mouseleave', leave);
+    el.addEventListener('mousemove', move);
+    el.addEventListener('mouseleave', leave);
     cleanups.push(() => { el.removeEventListener('mousemove', move); el.removeEventListener('mouseleave', leave); });
   });
 }
@@ -184,31 +288,53 @@ function hoverVideos() {
     if (!v) return;
     const enter = () => { v.play().catch(() => {}); };
     const leave = () => { v.pause(); };
-    el.addEventListener('pointerenter', enter); el.addEventListener('pointerleave', leave);
+    el.addEventListener('pointerenter', enter);
+    el.addEventListener('pointerleave', leave);
     cleanups.push(() => { el.removeEventListener('pointerenter', enter); el.removeEventListener('pointerleave', leave); });
   });
 }
 
 function anchors() {
-  // Sanftes Scrollen zu Ankern mit Header-Offset (nativ, keine Verzögerung der Navigation)
+  // Sanftes Scrollen zu Ankern – nur für Ziele, die es auf dieser Seite gibt.
   document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach((a) => {
-    const h = () => {
-      const id = a.getAttribute('href')!.slice(1);
-      const t = id && document.getElementById(id);
-      if (!t) return;
-      t.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'start' });
-    };
-    a.addEventListener('click', (e) => { e.preventDefault(); h(); history.pushState(null, '', a.getAttribute('href')); });
+    const href = a.getAttribute('href')!;
+    if (href.length < 2) return;
+    a.addEventListener('click', (e) => {
+      const target = document.getElementById(href.slice(1));
+      if (!target) return; // kein Ziel → Browser macht sein Standardverhalten
+      e.preventDefault();
+      target.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'start' });
+      history.pushState(null, '', href);
+    });
   });
 }
 
 export function init() {
-  reveal(); header(); videos(); hoverVideos(); parallax(); sectionTransitions(); statement(); featured(); takeover(); drift(); heroScroll(); magnetic(); anchors();
+  // Signal an den Watchdog im <head>: das Motion-System läuft.
+  document.documentElement.setAttribute('data-motion', 'ready');
+
+  reveal();
+  safetyNet();
+  header();
+  counters();
+  videos();
+  hoverVideos();
+  parallax();
+  sectionTransitions();
+  statement();
+  featured();
+  takeover();
+  drift();
+  heroScroll();
+  magnetic();
+  anchors();
+
   requestAnimationFrame(() => ScrollTrigger.refresh());
 }
 
 export function destroy() {
-  cleanups.forEach((fn) => fn()); cleanups = [];
+  cleanups.forEach((fn) => fn());
+  cleanups = [];
   ScrollTrigger.getAll().forEach((st) => st.kill());
   gsap.globalTimeline.clear();
 }

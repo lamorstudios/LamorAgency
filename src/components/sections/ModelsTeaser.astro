@@ -1,0 +1,64 @@
+---
+/**
+ * Models & Talents – der Unterschied zu den meisten Agenturen.
+ * Teaser auf der Startseite, führt auf /models/.
+ */
+import Media from '@/components/Media.astro';
+import Words from '@/components/Words.astro';
+import Button from '@/components/Button.astro';
+import { talentCategories } from '@/data/models';
+---
+<section class="mdl section" data-theme="dark" data-bg="dark" aria-labelledby="mdl-title">
+  <div class="container mdl__inner">
+    <div class="mdl__text">
+      <p class="t-label mdl__label" data-reveal="fade">Models & Talents</p>
+      <h2 class="t-display mdl__title" id="mdl-title">
+        <Words lines={['Die Gesichter', 'gibt es bei uns']} />
+      </h2>
+      <p class="t-lead mdl__lead" data-reveal style="--reveal-delay:180ms">
+        Du brauchst keine zweite Agentur für dein Casting.
+      </p>
+      <p class="t-body t-muted mdl__text-body" data-reveal style="--reveal-delay:240ms">
+        LAMOR hat einen eigenen Models- und Talent-Bereich. Casting, Booking und
+        Produktion laufen über denselben Tisch – das spart dir Abstimmung,
+        Doppelkosten und das Risiko, dass am Set jemand steht, der nicht zur Marke passt.
+      </p>
+
+      <ul class="mdl__tags" role="list" data-reveal style="--reveal-delay:300ms">
+        {talentCategories.map((c) => <li class="mdl__tag t-label">{c}</li>)}
+      </ul>
+
+      <div class="mdl__cta" data-reveal style="--reveal-delay:360ms">
+        <Button href="/models/" label="Models & Talents" arrow="right" />
+      </div>
+    </div>
+
+    <div class="mdl__media" data-reveal="fade" style="--reveal-delay:200ms">
+      <Media
+        media={{ type: 'placeholder', alt: 'Models und Talents von LAMOR AGENCY', label: '[MODELS] Talent-Portrait' }}
+        ratio="portrait"
+        reveal
+        hover
+        sizes="(min-width: 1024px) 40vw, 100vw"
+      />
+    </div>
+  </div>
+</section>
+
+<style>
+  .mdl__inner { display: grid; gap: var(--space-7); align-items: center; }
+  @media (min-width: 1024px) {
+    .mdl__inner { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--space-8); }
+    /* Bild zuerst im Layout, Text bleibt im DOM vorn (Lesereihenfolge). */
+    .mdl__media { order: 2; }
+  }
+  .mdl__label { color: var(--c-accent); margin-bottom: var(--space-4); }
+  .mdl__title { max-width: 12ch; }
+  .mdl__lead { margin-top: var(--space-5); max-width: 34ch; }
+  .mdl__text-body { margin-top: var(--space-4); max-width: 52ch; }
+
+  .mdl__tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: var(--space-6); }
+  .mdl__tag { padding: 0.5em 0.9em; border: 1px solid var(--line); border-radius: var(--radius-pill); color: var(--fg-muted); }
+
+  .mdl__cta { margin-top: var(--space-6); }
+</style>

@@ -1,0 +1,122 @@
+---
+/**
+ * Leistungen – sechs Disziplinen, ein Studio.
+ * Zeilenlayout wie in einem Magazin-Inhaltsverzeichnis; bei Hover schiebt sich
+ * die Medienvorschau ein (nur Desktop, nur mit feinem Zeiger).
+ */
+import Media from '@/components/Media.astro';
+import Words from '@/components/Words.astro';
+import ArrowLink from '@/components/ArrowLink.astro';
+import { services } from '@/data/services';
+
+interface Props { showAll?: boolean; heading?: string }
+const { showAll = false, heading = 'Sechs Disziplinen, ein Studio.' } = Astro.props;
+---
+<section class="svc section" data-theme="dark" data-bg="dark" aria-labelledby="svc-title">
+  <div class="container">
+    <div class="svc__head">
+      <p class="t-label svc__label" data-reveal="fade">Leistungen</p>
+      <h2 class="t-say svc__title" id="svc-title"><Words text={heading} /></h2>
+      <p class="t-lead t-muted svc__lead" data-reveal style="--reveal-delay:140ms">
+        Alles, was eine Marke sichtbar macht – aus einer Hand, in einem Look.
+      </p>
+    </div>
+
+    <ul class="svc__list" role="list">
+      {services.map((s, i) => (
+        <li class="svc__row" data-reveal style={`--reveal-delay:${i * 60}ms`} data-hover-video>
+          <a class="svc__link" href={`/services/#${s.slug}`} aria-label={`${s.title} – Leistungen ansehen`}>
+            <span class="svc__index t-label">{s.index}</span>
+            <span class="svc__name">{s.title}</span>
+            <span class="svc__short t-body">{s.short}</span>
+            <span class="svc__arrow" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="none"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+            </span>
+          </a>
+          <span class="svc__preview no-touch-only" aria-hidden="true">
+            <Media media={s.media} ratio="portrait" sizes="220px" widths={[220, 440]} />
+          </span>
+          {showAll && (
+            <ul class="svc__tags" role="list">
+              {s.items.map((t) => <li class="svc__tag t-label">{t}</li>)}
+            </ul>
+          )}
+        </li>
+      ))}
+    </ul>
+
+    {!showAll && (
+      <div class="svc__more" data-reveal>
+        <ArrowLink href="/services/" label="Alle Leistungen im Detail" />
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .svc__head { display: grid; gap: var(--space-4); margin-bottom: var(--space-8); }
+  .svc__label { color: var(--c-accent); }
+  .svc__title { max-width: 16ch; }
+  .svc__lead { max-width: 46ch; }
+
+  .svc__list { display: grid; border-top: 1px solid var(--line); }
+  .svc__row { position: relative; border-bottom: 1px solid var(--line); }
+
+  .svc__link {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: 'index name arrow' '. short .';
+    align-items: baseline;
+    gap: 0.5rem var(--space-4);
+    padding-block: clamp(1.25rem, 3vw, 2.25rem);
+    transition: color var(--dur-base) var(--ease-out);
+  }
+  .svc__index { grid-area: index; color: var(--fg-muted); padding-top: 0.5em; }
+  .svc__name {
+    grid-area: name;
+    font-family: var(--font-display);
+    font-weight: var(--fw-display);
+    font-stretch: var(--wd-wide);
+    font-size: clamp(1.75rem, 1rem + 4vw, 4rem);
+    line-height: 0.95;
+    letter-spacing: var(--ls-tight);
+    text-transform: uppercase;
+  }
+  .svc__short { grid-area: short; color: var(--fg-muted); max-width: 48ch; }
+  .svc__arrow { grid-area: arrow; align-self: center; width: 1.25rem; color: var(--fg-muted); transition: transform var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out); }
+  .svc__arrow svg { width: 100%; height: auto; }
+
+  @media (hover: hover) and (pointer: fine) {
+    .svc__row:hover .svc__name { color: var(--c-accent); }
+    .svc__row:hover .svc__arrow { transform: translate(0.3em, -0.3em); color: var(--c-accent); }
+  }
+  .svc__link:focus-visible { outline-offset: -2px; }
+
+  /* Medienvorschau – nur dort, wo wirklich gehovert werden kann. */
+  .svc__preview {
+    position: absolute;
+    top: 50%;
+    right: clamp(3rem, 10vw, 9rem);
+    width: clamp(140px, 14vw, 220px);
+    transform: translateY(-50%) scale(0.92);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
+    z-index: 2;
+  }
+  @media (hover: hover) and (pointer: fine) and (min-width: 1024px) {
+    .svc__row:hover .svc__preview { opacity: 1; transform: translateY(-50%) scale(1); }
+  }
+  @media (prefers-reduced-motion: reduce) { .svc__preview { transition: none; } }
+
+  /* Vollansicht auf /services/ */
+  .svc__tags { display: flex; flex-wrap: wrap; gap: 0.5rem; padding-bottom: clamp(1.25rem, 3vw, 2rem); }
+  .svc__tag { padding: 0.5em 0.9em; border: 1px solid var(--line); border-radius: var(--radius-pill); color: var(--fg-muted); }
+
+  .svc__more { margin-top: var(--space-7); }
+
+  @media (min-width: 768px) {
+    .svc__link { grid-template-columns: auto minmax(0, 9fr) minmax(0, 11fr) auto; grid-template-areas: 'index name short arrow'; align-items: center; }
+    .svc__short { padding-right: var(--space-6); }
+  }
+</style>

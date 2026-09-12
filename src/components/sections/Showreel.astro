@@ -1,0 +1,78 @@
+---
+/**
+ * Showreel – der Film-Moment der Seite.
+ * Das Medium öffnet sich beim Scrollen auf die volle Breite (data-takeover).
+ * Fällt die Animation aus, steht es einfach sofort in voller Breite da.
+ *
+ * Bestehendes LAMOR-Showreel eintragen (kein Stockmaterial):
+ *   reel = { type: 'video', src: '/media/showreel.mp4',
+ *            poster: '/src/assets/brand/showreel-poster.jpg', alt: '…' }
+ */
+import Media from '@/components/Media.astro';
+import Words from '@/components/Words.astro';
+import ArrowLink from '@/components/ArrowLink.astro';
+
+// Produktionsarten – dieselben Kategorien, nach denen /work/ gefiltert werden kann.
+const categories = ['Commercial', 'Social', 'Music', 'Event', 'Real Estate'];
+
+// PLACEHOLDER: durch das bestehende Showreel ersetzen (siehe README).
+const reel = {
+  type: 'placeholder' as const,
+  alt: 'LAMOR AGENCY Showreel',
+  label: '[SHOWREEL] Reel 2026',
+  ratio: 'cinema' as const,
+};
+---
+<section class="reel" data-theme="dark" data-bg="dark" aria-labelledby="reel-title">
+  <div class="container reel__head">
+    <p class="t-label reel__label" data-reveal="fade">Showreel</p>
+    <h2 class="t-display reel__title" id="reel-title">
+      <Words lines={['Von der Idee', 'bis zum finalen Frame.']} />
+    </h2>
+  </div>
+
+  <div class="reel__media" data-takeover>
+    <Media media={reel} priority={false} sizes="100vw" autoplay />
+  </div>
+
+  <div class="container reel__foot">
+    <ul class="reel__cats" role="list">
+      {categories.map((c, i) => (
+        <li class="reel__cat" data-reveal="fade" style={`--reveal-delay:${i * 70}ms`}>
+          <a href="/work/" class="reel__cat-link">
+            <span class="reel__cat-dot" aria-hidden="true"></span>
+            <span class="t-label">{c}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+    <div class="reel__more" data-reveal="fade">
+      <ArrowLink href="/work/" label="Alle Arbeiten" />
+    </div>
+  </div>
+</section>
+
+<style>
+  .reel { padding-block: var(--space-9); overflow: clip; }
+  .reel__head { display: grid; gap: var(--space-4); margin-bottom: var(--space-7); }
+  .reel__label { color: var(--c-accent); }
+  .reel__title { max-width: 16ch; }
+
+  .reel__media { width: 100%; }
+
+  .reel__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-5);
+    margin-top: var(--space-6);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--line);
+  }
+  .reel__cats { display: flex; flex-wrap: wrap; gap: var(--space-3) clamp(1rem, 3vw, 2.5rem); }
+  .reel__cat-link { display: inline-flex; align-items: center; gap: 0.6em; min-height: 44px; color: var(--fg-muted); transition: color var(--dur-base) var(--ease-out); }
+  .reel__cat-link:hover { color: var(--fg); }
+  .reel__cat-dot { width: 0.35rem; height: 0.35rem; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+  .reel__cat-link:hover .reel__cat-dot { background: var(--c-accent); }
+</style>

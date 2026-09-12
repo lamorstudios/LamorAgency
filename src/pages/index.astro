@@ -1,52 +1,45 @@
 ---
+/**
+ * Startseite – die Dramaturgie:
+ * Hero → Vertrauen → Problem/Lösung → Leistungen → Film → Arbeiten → Prozess
+ * → Models → Branchen → Zahlen → Stimmen → Preise → FAQ → Kontakt.
+ */
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import Hero from '@/components/home/Hero.astro';
-import AgencyStatement from '@/components/home/AgencyStatement.astro';
+import Hero from '@/components/sections/Hero.astro';
+import Clients from '@/components/sections/Clients.astro';
+import Comparison from '@/components/sections/Comparison.astro';
+import Services from '@/components/sections/Services.astro';
+import Showreel from '@/components/sections/Showreel.astro';
 import SelectedWork from '@/components/home/SelectedWork.astro';
-import FeaturedProject from '@/components/home/FeaturedProject.astro';
-import Statement from '@/components/home/Statement.astro';
-import ServicesList from '@/components/ServicesList.astro';
-import SectionLabel from '@/components/SectionLabel.astro';
-import Clients from '@/components/Clients.astro';
+import Process from '@/components/sections/Process.astro';
+import ModelsTeaser from '@/components/sections/ModelsTeaser.astro';
+import Industries from '@/components/sections/Industries.astro';
+import Stats from '@/components/sections/Stats.astro';
+import Testimonials from '@/components/sections/Testimonials.astro';
+import Pricing from '@/components/sections/Pricing.astro';
+import Faq from '@/components/sections/Faq.astro';
 import ContactCta from '@/components/ContactCta.astro';
-import ArrowLink from '@/components/ArrowLink.astro';
 import { site } from '@/data/site';
+import { faqPage, offerCatalog } from '@/lib/schema';
 ---
 <BaseLayout
-  title={`${site.name} | Social Media, Film & Branding Agentur München`}
-  description={site.description}
+  title={`Werbeagentur München | Video, Social Media & Branding – ${site.name}`}
+  description="LAMOR AGENCY aus München: Videoproduktion, Fotografie, Social Media, Webdesign, Branding und eigene Models. Über 500 Mio. Aufrufe auf unsere Arbeit. Jetzt Projekt anfragen."
   theme="dark"
-  bodyClass="has-bg-transitions"
+  jsonLd={[faqPage(), offerCatalog()]}
 >
   <Hero />
-  <AgencyStatement />
+  <Clients />
+  <Comparison />
+  <Services />
+  <Showreel />
   <SelectedWork />
-  <FeaturedProject />
-  <Statement />
-
-  <section class="home-services section" data-theme="light" data-bg="light" aria-labelledby="services-title">
-    <div class="container">
-      <div class="home-services__head">
-        <SectionLabel label="Leistungen" />
-        <h2 class="t-say home-services__title" id="services-title" data-reveal>Neun Disziplinen,<br />ein Studio.</h2>
-      </div>
-      <ServicesList mode="compact" />
-      <div class="home-services__more" data-reveal>
-        <ArrowLink href="/services/" label="Alle Leistungen im Detail" />
-      </div>
-    </div>
-  </section>
-
-  <div data-theme="light" data-bg="light">
-    <Clients />
-  </div>
-
+  <Process />
+  <ModelsTeaser />
+  <Industries />
+  <Stats />
+  <Testimonials />
+  <Pricing compact />
+  <Faq />
   <ContactCta />
 </BaseLayout>
-
-<style>
-  .home-services { color: var(--c-ink); padding-block: var(--space-10) var(--space-9); }
-  .home-services__head { margin-bottom: var(--space-8); }
-  .home-services__title { max-width: 14ch; }
-  .home-services__more { margin-top: var(--space-8); }
-</style>

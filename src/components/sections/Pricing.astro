@@ -1,0 +1,178 @@
+---
+/**
+ * Preis-Pakete. ALLE Werte kommen aus src/data/pricing.ts – hier steht kein
+ * einziger Betrag im Markup. Logik: monatlicher Betrag + einmaliger Projektstart.
+ */
+import Words from '@/components/Words.astro';
+import ArrowLink from '@/components/ArrowLink.astro';
+import { packages, priceLine, formatPrice, priceNote } from '@/data/pricing';
+
+interface Props { compact?: boolean }
+const { compact = false } = Astro.props;
+---
+<section class="pr section" id="pricing" data-theme="light" data-bg="light" aria-labelledby="pr-title">
+  <div class="container">
+    <div class="pr__head">
+      <p class="t-label pr__label" data-reveal="fade">Modelle</p>
+      <h2 class="t-say pr__title" id="pr-title"><Words text="Klare Modelle statt Angebots-Dschungel." /></h2>
+      <p class="t-lead t-muted pr__lead" data-reveal style="--reveal-delay:140ms">
+        Ein monatlicher Betrag für die laufende Arbeit, ein einmaliger Projektstart
+        für den Aufbau. Du weißt vorher, woran du bist.
+      </p>
+    </div>
+
+    <ul class="pr__grid" role="list">
+      {packages.map((p, i) => (
+        <li
+          class={`pr__card ${p.featured ? 'pr__card--featured' : ''}`}
+          data-reveal
+          style={`--reveal-delay:${i * 110}ms`}
+        >
+          {p.featured && <span class="pr__badge t-label">{p.label}</span>}
+          <header class="pr__card-head">
+            {!p.featured && <span class="pr__card-label t-label">{p.label}</span>}
+            <h3 class="pr__name">{p.name}</h3>
+            <p class="pr__for t-small">{p.for}</p>
+          </header>
+
+          <div class="pr__price">
+            <p class="pr__monthly">
+              <span class="pr__monthly-value">{priceLine(p.monthly)}</span>
+            </p>
+            <p class="pr__setup t-small">
+              <span class="pr__setup-value">{p.setup.from ? 'ab ' : ''}{formatPrice(p.setup)}</span>
+              <span class="t-muted"> {p.setup.note}</span>
+            </p>
+          </div>
+
+          <ul class="pr__features" role="list">
+            {p.features.map((f) => (
+              <li class="pr__feature">
+                <svg class="pr__check" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 6.5L4.8 9L10 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"/></svg>
+                <span>{f}</span>
+              </li>
+            ))}
+          </ul>
+
+          <a href={p.cta.href} class={`btn pr__cta ${p.featured ? '' : 'btn--ghost'}`} data-magnetic>
+            <span>{p.cta.label}</span>
+            <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <p class="pr__note t-small t-muted" data-reveal="fade">{priceNote}</p>
+
+    <div class="pr__foot" data-reveal>
+      <p class="t-h3 pr__foot-title">Noch nicht sicher, welches Modell passt?</p>
+      <div class="pr__foot-actions">
+        <a href="/contact/" class="btn" data-magnetic>
+          <span>Kostenloses Erstgespräch</span>
+          <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+        </a>
+        {compact && <ArrowLink href="/pricing/" label="Alle Modelle und Einzelleistungen" />}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .pr__head { display: grid; gap: var(--space-4); margin-bottom: var(--space-8); }
+  .pr__label { color: var(--c-accent); }
+  .pr__title { max-width: 18ch; }
+  .pr__lead { max-width: 50ch; }
+
+  .pr__grid { display: grid; gap: var(--space-5); align-items: stretch; }
+  @media (min-width: 900px) { .pr__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4); } }
+
+  .pr__card {
+    position: relative;
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    gap: var(--space-5);
+    padding: clamp(1.5rem, 3.5vw, 2.5rem);
+    border: 1px solid var(--line);
+    background: var(--c-paper);
+    transition: border-color var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .pr__card:hover { border-color: var(--fg); }
+  }
+
+  /* Hauptempfehlung: dunkle Fläche, damit die Wahl sofort lesbar ist. */
+  .pr__card--featured {
+    background: var(--c-ink);
+    color: var(--c-paper);
+    border-color: var(--c-ink);
+  }
+  .pr__card--featured .pr__feature { border-color: var(--c-ink-3); }
+  .pr__card--featured .pr__for,
+  .pr__card--featured .t-muted { color: var(--c-grey-dark); }
+  .pr__card--featured .pr__check { color: var(--c-accent); }
+  .pr__card--featured .pr__cta { --btn-bg: var(--c-paper); --btn-fg: var(--c-ink); border-color: var(--c-paper); }
+  @media (min-width: 900px) {
+    .pr__card--featured { transform: translateY(calc(-1 * var(--space-4))); }
+  }
+
+  .pr__badge {
+    position: absolute;
+    top: 0; left: clamp(1.5rem, 3.5vw, 2.5rem);
+    transform: translateY(-50%);
+    padding: 0.5em 0.9em;
+    background: var(--c-accent);
+    color: #fff;
+    border-radius: var(--radius-pill);
+  }
+
+  .pr__card-head { display: grid; gap: var(--space-2); }
+  .pr__card-label { color: var(--fg-muted); }
+  .pr__name {
+    font-family: var(--font-display);
+    font-weight: var(--fw-display);
+    font-stretch: var(--wd-wide);
+    font-size: clamp(1.35rem, 1rem + 1.4vw, 1.9rem);
+    line-height: 1;
+    letter-spacing: var(--ls-tight);
+    text-transform: uppercase;
+  }
+  .pr__for { color: var(--fg-muted); max-width: 34ch; }
+
+  .pr__price { display: grid; gap: 0.35rem; padding-block: var(--space-4); border-block: 1px solid var(--line); }
+  .pr__card--featured .pr__price { border-color: var(--c-ink-3); }
+  .pr__monthly { margin: 0; }
+  .pr__monthly-value {
+    font-family: var(--font-display);
+    font-weight: var(--fw-display);
+    font-stretch: var(--wd-wide);
+    font-size: clamp(1.6rem, 1.1rem + 1.9vw, 2.5rem);
+    line-height: 1.05;
+    letter-spacing: var(--ls-tight);
+    font-variant-numeric: tabular-nums;
+    /* Lange Preiszeilen brechen sauber statt zu überlaufen. */
+    overflow-wrap: break-word;
+  }
+  .pr__setup-value { font-weight: var(--fw-semi); }
+
+  .pr__features { display: grid; align-content: start; }
+  .pr__feature { display: flex; align-items: flex-start; gap: 0.7em; padding-block: var(--space-3); border-top: 1px solid var(--line); font-size: var(--fs-small); }
+  .pr__feature:first-child { border-top: 0; padding-top: 0; }
+  .pr__check { width: 0.85rem; height: 0.85rem; margin-top: 0.3em; flex-shrink: 0; color: var(--c-accent); }
+
+  .pr__cta { width: 100%; justify-content: space-between; }
+
+  .pr__note { margin-top: var(--space-5); }
+
+  .pr__foot {
+    display: grid;
+    gap: var(--space-5);
+    margin-top: var(--space-8);
+    padding-top: var(--space-7);
+    border-top: 1px solid var(--line);
+  }
+  .pr__foot-title { max-width: 20ch; }
+  .pr__foot-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-5); }
+  @media (min-width: 900px) {
+    .pr__foot { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+  }
+</style>

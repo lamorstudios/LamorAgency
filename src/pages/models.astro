@@ -1,0 +1,121 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import Media from '@/components/Media.astro';
+import Words from '@/components/Words.astro';
+import Button from '@/components/Button.astro';
+import ContactCta from '@/components/ContactCta.astro';
+import { talentCategories, bookingSteps, publishedTalents } from '@/data/models';
+import { breadcrumb } from '@/lib/schema';
+---
+<BaseLayout
+  title="Models & Talents buchen – München"
+  description="Models und Talents direkt über LAMOR AGENCY buchen: Commercials, Social Content, UGC, Musikvideos, Fashion, Fitness, Beauty und Lifestyle – Casting, Booking und Produktion aus einer Hand."
+  jsonLd={[breadcrumb([{ name: 'Models & Talents', path: '/models/' }])]}
+>
+  <PageHeader
+    kicker="Models & Talents"
+    title="Models"
+    titleLines={['Die Gesichter', 'für deine Kampagne.']}
+    lead="Casting, Booking und Produktion laufen über dasselbe Studio. Du brauchst keine zweite Agentur – und am Set steht niemand, der nicht zur Marke passt."
+    meta="Buchbar ab Konzept"
+  />
+
+  <section class="mp section" data-theme="light" data-bg="light" aria-labelledby="mp-cats">
+    <div class="container">
+      <h2 class="t-say mp__title" id="mp-cats"><Words text="Wofür unsere Talents gebucht werden." /></h2>
+      <ul class="mp__cats" role="list">
+        {talentCategories.map((c, i) => (
+          <li class="mp__cat" data-reveal style={`--reveal-delay:${i * 55}ms`}>
+            <span class="mp__cat-index t-label">{String(i + 1).padStart(2, '0')}</span>
+            <span class="mp__cat-name">{c}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="mp-book section" data-theme="dark" data-bg="dark" aria-labelledby="mp-book">
+    <div class="container mp-book__inner">
+      <div class="mp-book__text">
+        <p class="t-label mp-book__label" data-reveal="fade">So läuft eine Buchung</p>
+        <h2 class="t-display mp-book__title" id="mp-book"><Words lines={['Vier Schritte', 'bis zum Dreh.']} /></h2>
+        <ol class="mp-book__steps" role="list">
+          {bookingSteps.map((s, i) => (
+            <li class="mp-book__step" data-reveal style={`--reveal-delay:${i * 80}ms`}>
+              <span class="mp-book__step-index t-label">{s.index}</span>
+              <h3 class="t-h4">{s.title}</h3>
+              <p class="t-small t-muted">{s.text}</p>
+            </li>
+          ))}
+        </ol>
+        <div class="mp-book__cta" data-reveal>
+          <Button href="/contact/?leistung=models" label="Talent anfragen" />
+        </div>
+      </div>
+      <div class="mp-book__media" data-reveal="fade">
+        <Media
+          media={{ type: 'placeholder', alt: 'Model-Shooting von LAMOR AGENCY', label: '[MODELS] Setfoto' }}
+          ratio="portrait"
+          reveal
+          sizes="(min-width: 1024px) 40vw, 100vw"
+        />
+      </div>
+    </div>
+  </section>
+
+  {publishedTalents.length > 0 && (
+    <section class="mp-list section" data-theme="light" data-bg="light" aria-labelledby="mp-list">
+      <div class="container">
+        <h2 class="t-say" id="mp-list" data-reveal>Unsere Talents</h2>
+        <ul class="mp-list__grid" role="list">
+          {publishedTalents.map((t, i) => (
+            <li class="mp-list__item" data-reveal style={`--reveal-delay:${i * 70}ms`}>
+              <Media
+                media={{ type: t.image ? 'image' : 'placeholder', src: t.image, alt: t.name, label: '[TALENT] Portrait' }}
+                ratio="portrait"
+                hover
+                sizes="(min-width: 900px) 25vw, 50vw"
+              />
+              <p class="mp-list__name t-h4">{t.name}</p>
+              <p class="t-label t-muted">{t.categories.join(' · ')}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <ContactCta />
+</BaseLayout>
+
+<style>
+  .mp__title { max-width: 18ch; margin-bottom: var(--space-7); }
+  .mp__cats { display: grid; border-top: 1px solid var(--line); }
+  .mp__cat { display: flex; align-items: baseline; gap: var(--space-4); padding-block: clamp(0.9rem, 2.2vw, 1.4rem); border-bottom: 1px solid var(--line); }
+  .mp__cat-index { color: var(--fg-muted); flex-shrink: 0; }
+  .mp__cat-name {
+    font-family: var(--font-display);
+    font-weight: var(--fw-display);
+    font-stretch: var(--wd-wide);
+    font-size: clamp(1.5rem, 1rem + 3vw, 3rem);
+    line-height: 1;
+    letter-spacing: var(--ls-tight);
+    text-transform: uppercase;
+  }
+  @media (min-width: 768px) { .mp__cats { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--space-7); } }
+
+  .mp-book__inner { display: grid; gap: var(--space-7); align-items: start; }
+  @media (min-width: 1024px) { .mp-book__inner { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--space-8); } }
+  .mp-book__label { color: var(--c-accent); margin-bottom: var(--space-4); }
+  .mp-book__title { max-width: 12ch; margin-bottom: var(--space-7); }
+  .mp-book__steps { display: grid; gap: var(--space-5); }
+  @media (min-width: 620px) { .mp-book__steps { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-6); } }
+  .mp-book__step { display: grid; gap: 0.35rem; align-content: start; padding-top: var(--space-4); border-top: 1px solid var(--line); }
+  .mp-book__step-index { color: var(--c-accent); }
+  .mp-book__cta { margin-top: var(--space-7); }
+
+  .mp-list__grid { display: grid; gap: var(--space-6) var(--grid-gap); grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: var(--space-7); }
+  @media (min-width: 900px) { .mp-list__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  .mp-list__name { margin-top: var(--space-3); }
+</style>

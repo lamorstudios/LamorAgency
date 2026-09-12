@@ -1,0 +1,95 @@
+---
+/**
+ * Selected Clients – Trust-Bar weit oben auf der Seite.
+ * Logos kommen aus src/data/clients.ts. Solange kein Logo hinterlegt ist,
+ * wird der Markenname typografisch gesetzt (bewusst gestaltet, nicht kaputt).
+ *
+ * Bewegung: reine CSS-Marquee, pausiert bei Hover und bei Reduced Motion
+ * (dann steht die Reihe still – der Inhalt bleibt lesbar).
+ */
+import { Picture } from 'astro:assets';
+import { clients } from '@/data/clients';
+
+interface Props { title?: string; label?: string; theme?: 'dark' | 'light' }
+const { title = 'Marken, die schon mit uns gearbeitet haben.', label = 'Selected Clients', theme = 'dark' } = Astro.props;
+
+const logos = import.meta.glob<{ default: ImageMetadata }>('/src/assets/brand/clients/*.{svg,png,jpg,webp,avif}');
+const resolved = await Promise.all(
+  clients.map(async (c) => ({
+    ...c,
+    img: c.logo && logos[c.logo] ? (await logos[c.logo]()).default : undefined,
+  })),
+);
+// Zwei identische Reihen ergeben die endlose Bewegung.
+const rows = [resolved, resolved];
+---
+<section class="clients" data-theme={theme} data-bg={theme} aria-labelledby="clients-title">
+  <div class="container clients__head">
+    <p class="t-label clients__label" data-reveal="fade">{label}</p>
+    <h2 class="t-h3 clients__title" id="clients-title" data-reveal>{title}</h2>
+  </div>
+
+  <div class="clients__marquee" data-marquee>
+    {rows.map((row, ri) => (
+      <ul class="clients__row" role={ri === 0 ? 'list' : 'presentation'} aria-hidden={ri === 1 ? 'true' : undefined}>
+        {row.map((c) => (
+          <li class="clients__item">
+            {c.img ? (
+              <Picture src={c.img} formats={['webp']} widths={[160, 320]} sizes="160px" alt={c.name} class="clients__logo" loading="lazy" />
+            ) : (
+              <span class="clients__name">{c.name}</span>
+            )}
+          </li>
+        ))}
+      </ul>
+    ))}
+  </div>
+</section>
+
+<style>
+  .clients { padding-block: var(--space-8); overflow: clip; }
+  .clients__head { display: grid; gap: var(--space-3); margin-bottom: var(--space-7); }
+  .clients__label { color: var(--c-accent); }
+  .clients__title { max-width: 22ch; }
+
+  .clients__marquee {
+    display: flex;
+    width: max-content;
+    /* Weiche Kanten links/rechts statt harter Schnitt */
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  }
+  .clients__row {
+    display: flex;
+    align-items: center;
+    gap: clamp(2.5rem, 6vw, 6rem);
+    padding-right: clamp(2.5rem, 6vw, 6rem);
+    margin: 0;
+    list-style: none;
+  }
+  .clients__item { flex: none; display: grid; place-items: center; }
+  .clients__logo { width: auto; height: clamp(1.5rem, 3vw, 2.25rem); object-fit: contain; opacity: 0.65; filter: grayscale(1); transition: opacity var(--dur-base) var(--ease-out), filter var(--dur-base) var(--ease-out); }
+  .clients__item:hover .clients__logo { opacity: 1; filter: none; }
+  .clients__name {
+    font-family: var(--font-display);
+    font-weight: var(--fw-semi);
+    font-stretch: var(--wd-wide);
+    font-size: clamp(1.1rem, 0.9rem + 1.1vw, 1.85rem);
+    letter-spacing: var(--ls-snug);
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--fg-muted);
+    transition: color var(--dur-base) var(--ease-out);
+  }
+  .clients__item:hover .clients__name { color: var(--fg); }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .clients__row { animation: clients-scroll 48s linear infinite; }
+    .clients__marquee:hover .clients__row { animation-play-state: paused; }
+    @keyframes clients-scroll { to { transform: translateX(-100%); } }
+  }
+  /* Ohne Bewegung: Reihe steht, zweite Reihe ist ohnehin nur Dekoration. */
+  @media (prefers-reduced-motion: reduce) {
+    .clients__marquee { overflow-x: auto; scrollbar-width: none; }
+    .clients__marquee::-webkit-scrollbar { display: none; }
+  }
+</style>

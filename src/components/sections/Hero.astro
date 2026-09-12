@@ -1,0 +1,147 @@
+---
+/**
+ * Hero – der wichtigste Bereich der Seite.
+ * Aussage in drei Sekunden: LAMOR baut Markenauftritte, Content und digitale
+ * Erlebnisse. Belegt durch die Reichweite, nicht durch Adjektive.
+ *
+ * Showreel eintragen (bestehendes LAMOR-Video verwenden, kein Stockmaterial):
+ *   const showreel = { type: 'video', src: '/media/showreel.mp4',
+ *                      poster: '/src/assets/brand/showreel-poster.jpg', alt: '…' };
+ */
+import Media from '@/components/Media.astro';
+import Words from '@/components/Words.astro';
+import Button from '@/components/Button.astro';
+import { site } from '@/data/site';
+import { stats } from '@/data/stats';
+
+// PLACEHOLDER: durch das bestehende LAMOR-Showreel ersetzen (siehe README).
+const showreel = {
+  type: 'placeholder' as const,
+  alt: 'LAMOR AGENCY Showreel',
+  label: '[SHOWREEL] Hero-Video',
+  ratio: 'cinema' as const,
+};
+
+// Drei Belege direkt unter dem CTA – kommen aus src/data/stats.ts.
+const proof = [stats[0], stats[1], stats[3]];
+---
+<section class="hero" data-hero data-theme="dark" data-bg="dark" aria-labelledby="hero-title">
+  <div class="hero__inner container">
+    <p class="hero__eyebrow t-label" data-reveal="fade">
+      <span class="hero__dot" aria-hidden="true"></span>
+      Creative Studio · {site.address.city}
+    </p>
+
+    <h1 class="hero__title t-hero" id="hero-title" data-hero-title>
+      <Words lines={['Marken, die man', 'nicht übersieht.']} />
+    </h1>
+
+    <div class="hero__meta">
+      <p class="hero__lead t-lead" data-reveal style="--reveal-delay:220ms">
+        LAMOR AGENCY verbindet Video, Fotografie, Social Media, Branding und Webdesign
+        zu Markenauftritten, die gesehen, verstanden und erinnert werden.
+      </p>
+
+      <div class="hero__actions" data-reveal style="--reveal-delay:320ms">
+        <Button href="/contact/" label="Projekt anfragen" />
+        <Button href="/work/" label="Arbeiten ansehen" variant="ghost" arrow="right" />
+      </div>
+    </div>
+  </div>
+
+  <div class="hero__media" data-hero-media data-reveal="fade" style="--reveal-delay:420ms">
+    <Media media={showreel} priority sizes="100vw" autoplay class="hero__reel" />
+    <span class="hero__reel-tag t-label" aria-hidden="true">Showreel</span>
+  </div>
+
+  <div class="hero__proof container">
+    <ul class="hero__proof-list" role="list">
+      {proof.map((s, i) => (
+        <li class="hero__proof-item" data-reveal="fade" style={`--reveal-delay:${480 + i * 70}ms`}>
+          <span class="hero__proof-value">{s.prefix ?? ''}{s.value}{s.suffix ?? ''}</span>
+          <span class="hero__proof-label t-label t-muted">{s.label}</span>
+        </li>
+      ))}
+    </ul>
+    <p class="hero__claim t-label" data-reveal="fade" style="--reveal-delay:700ms">{site.claim}</p>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    background: var(--c-ink);
+    color: var(--c-paper);
+    padding-top: calc(var(--header-h) + clamp(2.5rem, 8vh, 7rem));
+    padding-bottom: var(--space-8);
+    overflow: clip;
+  }
+  .hero__inner { display: grid; gap: var(--space-5); }
+
+  .hero__eyebrow { display: inline-flex; align-items: center; gap: 0.7em; color: var(--c-grey-dark); }
+  .hero__dot { width: 0.45rem; height: 0.45rem; border-radius: 50%; background: var(--c-accent); flex-shrink: 0; }
+  @media (prefers-reduced-motion: no-preference) {
+    .hero__dot { animation: hero-pulse 2.6s var(--ease-in-out) infinite; }
+    @keyframes hero-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.45; transform: scale(0.8); } }
+  }
+
+  .hero__title { margin-block: var(--space-2) var(--space-4); max-width: 16ch; }
+
+  /* Lead und CTA stehen nebeneinander, sobald Platz da ist. */
+  .hero__meta { display: grid; gap: var(--space-6); align-items: end; }
+  .hero__lead { max-width: 46ch; color: var(--c-grey-dark); }
+  .hero__actions { display: flex; flex-wrap: wrap; gap: var(--space-4); }
+
+  @media (min-width: 900px) {
+    .hero__meta { grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-8); }
+    .hero__actions { justify-content: flex-end; }
+  }
+
+  /* ---------- Showreel */
+  .hero__media {
+    position: relative;
+    margin-top: clamp(2rem, 5vw, 4rem);
+    padding-inline: var(--gutter);
+  }
+  .hero__reel-tag {
+    position: absolute;
+    left: calc(var(--gutter) + clamp(0.75rem, 2vw, 1.5rem));
+    bottom: clamp(0.75rem, 2vw, 1.5rem);
+    padding: 0.5em 0.9em;
+    background: rgba(10, 10, 10, 0.55);
+    backdrop-filter: blur(6px);
+    color: #fff;
+    border-radius: var(--radius-pill);
+  }
+
+  /* ---------- Belege */
+  .hero__proof {
+    display: grid;
+    gap: var(--space-5);
+    margin-top: clamp(2rem, 5vw, 3.5rem);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--c-ink-3);
+  }
+  .hero__proof-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4); }
+  .hero__proof-item { display: grid; gap: 0.35rem; }
+  .hero__proof-value {
+    font-family: var(--font-display);
+    font-weight: var(--fw-display);
+    font-stretch: var(--wd-wide);
+    font-size: clamp(1.5rem, 1rem + 2.6vw, 3rem);
+    line-height: 1;
+    letter-spacing: var(--ls-tight);
+  }
+  .hero__proof-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hero__claim { color: var(--c-accent); }
+
+  @media (min-width: 900px) {
+    .hero__proof { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+    .hero__proof-list { grid-template-columns: repeat(3, minmax(0, auto)); gap: clamp(2rem, 5vw, 5rem); }
+  }
+  /* Sehr schmale Geräte: Belege untereinander statt gequetscht. */
+  @media (max-width: 420px) {
+    .hero__proof-list { grid-template-columns: 1fr 1fr; gap: var(--space-4) var(--space-5); }
+    .hero__proof-item:last-child { grid-column: span 2; }
+  }
+</style>

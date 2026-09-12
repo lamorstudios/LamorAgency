@@ -1,102 +1,323 @@
 ---
 /**
- * Kontaktformular – Netlify Forms (data-netlify) mit progressivem JS-Submit,
- * Inline-Validierung, Success- und Error-State. Funktioniert auch ohne JS.
+ * Anfrage-Formular – Netlify Forms.
+ * Funktioniert vollständig OHNE JavaScript (normaler POST auf Netlify);
+ * mit JS kommen Inline-Validierung und ein Erfolgs-/Fehlerzustand dazu.
+ *
+ * Vorbelegung über Query-Parameter:
+ *   /contact/?paket=growth       → Budget-/Paketfeld
+ *   /contact/?leistung=models    → Dienstleistung
  */
----
-<form class="form" name="contact" method="POST" action="/contact/?sent=1" data-netlify="true" netlify-honeypot="bot-field" novalidate data-contact-form>
-  <input type="hidden" name="form-name" value="contact" />
-  <p class="visually-hidden" aria-hidden="true"><label>Bitte leer lassen: <input name="bot-field" tabindex="-1" autocomplete="off" /></label></p>
+import { packages } from '@/data/pricing';
 
-  <div class="form__field" data-reveal>
-    <label for="f-name" class="t-label">Name</label>
-    <input id="f-name" name="name" type="text" autocomplete="name" required minlength="2" placeholder="Wie heißt du?" aria-describedby="e-name" />
-    <p class="form__error t-small" id="e-name" aria-live="polite"></p>
+// Auswahl der Dienstleistungen – bewusst nah an der Sprache der Anfragenden.
+const serviceOptions = [
+  { value: 'video', label: 'Video' },
+  { value: 'foto', label: 'Fotografie' },
+  { value: 'social', label: 'Social Media' },
+  { value: 'web', label: 'Webdesign' },
+  { value: 'branding', label: 'Branding' },
+  { value: 'models', label: 'Models / Talent' },
+  { value: 'komplett', label: 'Komplettpaket' },
+  { value: 'sonstiges', label: 'Sonstiges' },
+];
+
+const budgetOptions = [
+  'Noch offen',
+  'bis 2.500 €',
+  '2.500 – 5.000 €',
+  '5.000 – 10.000 €',
+  'über 10.000 €',
+  'Monatliche Betreuung',
+];
+
+// Für das JS-Prefill: gültige Paket-IDs.
+const packageIds = packages.map((p) => p.id).join(',');
+---
+<form
+  class="form"
+  name="contact"
+  method="POST"
+  action="/contact/?sent=1"
+  data-netlify="true"
+  netlify-honeypot="bot-field"
+  novalidate
+  data-contact-form
+  data-packages={packageIds}
+>
+  <input type="hidden" name="form-name" value="contact" />
+  <input type="hidden" name="paket" value="" data-prefill-package />
+  <p class="visually-hidden" aria-hidden="true">
+    <label>Bitte leer lassen: <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
+  </p>
+
+  <div class="form__row">
+    <div class="form__field" data-reveal>
+      <label for="f-name" class="t-label">Name *</label>
+      <input id="f-name" name="name" type="text" autocomplete="name" required minlength="2" placeholder="Wie heißt du?" aria-describedby="e-name" />
+      <p class="form__error t-small" id="e-name" aria-live="polite"></p>
+    </div>
+    <div class="form__field" data-reveal style="--reveal-delay:60ms">
+      <label for="f-company" class="t-label">Firma</label>
+      <input id="f-company" name="firma" type="text" autocomplete="organization" placeholder="Unternehmen / Marke" />
+    </div>
   </div>
-  <div class="form__field" data-reveal style="--reveal-delay:60ms">
-    <label for="f-email" class="t-label">E-Mail</label>
-    <input id="f-email" name="email" type="email" autocomplete="email" inputmode="email" required placeholder="name@unternehmen.de" aria-describedby="e-email" />
-    <p class="form__error t-small" id="e-email" aria-live="polite"></p>
+
+  <div class="form__row">
+    <div class="form__field" data-reveal style="--reveal-delay:120ms">
+      <label for="f-email" class="t-label">E-Mail *</label>
+      <input id="f-email" name="email" type="email" autocomplete="email" inputmode="email" required placeholder="name@unternehmen.de" aria-describedby="e-email" />
+      <p class="form__error t-small" id="e-email" aria-live="polite"></p>
+    </div>
+    <div class="form__field" data-reveal style="--reveal-delay:180ms">
+      <label for="f-phone" class="t-label">Telefon</label>
+      <input id="f-phone" name="telefon" type="tel" autocomplete="tel" inputmode="tel" placeholder="+49 …" />
+    </div>
   </div>
-  <div class="form__field" data-reveal style="--reveal-delay:120ms">
-    <label for="f-message" class="t-label">Projekt</label>
-    <textarea id="f-message" name="message" rows="5" required minlength="10" placeholder="Erzähl uns kurz, worum es geht." aria-describedby="e-message"></textarea>
+
+  <div class="form__field" data-reveal style="--reveal-delay:240ms">
+    <label for="f-web" class="t-label">Website / Instagram</label>
+    <input id="f-web" name="website" type="text" inputmode="url" placeholder="deine-seite.de oder @handle" />
+  </div>
+
+  <fieldset class="form__fieldset" data-reveal style="--reveal-delay:300ms">
+    <legend class="t-label form__legend">Dienstleistung *</legend>
+    <div class="form__chips" role="group" aria-describedby="e-service">
+      {serviceOptions.map((o) => (
+        <label class="form__chip">
+          <input type="checkbox" name="dienstleistung" value={o.label} data-service={o.value} />
+          <span>{o.label}</span>
+        </label>
+      ))}
+    </div>
+    <p class="form__error t-small" id="e-service" aria-live="polite"></p>
+  </fieldset>
+
+  <div class="form__field" data-reveal style="--reveal-delay:360ms">
+    <label for="f-budget" class="t-label">Budget</label>
+    <div class="form__select">
+      <select id="f-budget" name="budget">
+        {budgetOptions.map((b) => <option value={b}>{b}</option>)}
+      </select>
+      <svg class="form__select-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6L8 11L13 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+    </div>
+  </div>
+
+  <div class="form__field" data-reveal style="--reveal-delay:420ms">
+    <label for="f-message" class="t-label">Projektbeschreibung *</label>
+    <textarea id="f-message" name="projekt" rows="5" required minlength="10" placeholder="Worum geht es? Was soll entstehen, bis wann?" aria-describedby="e-message"></textarea>
     <p class="form__error t-small" id="e-message" aria-live="polite"></p>
   </div>
 
-  <div class="form__actions" data-reveal style="--reveal-delay:180ms">
-    <button type="submit" class="btn" data-magnetic>
-      <span data-submit-label>Anfrage senden</span>
-      <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
-    </button>
-    <p class="t-small t-muted form__hint">Mit dem Absenden stimmst du der Verarbeitung deiner Daten gemäß <a href="/datenschutz/" class="link">Datenschutzerklärung</a> zu.</p>
+  <div class="form__consent" data-reveal style="--reveal-delay:470ms">
+    <label class="form__check">
+      <input type="checkbox" name="datenschutz" value="akzeptiert" required aria-describedby="e-consent" />
+      <span class="t-small">
+        Ich habe die <a href="/datenschutz/" class="link">Datenschutzerklärung</a> gelesen und stimme zu,
+        dass meine Angaben zur Bearbeitung meiner Anfrage verarbeitet werden. *
+      </span>
+    </label>
+    <p class="form__error t-small" id="e-consent" aria-live="polite"></p>
   </div>
 
-  <div class="form__status" role="status" aria-live="polite" data-form-status hidden></div>
+  <div class="form__actions" data-reveal style="--reveal-delay:520ms">
+    <button type="submit" class="btn" data-magnetic>
+      <span data-submit-label>Projekt anfragen</span>
+      <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+    </button>
+    <p class="t-small t-muted form__hint">Pflichtfelder sind mit * markiert. Wir melden uns in der Regel innerhalb eines Werktags.</p>
+  </div>
+
+  <div class="form__status" role="status" aria-live="polite" tabindex="-1" data-form-status hidden></div>
 </form>
 
 <style>
   .form { display: grid; gap: var(--space-6); }
-  .form__field { display: grid; gap: var(--space-2); }
-  .form__field label { color: var(--fg-muted); transition: color var(--dur-fast); }
+  .form__row { display: grid; gap: var(--space-6); }
+  @media (min-width: 620px) { .form__row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5); } }
+
+  .form__field { display: grid; gap: var(--space-2); min-width: 0; }
+  .form__field label, .form__legend { color: var(--fg-muted); transition: color var(--dur-fast); }
   .form__field:focus-within label { color: var(--fg); }
-  .form input, .form textarea { width: 100%; min-height: 3.25rem; padding: 0.9rem 0; background: transparent; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; font-size: var(--fs-lead); line-height: 1.3; color: var(--fg); transition: border-color var(--dur-base) var(--ease-out); -webkit-appearance: none; appearance: none; }
+
+  .form input[type='text'], .form input[type='email'], .form input[type='tel'], .form textarea, .form select {
+    width: 100%;
+    min-height: 3.25rem;
+    padding: 0.9rem 0;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    border-radius: 0;
+    font-size: var(--fs-lead);
+    line-height: 1.3;
+    color: var(--fg);
+    transition: border-color var(--dur-base) var(--ease-out);
+    -webkit-appearance: none;
+    appearance: none;
+  }
   .form textarea { resize: vertical; min-height: 8rem; }
   .form input::placeholder, .form textarea::placeholder { color: color-mix(in srgb, var(--fg-muted) 65%, transparent); }
-  .form input:focus, .form textarea:focus { outline: none; border-bottom-color: var(--fg); }
-  .form input[aria-invalid='true'], .form textarea[aria-invalid='true'] { border-bottom-color: var(--c-accent); }
-  .form__error { color: var(--c-accent); min-height: 1.2em; }
+  .form input:focus, .form textarea:focus, .form select:focus { outline: none; border-bottom-color: var(--fg); }
+  .form [aria-invalid='true'] { border-bottom-color: var(--c-accent); }
+
+  /* Select braucht einen eigenen Pfeil, weil appearance: none den nativen entfernt. */
+  .form__select { position: relative; }
+  .form__select select { padding-right: 2rem; cursor: pointer; }
+  .form__select option { background: var(--c-ink); color: var(--c-paper); }
+  .form__select-icon { position: absolute; right: 0; top: 50%; width: 1rem; height: 1rem; transform: translateY(-50%); pointer-events: none; color: var(--fg-muted); }
+
+  .form__fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: var(--space-3); min-width: 0; }
+  .form__chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .form__chip { position: relative; }
+  .form__chip input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+  .form__chip span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0.6em 1.1em;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-pill);
+    font-family: var(--font-body);
+    font-size: var(--fs-eyebrow);
+    font-weight: var(--fw-semi);
+    font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+    color: var(--fg-muted);
+    transition: background var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
+  }
+  .form__chip input:checked + span { background: var(--c-accent); border-color: var(--c-accent); color: #fff; }
+  .form__chip input:focus-visible + span { outline: 2px solid var(--fg); outline-offset: 3px; }
+  @media (hover: hover) { .form__chip:hover span { border-color: var(--fg); color: var(--fg); } }
+  .form__chip input:checked + span:hover { color: #fff; }
+
+  .form__consent { display: grid; gap: var(--space-2); }
+  .form__check { display: flex; align-items: flex-start; gap: 0.75em; cursor: pointer; }
+  .form__check input {
+    flex-shrink: 0;
+    width: 1.15rem; height: 1.15rem;
+    margin-top: 0.15em;
+    accent-color: var(--c-accent);
+    cursor: pointer;
+  }
+  .form__check span { max-width: 60ch; color: var(--fg-muted); }
+
+  .form__error { color: var(--c-accent); }
   .form__error:empty { display: none; }
+
   .form__actions { display: grid; gap: var(--space-4); justify-items: start; padding-top: var(--space-2); }
-  .form__hint { max-width: 40ch; }
+  .form__hint { max-width: 44ch; }
+
   .form__status { padding: var(--space-6); border: 1px solid var(--line); }
   .form__status.is-success { border-color: var(--fg); }
   .form__status.is-error { border-color: var(--c-accent); }
-  .form__status h2 { font-size: var(--fs-h3); font-family: var(--font-display); letter-spacing: var(--ls-snug); margin-bottom: var(--space-2); }
-  .form.is-sent .form__field, .form.is-sent .form__actions { display: none; }
+  .form__status :global(h2) { font-size: var(--fs-h3); font-family: var(--font-display); letter-spacing: var(--ls-snug); margin-bottom: var(--space-2); }
+  .form.is-sent .form__row,
+  .form.is-sent .form__field,
+  .form.is-sent .form__fieldset,
+  .form.is-sent .form__consent,
+  .form.is-sent .form__actions { display: none; }
   .form.is-busy .btn { opacity: 0.6; pointer-events: none; }
 </style>
 
 <script>
   function initForm() {
     const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
-    if (!form || (form as any).__init) return; (form as any).__init = true;
+    if (!form || (form as any).__init) return;
+    (form as any).__init = true;
+
     const status = form.querySelector<HTMLElement>('[data-form-status]')!;
-    const fields = Array.from(form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input:not([type=hidden]):not([name=bot-field]), textarea'));
+    const chips = Array.from(form.querySelectorAll<HTMLInputElement>('input[name="dienstleistung"]'));
+    const consent = form.querySelector<HTMLInputElement>('input[name="datenschutz"]')!;
+    const fields = Array.from(
+      form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input[required]:not([type=checkbox]), textarea[required]'),
+    );
+
+    /* ---- Vorbelegung aus der URL (?paket=…, ?leistung=…) ---- */
+    const params = new URLSearchParams(location.search);
+    const paket = params.get('paket');
+    const allowed = (form.dataset.packages || '').split(',').filter(Boolean);
+    if (paket && allowed.includes(paket)) {
+      const hidden = form.querySelector<HTMLInputElement>('[data-prefill-package]');
+      if (hidden) hidden.value = paket;
+    }
+    const leistung = params.get('leistung');
+    if (leistung) {
+      const match = chips.find((c) => c.dataset.service === leistung);
+      if (match) match.checked = true;
+    }
+
+    /* ---- Validierung ---- */
+    const setError = (id: string, message: string) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = message;
+    };
     const msg = (el: HTMLInputElement | HTMLTextAreaElement) => {
       if (el.validity.valueMissing) return 'Bitte ausfüllen.';
       if (el.validity.typeMismatch) return 'Bitte eine gültige E-Mail-Adresse eingeben.';
       if (el.validity.tooShort) return `Mindestens ${el.minLength} Zeichen.`;
       return '';
     };
-    const validate = (el: HTMLInputElement | HTMLTextAreaElement) => {
-      const err = document.getElementById(el.getAttribute('aria-describedby') || '');
+    const validateField = (el: HTMLInputElement | HTMLTextAreaElement) => {
       const m = msg(el);
       el.setAttribute('aria-invalid', m ? 'true' : 'false');
-      if (err) err.textContent = m;
+      setError(el.getAttribute('aria-describedby') || '', m);
       return !m;
     };
-    fields.forEach((f) => { f.addEventListener('blur', () => validate(f)); f.addEventListener('input', () => { if (f.getAttribute('aria-invalid') === 'true') validate(f); }); });
-    const show = (type: 'success' | 'error', title: string, text: string) => {
-      status.hidden = false; status.className = `form__status is-${type}`;
-      status.innerHTML = `<h2>${title}</h2><p>${text}</p>`;
-      status.focus?.();
+    const validateChips = () => {
+      const ok = chips.some((c) => c.checked);
+      setError('e-service', ok ? '' : 'Bitte mindestens eine Leistung auswählen.');
+      return ok;
     };
-    if (new URLSearchParams(location.search).get('sent') === '1') { form.classList.add('is-sent'); show('success', 'Danke – Anfrage erhalten.', 'Wir melden uns so schnell wie möglich.'); }
+    const validateConsent = () => {
+      const ok = consent.checked;
+      setError('e-consent', ok ? '' : 'Ohne Zustimmung können wir die Anfrage nicht verarbeiten.');
+      return ok;
+    };
+
+    fields.forEach((f) => {
+      f.addEventListener('blur', () => validateField(f));
+      f.addEventListener('input', () => { if (f.getAttribute('aria-invalid') === 'true') validateField(f); });
+    });
+    chips.forEach((c) => c.addEventListener('change', () => { if (chips.some((x) => x.checked)) setError('e-service', ''); }));
+    consent.addEventListener('change', () => { if (consent.checked) setError('e-consent', ''); });
+
+    /* ---- Status ---- */
+    const show = (type: 'success' | 'error', title: string, text: string) => {
+      status.hidden = false;
+      status.className = `form__status is-${type}`;
+      status.innerHTML = `<h2>${title}</h2><p>${text}</p>`;
+      status.focus();
+    };
+    if (params.get('sent') === '1') {
+      form.classList.add('is-sent');
+      show('success', 'Danke – Anfrage erhalten.', 'Wir melden uns in der Regel innerhalb eines Werktags.');
+    }
+
+    /* ---- Absenden ---- */
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const ok = fields.map(validate).every(Boolean);
-      if (!ok) { fields.find((f) => f.getAttribute('aria-invalid') === 'true')?.focus(); return; }
+      const fieldsOk = fields.map(validateField).every(Boolean);
+      const ok = [fieldsOk, validateChips(), validateConsent()].every(Boolean);
+      if (!ok) {
+        const firstBad =
+          form.querySelector<HTMLElement>('[aria-invalid="true"]') ??
+          (!chips.some((c) => c.checked) ? chips[0] : consent);
+        firstBad?.focus();
+        return;
+      }
       form.classList.add('is-busy');
       try {
         const body = new URLSearchParams(new FormData(form) as any).toString();
         const res = await fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
         if (!res.ok) throw new Error(String(res.status));
         form.classList.add('is-sent');
-        show('success', 'Danke – Anfrage erhalten.', 'Wir melden uns so schnell wie möglich. Bis dahin: Instagram @lamoragency.');
+        show('success', 'Danke – Anfrage erhalten.', 'Wir melden uns in der Regel innerhalb eines Werktags. Bis dahin: Instagram @lamoragency.');
       } catch {
-        show('error', 'Das hat leider nicht geklappt.', 'Bitte versuch es noch einmal oder schreib uns direkt per E-Mail.');
-      } finally { form.classList.remove('is-busy'); }
+        show('error', 'Das hat leider nicht geklappt.', 'Bitte versuch es noch einmal oder schreib uns direkt an info@lamoragency.de.');
+      } finally {
+        form.classList.remove('is-busy');
+      }
     });
   }
   document.addEventListener('astro:page-load', initForm);
