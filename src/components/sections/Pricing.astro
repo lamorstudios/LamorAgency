@@ -19,9 +19,10 @@ const { compact = false } = Astro.props;
         Ein monatlicher Betrag für die laufende Arbeit, ein einmaliger Projektstart
         für den Aufbau. Du weißt vorher, woran du bist.
       </p>
+      <p class="swipe-hint pr__hint" aria-hidden="true">Wischen für alle Modelle</p>
     </div>
 
-    <ul class="pr__grid" role="list">
+    <ul class="pr__grid swipe" role="list">
       {packages.map((p, i) => (
         <li
           class={`pr__card ${p.featured ? 'pr__card--featured' : ''}`}
@@ -83,8 +84,20 @@ const { compact = false } = Astro.props;
   .pr__title { max-width: 18ch; }
   .pr__lead { max-width: 50ch; }
 
-  .pr__grid { display: grid; gap: var(--space-5); align-items: stretch; }
-  @media (min-width: 900px) { .pr__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4); } }
+  /* Unter 900px waagerechte Swipe-Reihe statt drei gestapelter Karten. */
+  @media (min-width: 900px) {
+    .pr__grid {
+      grid-auto-flow: row;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-auto-columns: auto;
+      gap: var(--space-4);
+      overflow: visible;
+      margin-inline: 0;
+      padding-inline: 0;
+      padding-bottom: 0;
+    }
+    .pr__hint { display: none; }
+  }
 
   .pr__card {
     position: relative;

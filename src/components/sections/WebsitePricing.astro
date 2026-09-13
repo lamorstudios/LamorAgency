@@ -15,13 +15,14 @@ import { priceNote } from '@/data/pricing';
     <div class="wp__head">
       <p class="t-label wp__label" data-reveal="fade">Website-Pakete</p>
       <h2 class="t-say wp__title" id="wp-title"><Words text="Was deine Website kostet." /></h2>
+      <p class="swipe-hint wp__hint" aria-hidden="true">Wischen für alle Pakete</p>
       <p class="t-lead t-muted wp__lead" data-reveal style="--reveal-delay:140ms">
         Die Website ist ein einmaliges Projekt. Die monatliche Betreuung ist optional
         und übernimmt danach Hosting, Wartung und kleine Änderungen.
       </p>
     </div>
 
-    <ul class="wp__grid" role="list">
+    <ul class="wp__grid swipe" role="list">
       {websitePricing.map((p, i) => (
         <li class={`wp__card ${p.highlighted ? 'wp__card--featured' : ''}`} data-reveal style={`--reveal-delay:${i * 90}ms`}>
           {p.highlighted && <span class="wp__badge t-label">{p.label}</span>}
@@ -48,13 +49,29 @@ import { priceNote } from '@/data/pricing';
             <p class="wp__for-label t-label t-muted">Passend für</p>
             <p class="wp__for t-small">{p.for.join(' · ')}</p>
             <ul class="wp__features" role="list">
-              {p.features.map((f) => (
+              {p.features.slice(0, 6).map((f) => (
                 <li class="wp__feature">
                   <svg class="wp__check" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 6.5L4.8 9L10 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"/></svg>
                   <span>{f}</span>
                 </li>
               ))}
             </ul>
+            {p.features.length > 6 && (
+              <details class="wp__more">
+                <summary class="wp__more-sum">
+                  <span>+ {p.features.length - 6} weitere Leistungen</span>
+                  <span class="wp__more-icon" aria-hidden="true"></span>
+                </summary>
+                <ul class="wp__features wp__features--rest" role="list">
+                  {p.features.slice(6).map((f) => (
+                    <li class="wp__feature">
+                      <svg class="wp__check" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 6.5L4.8 9L10 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"/></svg>
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            )}
           </div>
 
           <a href={p.cta.href} class={`btn wp__cta ${p.highlighted ? '' : 'btn--ghost'}`}>
@@ -104,9 +121,23 @@ import { priceNote } from '@/data/pricing';
   .wp__title { max-width: 18ch; }
   .wp__lead { max-width: 52ch; }
 
-  .wp__grid { display: grid; gap: var(--space-5); align-items: stretch; }
-  @media (min-width: 700px) { .wp__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); } }
+  /* Unter 700px waagerechte Swipe-Reihe (siehe .swipe in global.css),
+     darueber ein normales Raster. Das spart auf dem Telefon rund vier
+     Bildschirme, ohne eine einzige Leistung zu verstecken. */
+  @media (min-width: 700px) {
+    .wp__grid {
+      grid-auto-flow: row;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-auto-columns: auto;
+      gap: var(--space-4);
+      overflow: visible;
+      margin-inline: 0;
+      padding-inline: 0;
+      padding-bottom: 0;
+    }
+  }
   @media (min-width: 1200px) { .wp__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  @media (min-width: 700px) { .wp__hint { display: none; } }
 
   .wp__card {
     position: relative;
@@ -158,6 +189,25 @@ import { priceNote } from '@/data/pricing';
   .wp__feature { display: flex; align-items: flex-start; gap: 0.6em; padding-block: 0.5rem; border-top: 1px solid var(--line); font-size: var(--fs-small); }
   .wp__feature:first-child { border-top: 0; }
   .wp__check { width: 0.8rem; height: 0.8rem; margin-top: 0.35em; flex-shrink: 0; color: var(--c-accent); }
+
+  /* Aufklappbare Restliste – nativ, funktioniert auch ohne JavaScript. */
+  .wp__more { margin-top: var(--space-3); border-top: 1px solid var(--line); padding-top: var(--space-3); }
+  .wp__card--featured .wp__more { border-color: var(--c-ink-3); }
+  .wp__more-sum {
+    display: flex; align-items: center; justify-content: space-between; gap: 0.75em;
+    cursor: pointer; list-style: none; min-height: 44px;
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--c-accent);
+  }
+  .wp__more-sum::-webkit-details-marker { display: none; }
+  .wp__more-icon { position: relative; width: 0.75rem; height: 0.75rem; flex: none; }
+  .wp__more-icon::before, .wp__more-icon::after {
+    content: ''; position: absolute; inset: 50% 0 auto 0; height: 1.5px; background: currentColor;
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+  .wp__more-icon::after { transform: rotate(90deg); }
+  .wp__more[open] .wp__more-icon::after { transform: rotate(0deg); }
+  .wp__features--rest { margin-top: var(--space-3); }
 
   .wp__cta { width: 100%; justify-content: space-between; }
   .wp__note { margin-top: var(--space-5); max-width: 70ch; }

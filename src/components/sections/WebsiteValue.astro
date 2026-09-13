@@ -8,27 +8,7 @@
  * keine erfundene Garantie.
  */
 import Media from '@/components/Media.astro';
-import { websiteEntryPrice, euro } from '@/data/website-pricing';
-
-// Bewusst sachlich: die Nachteile entstehen aus der Aufteilung auf mehrere
-// Gewerke, nicht aus der Qualität der Dienstleister. Keine Wertung über Dritte.
-const separateRoles = ['Webdesigner', 'Fotograf', 'Videograf', 'Branding / Grafik', 'Social Media'];
-const separateEffects = [
-  'Mehrere Ansprechpartner',
-  'Mehrere Briefings',
-  'Unterschiedliche Designsprache möglich',
-  'Separate Abstimmungen',
-  'Inhalte müssen zwischen Gewerken koordiniert werden',
-];
-
-const togetherRoles = ['Website', 'Foto', 'Video', 'Branding', 'Social Content'];
-const togetherEffects = [
-  'Ein Ansprechpartner',
-  'Eine Creative Direction',
-  'Ein konsistenter Markenauftritt',
-  'Content direkt passend für Website & Social',
-  'Weniger Abstimmung zwischen externen Gewerken',
-];
+import { websiteEntryPrice, euro, websiteComparison } from '@/data/website-pricing';
 
 const assurances = [
   'Transparente Preise ab Erstgespräch',
@@ -54,40 +34,40 @@ const assurances = [
       </p>
     </div>
 
-    <div class="wv__compare">
-      <!-- Links: der übliche Weg -->
-      <div class="wv__side wv__side--split">
-        <p class="wv__side-label">Klassisch einzeln</p>
-        <ul class="wv__roles" role="list">
-          {separateRoles.map((r) => <li class="wv__tag">{r}</li>)}
-        </ul>
-        <ul class="wv__list" role="list">
-          {separateEffects.map((e) => (
-            <li class="wv__row">
-              <span class="wv__mark wv__mark--off" aria-hidden="true"></span>
-              <span>{e}</span>
-            </li>
-          ))}
-        </ul>
+    <!-- Kategorie-Vergleich: links die uebliche Aufteilung, rechts unser Umfang.
+         Auf jedem Viewport zwei Spalten unter einer Kategoriezeile – das haelt
+         den Block kurz und die Gegenueberstellung sofort lesbar. -->
+    <div class="cmpt" role="table" aria-label="Vergleich: üblicher Weg und LAMOR AGENCY">
+      <div class="cmpt__head" role="row" aria-hidden="true">
+        <span class="cmpt__head-cat"></span>
+        <span class="cmpt__head-a">Üblicherweise</span>
+        <span class="cmpt__head-b">LAMOR Agency</span>
       </div>
 
-      <p class="wv__vs" aria-hidden="true"><span>vs.</span></p>
-
-      <!-- Rechts: LAMOR -->
-      <div class="wv__side wv__side--lamor">
-        <p class="wv__side-label">LAMOR Agency</p>
-        <ul class="wv__roles" role="list">
-          {togetherRoles.map((r) => <li class="wv__tag wv__tag--on">{r}</li>)}
-        </ul>
-        <ul class="wv__list" role="list">
-          {togetherEffects.map((e) => (
-            <li class="wv__row">
-              <span class="wv__mark wv__mark--on" aria-hidden="true"></span>
-              <span>{e}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
+      {websiteComparison.map((row) => (
+        <div class="cmpt__group" role="rowgroup">
+          <p class="cmpt__cat">{row.category}</p>
+          <div class="cmpt__pair" role="row">
+            <div class="cmpt__cell cmpt__cell--a" role="cell">
+              <span class="cmpt__label">Üblicherweise</span>
+              <span class="cmpt__mark cmpt__mark--off" aria-hidden="true"></span>
+              <p class="cmpt__text">{row.others}</p>
+            </div>
+            <div class="cmpt__cell cmpt__cell--b" role="cell">
+              <span class="cmpt__label cmpt__label--on">LAMOR</span>
+              <ul class="cmpt__list" role="list">
+                {row.lamor.map((item) => (
+                  <li class="cmpt__item">
+                    <span class="cmpt__mark cmpt__mark--on" aria-hidden="true"></span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+              {row.note && <p class="cmpt__note">{row.note}</p>}
+            </div>
+          </div>
+        </div>
+      ))}
     </div>
 
     <!-- Website + Content als Aufwertung, mit sichtbarem Material -->
@@ -143,66 +123,89 @@ const assurances = [
   }
   .wv__lead { max-width: 54ch; color: var(--fg-muted); }
 
-  /* ---------- Vergleich ---------- */
-  .wv__compare { display: grid; gap: var(--space-4); align-items: stretch; }
-  @media (min-width: 900px) { .wv__compare { grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); gap: var(--space-3); } }
-
-  .wv__side {
-    padding: clamp(1.25rem, 3vw, 2rem);
+  /* ---------- Vergleichstabelle ---------- */
+  .cmpt {
     border: 1px solid var(--line);
     border-radius: clamp(0.6rem, 1.6vw, 1rem);
-    display: grid; align-content: start; gap: var(--space-4);
+    overflow: hidden;
   }
-  .wv__side--lamor { background: var(--c-paper); color: var(--c-ink); border-color: var(--c-paper); }
 
-  .wv__side-label {
-    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
-    letter-spacing: var(--ls-wider); text-transform: uppercase; color: var(--fg-muted);
+  /* Kopfzeile nur auf Desktop – auf Mobile stehen die Labels in den Zellen. */
+  .cmpt__head { display: none; }
+
+  .cmpt__group + .cmpt__group { border-top: 1px solid var(--line); }
+
+  .cmpt__cat {
+    padding: 0.7rem clamp(0.9rem, 2.5vw, 1.4rem);
+    background: var(--bg-2);
+    font-size: var(--fs-eyebrow);
+    font-weight: var(--fw-semi);
+    font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wider);
+    text-transform: uppercase;
+    color: var(--fg-muted);
   }
-  .wv__side--lamor .wv__side-label { color: var(--c-accent-text); }
 
-  .wv__list { display: grid; }
-  .wv__row {
+  /* Zwei Spalten ab der kleinsten Breite – das ist der Kern der Darstellung. */
+  .cmpt__pair { display: grid; grid-template-columns: 1fr 1fr; }
+  .cmpt__cell {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: baseline; gap: 0.7em;
-    padding-block: 0.7rem;
-    border-top: 1px solid var(--line);
-    font-size: var(--fs-small);
+    align-content: start;
+    gap: 0.4rem;
+    padding: clamp(0.8rem, 2.2vw, 1.25rem) clamp(0.7rem, 2vw, 1.4rem);
+    min-width: 0;
   }
-  .wv__row:first-child { border-top: 0; padding-top: 0; }
-  .wv__side--lamor .wv__row { border-color: var(--c-paper-3); }
+  .cmpt__cell--a { border-right: 1px solid var(--line); }
+  .cmpt__cell--b { background: color-mix(in srgb, var(--c-accent) 7%, transparent); }
 
-  .wv__mark { width: 0.9rem; height: 0.9rem; border-radius: 50%; flex: none; position: relative; align-self: center; }
-  .wv__mark--off { border: 1px solid var(--fg-muted); }
-  .wv__mark--off::after { content: ''; position: absolute; inset: 45% 22%; border-top: 1px solid var(--fg-muted); }
-  .wv__mark--on { background: var(--c-accent); }
-  .wv__mark--on::after {
+  .cmpt__label {
+    font-size: 0.66rem;
+    font-weight: var(--fw-semi);
+    font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+    color: var(--fg-muted);
+  }
+  .cmpt__label--on { color: var(--c-accent-on-dark); }
+
+  .cmpt__text { font-size: var(--fs-small); color: var(--fg-muted); overflow-wrap: break-word; }
+
+  .cmpt__list { display: grid; gap: 0.35rem; }
+  .cmpt__item { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.5em; align-items: baseline; font-size: var(--fs-small); }
+
+  .cmpt__mark { width: 0.85rem; height: 0.85rem; border-radius: 50%; flex: none; position: relative; align-self: center; }
+  .cmpt__mark--off { border: 1px solid var(--fg-muted); opacity: 0.7; }
+  .cmpt__mark--off::after { content: ''; position: absolute; inset: 45% 22%; border-top: 1px solid var(--fg-muted); }
+  .cmpt__mark--on { background: var(--c-accent); }
+  .cmpt__mark--on::after {
     content: ''; position: absolute; inset: 0;
     background: no-repeat center / 0.5rem url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none'><path d='M2 6.5L4.8 9L10 3' stroke='white' stroke-width='2.2' stroke-linecap='square'/></svg>");
   }
+  .cmpt__cell--a .cmpt__mark--off { justify-self: start; }
 
-  /* Die beteiligten Gewerke als Tag-Reihe – zeigt den Umfang auf einen Blick. */
-  .wv__roles { display: flex; flex-wrap: wrap; gap: 0.4rem; }
-  .wv__tag {
-    padding: 0.4em 0.75em;
-    border: 1px solid var(--line);
-    border-radius: var(--radius-pill);
-    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
-    letter-spacing: 0.04em; text-transform: uppercase;
-    color: var(--fg-muted);
-  }
-  .wv__tag--on { border-color: var(--c-accent); color: var(--c-accent-text); }
+  .cmpt__note { font-size: 0.72rem; color: var(--fg-muted); margin-top: 0.2rem; }
 
-  .wv__side-note { font-size: var(--fs-small); color: var(--fg-muted); }
-  .wv__side-note--on { color: var(--c-accent-text); font-weight: var(--fw-semi); }
+  @media (min-width: 900px) {
+    /* Ab hier tragen Kategorie und beide Spalten EINE Zeile – das spart
+       gegenueber der gestapelten Variante rund ein Drittel Hoehe. */
+    .cmpt__head {
+      display: grid;
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr) minmax(0, 1fr);
+      background: var(--bg-2);
+      border-bottom: 1px solid var(--line);
+    }
+    .cmpt__head span {
+      padding: 0.7rem 1.4rem;
+      font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+      letter-spacing: var(--ls-wider); text-transform: uppercase; color: var(--fg-muted);
+    }
+    .cmpt__head-b { color: var(--c-accent-on-dark); }
 
-  .wv__vs { display: grid; place-items: center; }
-  .wv__vs span {
-    display: grid; place-items: center; width: 3rem; height: 3rem;
-    border: 1px solid var(--line); border-radius: 50%;
-    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi);
-    letter-spacing: var(--ls-wider); text-transform: uppercase; color: var(--fg-muted);
+    .cmpt__group { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 2fr); align-items: stretch; }
+    .cmpt__cat { display: grid; align-content: center; background: transparent; border-right: 1px solid var(--line); }
+    .cmpt__pair { grid-template-columns: 1fr 1fr; }
+    .cmpt__label { display: none; }
+    .cmpt__cell { gap: 0.5rem; }
   }
 
   /* ---------- Upsell ---------- */

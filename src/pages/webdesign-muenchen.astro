@@ -67,7 +67,7 @@ const description = `Webdesign aus ${site.address.city}: individuelle Websites a
         <p class="t-label wx__label" data-reveal="fade">Beispiele</p>
         <h2 class="t-say wx__title" id="wx-title"><Words text="So sehen unsere Websites aus." /></h2>
       </div>
-      <ul class="wx__grid" role="list">
+      <ul class="wx__grid swipe" role="list">
         {examples.map((ex, i) => (
           <li class="wx__item" data-reveal style={`--reveal-delay:${i * 110}ms`}>
             <Media
@@ -158,8 +158,19 @@ const description = `Webdesign aus ${site.address.city}: individuelle Websites a
   .wx__head { display: grid; gap: var(--space-3); margin-bottom: var(--space-7); }
   .wx__label { color: var(--c-accent); }
   .wx__title { max-width: 18ch; }
-  .wx__grid { display: grid; gap: var(--space-6) var(--grid-gap); }
-  @media (min-width: 700px) { .wx__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  /* Unter 700px waagerechte Swipe-Reihe statt drei gestapelter Hochformate. */
+  @media (min-width: 700px) {
+    .wx__grid {
+      grid-auto-flow: row;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-auto-columns: auto;
+      gap: var(--space-6) var(--grid-gap);
+      overflow: visible;
+      margin-inline: 0;
+      padding-inline: 0;
+      padding-bottom: 0;
+    }
+  }
   .wx__caption { margin-top: var(--space-3); }
   .wx__note { margin-top: var(--space-6); max-width: 56ch; }
 

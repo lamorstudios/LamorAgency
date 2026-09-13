@@ -660,6 +660,46 @@ a:hover .media--hover > img, a:hover .media--hover > picture img, a:hover .media
 @media (min-width: 900px) { .sticky-cta { display: none; } }
 @media (prefers-reduced-motion: reduce) { .sticky-cta { transition: none; } }
 
+
+/* ==========================================================================
+   SWIPE-REIHE
+   Kartensets, die gestapelt zu viel Hoehe kosten, laufen auf schmalen
+   Geraeten waagerecht. Nativer Scroll-Container mit Snap: funktioniert mit
+   Finger, Trackpad, Tastatur und ohne JavaScript. Ab der Breite, ab der das
+   Raster passt, wird daraus wieder ein normales Grid.
+   ========================================================================== */
+.swipe {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: min(82vw, 22rem);
+  gap: var(--grid-gap);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  /* Karten beginnen und enden buendig am Containerrand. */
+  margin-inline: calc(-1 * var(--gutter));
+  padding-inline: var(--gutter);
+  padding-bottom: var(--space-3);
+}
+.swipe::-webkit-scrollbar { display: none; }
+.swipe > * { scroll-snap-align: start; }
+
+/* Hinweis, dass sich die Reihe schieben laesst – verschwindet im Grid. */
+.swipe-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  margin-top: var(--space-3);
+  font-size: var(--fs-eyebrow);
+  font-weight: var(--fw-semi);
+  font-stretch: var(--wd-tight);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+.swipe-hint::after { content: ''; width: 1.75rem; height: 1px; background: currentColor; }
+
 /* ==========================================================================
    FORMULARE
    Global, weil mehrere Formulare dieselbe Darstellung teilen

@@ -335,3 +335,46 @@ export const monthlyLine = (m: MonthlyRange | null): string | null => {
 };
 
 export const euro = (n: number) => nf.format(n);
+
+/**
+ * Vergleich nach Kategorien: wie es üblicherweise läuft – und wie bei LAMOR.
+ *
+ * REGEL: keine erfundenen Marktpreise und keine Wertung über Dritte. Die
+ * linke Spalte beschreibt ausschliesslich die STRUKTUR des üblichen Weges
+ * ("separat", "zusätzlich", "je nach Anbieter"), nie deren Qualität oder
+ * Preis. Nachprüfbar ist nur, was rechts steht – das ist unser Angebot.
+ */
+export interface ComparisonRow {
+  category: string;
+  /** Wie es üblicherweise aufgeteilt ist – rein strukturell. */
+  others: string;
+  /** Was bei LAMOR dazugehört. */
+  lamor: string[];
+  /** Einschränkung, wo sie sachlich nötig ist. */
+  note?: string;
+}
+
+export const websiteComparison: ComparisonRow[] = [
+  {
+    category: 'Website-Erstellung',
+    others: 'Separat beauftragt, je nach Anbieter unterschiedliche Kostenmodelle',
+    lamor: ['Komplette Website-Erstellung', 'Klar definierter Paketpreis'],
+  },
+  {
+    category: 'Einrichtung & Start',
+    others: 'Setup- oder Projektkosten können zusätzlich anfallen',
+    lamor: ['Keine versteckten Setup-Kosten', 'Was im Paket steht, ist der Preis'],
+  },
+  {
+    category: 'Betreuung',
+    others: 'Separate Ansprechpartner je Gewerk',
+    lamor: ['Website', 'Hosting', 'Wartung', 'Änderungen', 'Persönlicher Ansprechpartner'],
+    note: 'Umfang je nach gebuchter Betreuungsstufe',
+  },
+  {
+    category: 'Weitere Leistungen',
+    others: 'Webdesign, Content, Foto/Video und Branding werden getrennt koordiniert',
+    lamor: ['Webdesign', 'Branding', 'Foto', 'Video', 'Social Media'],
+    note: 'Alles aus einer Agentur verfügbar',
+  },
+];
