@@ -1,122 +1,152 @@
 ---
 /**
- * Selected Clients – zwei gegenläufige Laufbänder in Plakatgrösse.
+ * Trust – kommt früh, nicht nach fünfzehn Sections.
  *
- * Die obere Reihe läuft nach links und steht satt, die untere läuft nach
- * rechts und ist nur konturiert. Das Gegeneinander erzeugt Tiefe, ohne dass
- * eine zweite Farbe nötig wäre. Beim Hover füllt sich die Kontur.
+ * Drei Belege in einem hellen Block: mit wem gearbeitet wurde (Karten),
+ * wie viel daraus entstanden ist (Zahlen), und wofür (Kategorien).
+ * Helle Fläche als bewusster Bruch zum dunklen Hero-/Showreel-Block.
  *
  * Logos: sobald in src/data/clients.ts ein `logo` hinterlegt ist, ersetzt das
- * Bild den Schriftzug. Ohne Logo ist der Name typografisch gesetzt – bewusst
- * gestaltet, kein Fehlzustand.
+ * Bild den Schriftzug. Ohne Logo steht der Name typografisch – gestaltet,
+ * nicht kaputt.
  */
 import { Picture } from 'astro:assets';
 import { clients } from '@/data/clients';
+import { stats } from '@/data/stats';
 
-interface Props { title?: string; label?: string; theme?: 'dark' | 'light' }
+interface Props { title?: string; label?: string; theme?: 'dark' | 'light'; compact?: boolean }
 const {
   title = 'Marken, die schon mit uns gearbeitet haben.',
   label = 'Selected Clients',
-  theme = 'dark',
+  theme = 'light',
+  compact = false,
 } = Astro.props;
 
 const logos = import.meta.glob<{ default: ImageMetadata }>('/src/assets/brand/clients/*.{svg,png,jpg,webp,avif}');
 const resolved = await Promise.all(
   clients.map(async (c) => ({ ...c, img: c.logo && logos[c.logo] ? (await logos[c.logo]()).default : undefined })),
 );
-
-// Zwei Reihen aus derselben Liste – versetzt, damit sich nichts spiegelt.
-const half = Math.ceil(resolved.length / 2);
-const rows = [resolved.slice(0, half), resolved.slice(half)];
+const shown = compact ? resolved.slice(0, 10) : resolved;
+const figures = stats.slice(0, 4);
 ---
-<section class="cl" data-theme={theme} data-bg={theme} aria-labelledby="clients-title">
-  <div class="container cl__head">
-    <p class="t-label cl__label">{label}</p>
-    <h2 class="cl__title" id="clients-title" data-reveal>{title}</h2>
-    <p class="t-label cl__count" aria-hidden="true">{resolved.length} Marken</p>
-  </div>
-
-  {rows.map((row, ri) => (
-    <div class={`marquee cl__band ${ri === 1 ? 'cl__band--outline marquee--reverse' : ''}`}
-         style={`--marquee-speed:${ri === 0 ? 46 : 58}s`}>
-      {[0, 1].map((copy) => (
-        <ul class="marquee__row" role={ri === 0 && copy === 0 ? 'list' : 'presentation'} aria-hidden={copy === 1 ? 'true' : undefined}>
-          {row.map((c) => (
-            <li class="cl__item">
-              {c.img ? (
-                <Picture src={c.img} formats={['webp']} widths={[220, 440]} sizes="220px" alt={c.name} class="cl__logo" loading="lazy" />
-              ) : (
-                <span class="cl__name">{c.name}</span>
-              )}
-            </li>
-          ))}
-        </ul>
-      ))}
+<section class="tr" data-theme={theme} data-bg={theme} aria-labelledby="clients-title">
+  <div class="container">
+    <div class="tr__head">
+      <div>
+        <p class="eyebrow tr__label">{label}</p>
+        <h2 class="tr__title" id="clients-title">{title}</h2>
+      </div>
+      <p class="tr__note">
+        Von lokalen Unternehmen bis Major Label – <strong>{resolved.length}</strong> Marken im Auszug.
+      </p>
     </div>
-  ))}
+
+    <ul class="tr__grid" role="list">
+      {shown.map((c) => (
+        <li class="tr__cell">
+          {c.img ? (
+            <Picture src={c.img} formats={['webp']} widths={[220, 440]} sizes="180px" alt={c.name} class="tr__logo" loading="lazy" />
+          ) : (
+            <span class="tr__name">{c.name}</span>
+          )}
+          {c.note && <span class="tr__kind">{c.note}</span>}
+        </li>
+      ))}
+    </ul>
+
+    <!-- Social Proof direkt darunter: die Zahlen sind der zweite Beleg. -->
+    <ul class="tr__figures" role="list">
+      {figures.map((s) => (
+        <li class="tr__fig">
+          <span class="tr__fig-value">
+            {s.prefix ?? ''}<span data-count={s.value} data-grouped={s.grouped ? '' : undefined}>{s.grouped ? new Intl.NumberFormat('de-DE').format(s.value) : s.value}</span>{s.suffix ?? ''}
+          </span>
+          <span class="tr__fig-label">{s.label}</span>
+          {s.note && <span class="tr__fig-note">{s.note}</span>}
+        </li>
+      ))}
+    </ul>
+  </div>
 </section>
 
 <style>
-  .cl { padding-block: var(--space-9) var(--space-8); overflow: clip; }
+  .tr { padding-block: clamp(2.5rem, 6vw, 5rem); }
 
-  .cl__head {
-    display: grid;
-    gap: var(--space-3);
-    margin-bottom: clamp(2rem, 5vw, 4rem);
-  }
-  .cl__label { color: var(--c-accent-on-dark); }
-  .cl__title {
-    font-family: var(--font-display);
-    font-weight: var(--fw-medium);
-    font-stretch: 100%;
-    font-size: clamp(1.3rem, 1rem + 1.4vw, 2.1rem);
-    line-height: 1.15;
-    letter-spacing: var(--ls-snug);
-    max-width: 24ch;
-  }
-  .cl__count { color: var(--fg-muted); }
-  @media (min-width: 900px) {
-    .cl__head { grid-template-columns: auto minmax(0, 1fr) auto; align-items: baseline; gap: var(--space-7); }
-    .cl__count { justify-self: end; }
-  }
-
-  /* ---------- Bänder ---------- */
-  .cl__band { padding-block: clamp(0.4rem, 1.2vw, 0.9rem); }
-  .cl__band + .cl__band { border-top: 1px solid var(--line); margin-top: clamp(0.4rem, 1.2vw, 0.9rem); }
-
-  .cl__item { flex: none; display: grid; place-items: center; }
-
-  .cl__name {
-    font-family: var(--font-display);
-    font-weight: 800;
-    font-stretch: 112%;
+  .tr__head { display: grid; gap: var(--space-4); margin-bottom: clamp(1.5rem, 4vw, 2.5rem); }
+  .tr__label { margin-bottom: var(--space-3); }
+  .tr__title {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 112%;
     text-transform: uppercase;
-    font-size: clamp(1.9rem, 0.8rem + 5.2vw, 5.5rem);
-    line-height: 1.08;
-    letter-spacing: -0.035em;
-    white-space: nowrap;
-    color: var(--fg);
-    transition: color var(--dur-base) var(--ease-out);
+    font-size: clamp(1.4rem, 0.8rem + 2.4vw, 2.75rem);
+    line-height: 1.02; letter-spacing: -0.035em; max-width: 20ch;
   }
-  /* Die zweite Reihe nur konturiert – Tiefe ohne zweite Farbe. */
-  .cl__band--outline .cl__name {
-    color: transparent;
-    -webkit-text-stroke: 1px var(--fg-muted);
-    text-stroke: 1px var(--fg-muted);
-    transition: color var(--dur-base) var(--ease-out), -webkit-text-stroke-color var(--dur-base) var(--ease-out);
+  .tr__note { font-size: var(--fs-small); color: var(--fg-muted); max-width: 32ch; }
+  .tr__note strong { color: var(--fg); font-weight: var(--fw-bold); }
+  @media (min-width: 900px) {
+    .tr__head { grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: var(--space-7); }
+    .tr__note { text-align: right; }
+  }
+
+  /* Karten statt Laufband: lesbar, sofort erfassbar, ohne Bewegung. */
+  .tr__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: clamp(0.6rem, 1.6vw, 1rem);
+    overflow: hidden;
+  }
+  .tr__cell {
+    display: grid; place-items: center; align-content: center; gap: 0.35rem;
+    padding: clamp(1rem, 2.6vw, 1.75rem) 0.75rem;
+    background: var(--bg);
+    min-height: clamp(5rem, 12vw, 7rem);
+    text-align: center;
+    transition: background var(--dur-base) var(--ease-out);
   }
   @media (hover: hover) and (pointer: fine) {
-    .cl__item:hover .cl__name { color: var(--c-accent-on-dark); }
-    .cl__band--outline .cl__item:hover .cl__name { color: var(--c-accent-on-dark); -webkit-text-stroke-color: transparent; }
+    .tr__cell:hover { background: var(--bg-2); }
+    .tr__cell:hover .tr__name { color: var(--c-accent-text); }
   }
+  .tr__name {
+    font-family: var(--font-display); font-weight: 800; font-stretch: 105%;
+    text-transform: uppercase;
+    font-size: clamp(0.85rem, 0.65rem + 0.9vw, 1.25rem);
+    line-height: 1.05; letter-spacing: -0.025em;
+    transition: color var(--dur-base) var(--ease-out);
+  }
+  .tr__kind {
+    font-size: 0.7rem; font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--fg-muted);
+  }
+  .tr__logo { width: auto; height: clamp(1.4rem, 3vw, 2.25rem); object-fit: contain; filter: grayscale(1); opacity: 0.75; }
+  .tr__cell:hover .tr__logo { filter: none; opacity: 1; }
 
-  .cl__logo {
-    width: auto;
-    height: clamp(1.75rem, 3.5vw, 3rem);
-    object-fit: contain;
-    opacity: 0.7;
-    filter: grayscale(1);
-    transition: opacity var(--dur-base) var(--ease-out), filter var(--dur-base) var(--ease-out);
+  @media (min-width: 620px) { .tr__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (min-width: 1024px) { .tr__grid { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+
+  /* ---------- Zahlen ---------- */
+  .tr__figures {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(1.25rem, 3vw, 2rem);
+    margin-top: clamp(1.75rem, 4vw, 3rem);
+    padding-top: clamp(1.5rem, 3.5vw, 2.5rem);
+    border-top: 1px solid var(--line);
   }
-  .cl__item:hover .cl__logo { opacity: 1; filter: none; }
+  .tr__fig { display: grid; gap: 0.2rem; align-content: start; }
+  .tr__fig-value {
+    font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: 118%;
+    font-size: clamp(1.85rem, 1.1rem + 3.2vw, 3.75rem);
+    line-height: 0.95; letter-spacing: -0.045em;
+    font-variant-numeric: tabular-nums;
+    color: var(--c-accent);
+  }
+  .tr__fig-label {
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase;
+  }
+  .tr__fig-note { font-size: var(--fs-small); color: var(--fg-muted); max-width: 26ch; }
+  @media (min-width: 900px) { .tr__figures { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 </style>

@@ -1,8 +1,12 @@
 ---
 /**
  * Startseite – die Dramaturgie:
- * Hero → Vertrauen → Problem/Lösung → Leistungen → Film → Arbeiten → Prozess
- * → Models → Branchen → Zahlen → Stimmen → Preise → FAQ → Kontakt.
+ * Hero → Showreel → Vertrauen (Kunden + Zahlen) → Problem/Lösung → Leistungen
+ * → Webdesign → Arbeiten → Prozess → Models → Branchen → Zahlen → Stimmen
+ * → Preise → FAQ → Kontakt.
+ *
+ * Showreel und Trust stehen bewusst ganz vorn: Wer hier abspringt, soll die
+ * Arbeit gesehen und die Referenzen gelesen haben.
  */
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Hero from '@/components/sections/Hero.astro';
@@ -30,11 +34,11 @@ import { offerCatalog } from '@/lib/schema';
   jsonLd={[offerCatalog()]}
 >
   <Hero />
+  <Showreel />
   <Clients />
   <Comparison />
   <Services />
   <WebsiteTeaser />
-  <Showreel />
   <SelectedWork />
   <Process />
   <ModelsTeaser />

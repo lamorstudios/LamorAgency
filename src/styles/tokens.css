@@ -19,8 +19,9 @@
   /* Ein einziger Akzent – Signalrot wie Filmvorspann und Klappe.
      Bewusst sparsam: Punkt, Linie, ein Wort. Nie als Fläche hinter Text.
      An genau dieser Stelle änderbar, wirkt überall. */
-  --c-accent: #e5432b;
-  --c-accent-on-dark: #ff5c3d; /* aufgehellt für Labels auf dunklem Grund */
+  --c-accent: #e5432b;         /* Flächen, Marken, grosse Typo */
+  --c-accent-text: #bf2f1b;    /* abgedunkelt für kleine Schrift auf Papier (5.4:1) */
+  --c-accent-on-dark: #ff5c3d; /* aufgehellt für kleine Schrift auf Tinte (5.1:1) */
   --c-accent-deep: #b8321e;
   --c-accent-ink: #ffffff;
   --c-white: #ffffff;

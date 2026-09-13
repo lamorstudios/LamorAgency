@@ -479,6 +479,187 @@ a:hover .media--hover > img, a:hover .media--hover > picture img, a:hover .media
 .js .hairline { transform: scaleX(0); transition: transform 1.2s var(--ease-expo); }
 .js .hairline.is-inview { transform: scaleX(1); }
 
+
+/* ==========================================================================
+   VERKAUFS-BAUSTEINE
+   Wiederkehrende Elemente, die pro Bildschirm Information liefern:
+   Eyebrow, Chip, Badge, Geraeterahmen, Schrittkette, Preis-Splitter.
+   Bewusst global, weil sie auf Startseite und Landingpage gleich aussehen.
+   ========================================================================== */
+
+/* Auszeichnung mit Linien links und rechts – ordnet den Block ein, bevor
+   die Headline kommt. */
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.9em;
+  font-family: var(--font-body);
+  font-size: var(--fs-eyebrow);
+  font-weight: var(--fw-semi);
+  font-stretch: var(--wd-tight);
+  letter-spacing: var(--ls-wider);
+  text-transform: uppercase;
+  color: var(--c-accent-text);
+}
+[data-theme='dark'] .eyebrow, .surface-ink .eyebrow { color: var(--c-accent-on-dark); }
+.eyebrow::before { content: ''; width: clamp(1.5rem, 4vw, 3rem); height: 1px; background: currentColor; flex: none; opacity: 0.55; }
+.eyebrow--center { justify-content: center; }
+.eyebrow--center::after { content: ''; width: clamp(1.5rem, 4vw, 3rem); height: 1px; background: currentColor; flex: none; opacity: 0.55; }
+
+/* Hervorgehobenes Wort in einer Headline – der Griff, mit dem die Referenz
+   ihre Aussagen lesbar macht. */
+.hl { color: var(--c-accent); }
+[data-theme='dark'] .hl { color: var(--c-accent-on-dark); }
+
+/* Haken-Chips: knappe Belege unter einer Headline. */
+.chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+  padding: 0.6em 1em;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-eyebrow);
+  font-weight: var(--fw-semi);
+  font-stretch: var(--wd-tight);
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  color: var(--fg);
+  background: color-mix(in srgb, var(--fg) 4%, transparent);
+}
+.chip::before {
+  content: '';
+  width: 0.95em; height: 0.95em; flex: none;
+  border-radius: 50%;
+  background: var(--c-accent) no-repeat center / 0.55em
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none'><path d='M2 6.5L4.8 9L10 3' stroke='white' stroke-width='2.2' stroke-linecap='square'/></svg>");
+}
+.chip--plain::before { display: none; }
+
+/* Badge: eine kurze Einordnung an einer Karte. */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.45em 0.85em;
+  border-radius: var(--radius-pill);
+  background: var(--c-accent);
+  color: #fff;
+  font-size: var(--fs-eyebrow);
+  font-weight: var(--fw-semi);
+  font-stretch: var(--wd-tight);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  line-height: 1;
+}
+.badge--quiet { background: color-mix(in srgb, var(--fg) 8%, transparent); color: var(--fg); }
+
+/* Geraeterahmen mit schwebenden Beschriftungen – zeigt Arbeit, statt sie zu
+   behaupten. Die Labels sitzen bewusst halb ausserhalb des Rahmens. */
+.mock { position: relative; }
+.mock__frame {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: clamp(0.75rem, 2vw, 1.25rem);
+  background: var(--bg-2);
+  padding: clamp(0.4rem, 1vw, 0.7rem);
+  overflow: hidden;
+}
+.mock__bar { display: flex; gap: 0.3rem; padding: 0.35rem 0.2rem 0.55rem; }
+.mock__bar span { width: 0.45rem; height: 0.45rem; border-radius: 50%; background: var(--line); }
+.mock__tag {
+  position: absolute;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.5em 0.85em;
+  border-radius: var(--radius-pill);
+  background: var(--c-ink);
+  color: var(--c-paper);
+  border: 1px solid var(--c-ink-3);
+  font-size: var(--fs-eyebrow);
+  font-weight: var(--fw-semi);
+  font-stretch: var(--wd-tight);
+  letter-spacing: 0.04em;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+.mock__tag--tl { top: clamp(0.5rem, 2vw, 1rem); left: clamp(0.5rem, 2vw, 1rem); }
+.mock__tag--br { bottom: clamp(0.5rem, 2vw, 1rem); right: clamp(0.5rem, 2vw, 1rem); }
+.mock__tag i { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--c-accent); flex: none; }
+
+/* Kompakte Schrittkette – Ablauf ohne eigene Section. */
+.steps { display: grid; gap: 0.5rem; }
+.steps__item { display: flex; align-items: baseline; gap: 0.7em; font-size: var(--fs-small); }
+.steps__n {
+  flex: none;
+  display: inline-grid; place-items: center;
+  width: 1.6em; height: 1.6em;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  font-family: var(--font-display);
+  font-size: 0.75em;
+  font-weight: var(--fw-bold);
+  color: var(--c-accent);
+}
+@media (min-width: 620px) { .steps { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem 1.25rem; } }
+
+/* Preis-Splitter: einmalig links, monatlich rechts – die eine Stelle, an der
+   Missverstaendnisse entstehen, deshalb visuell getrennt. */
+.split {
+  display: grid;
+  border: 1px solid var(--line);
+  border-radius: clamp(0.75rem, 2vw, 1rem);
+  overflow: hidden;
+}
+.split__col { padding: clamp(1rem, 2.5vw, 1.5rem); display: grid; gap: 0.3rem; align-content: start; }
+.split__col + .split__col { border-top: 1px solid var(--line); }
+.split__label { font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight); letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--fg-muted); }
+.split__value {
+  font-family: var(--font-display);
+  font-weight: var(--fw-display);
+  font-stretch: var(--wd-wide);
+  font-size: clamp(1.5rem, 1rem + 2.2vw, 2.6rem);
+  line-height: 1;
+  letter-spacing: var(--ls-tight);
+  font-variant-numeric: tabular-nums;
+}
+.split__note { font-size: var(--fs-small); color: var(--fg-muted); }
+.split__col--lead .split__value { color: var(--c-accent); }
+@media (min-width: 560px) {
+  .split { grid-template-columns: 1fr 1fr; }
+  .split__col + .split__col { border-top: 0; border-left: 1px solid var(--line); }
+}
+
+/* Sticky-CTA – nur dort einsetzen, wo eine Seite auf eine Anfrage hinarbeitet. */
+.sticky-cta {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: var(--z-nav);
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.6rem var(--gutter) calc(0.6rem + env(safe-area-inset-bottom));
+  background: color-mix(in srgb, var(--c-ink) 88%, transparent);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border-top: 1px solid var(--c-ink-3);
+  transform: translateY(110%);
+  transition: transform var(--dur-base) var(--ease-out);
+}
+.sticky-cta.is-on { transform: none; }
+.sticky-cta__main { flex: 1; justify-content: center; min-height: 3rem; }
+.sticky-cta__alt {
+  flex: none; display: grid; place-items: center;
+  width: 3rem; height: 3rem; border-radius: 50%;
+  border: 1px solid var(--c-ink-3); color: var(--c-paper);
+}
+.sticky-cta__alt svg { width: 1.25rem; height: 1.25rem; }
+@media (min-width: 900px) { .sticky-cta { display: none; } }
+@media (prefers-reduced-motion: reduce) { .sticky-cta { transition: none; } }
+
 /* ==========================================================================
    FORMULARE
    Global, weil mehrere Formulare dieselbe Darstellung teilen

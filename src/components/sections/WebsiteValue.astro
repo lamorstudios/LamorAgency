@@ -1,0 +1,225 @@
+---
+/**
+ * Der eigentliche Verkaufsgrund: fünf Gewerke oder ein Studio.
+ *
+ * Bewusst KEIN Vergleich mit Wettbewerbern und keine Preisbehauptungen über
+ * Dritte – verglichen wird die Art zu beauftragen, und das ist belegbar.
+ * Darunter Risikoabbau ausschliesslich mit dem, was LAMOR wirklich zusagt:
+ * keine erfundene Garantie.
+ */
+import Media from '@/components/Media.astro';
+import { websiteEntryPrice, euro } from '@/data/website-pricing';
+
+const separate = [
+  { role: 'Webdesigner', task: 'baut die Seite' },
+  { role: 'Fotograf', task: 'liefert Bilder' },
+  { role: 'Videograf', task: 'dreht das Material' },
+  { role: 'Grafiker', task: 'macht das Design' },
+  { role: 'Social Media', task: 'bespielt die Kanäle' },
+];
+
+const together = ['Website', 'Fotografie', 'Video', 'Branding', 'Social Content'];
+
+const assurances = [
+  'Transparente Preise ab Erstgespräch',
+  'Klare Projektphasen',
+  'Ein persönlicher Ansprechpartner',
+  'Responsive immer inklusive',
+  'Keine versteckten Pflicht-Retainer',
+  'Betreuung bleibt optional',
+];
+---
+<section class="wv" data-theme="dark" data-bg="dark" aria-labelledby="wv-title">
+  <div class="container">
+    <div class="wv__head">
+      <p class="eyebrow">Der Unterschied</p>
+      <h2 class="wv__title" id="wv-title">
+        Fünf Dienstleister suchen –<br />
+        <span class="hl">oder einmal anfragen.</span>
+      </h2>
+      <p class="wv__lead">
+        Die meisten Websites scheitern nicht am Design, sondern daran, dass
+        Bilder, Videos und Texte aus vier verschiedenen Quellen kommen.
+      </p>
+    </div>
+
+    <div class="wv__compare">
+      <!-- Links: der übliche Weg -->
+      <div class="wv__side wv__side--split">
+        <p class="wv__side-label">Einzeln buchen</p>
+        <ul class="wv__list" role="list">
+          {separate.map((s) => (
+            <li class="wv__row">
+              <span class="wv__mark wv__mark--off" aria-hidden="true"></span>
+              <span class="wv__role">{s.role}</span>
+              <span class="wv__task">{s.task}</span>
+            </li>
+          ))}
+        </ul>
+        <p class="wv__side-note">Vier Briefings, vier Rechnungen, vier Bildsprachen.</p>
+      </div>
+
+      <p class="wv__vs" aria-hidden="true"><span>vs.</span></p>
+
+      <!-- Rechts: LAMOR -->
+      <div class="wv__side wv__side--lamor">
+        <p class="wv__side-label">LAMOR</p>
+        <ul class="wv__list" role="list">
+          {together.map((t) => (
+            <li class="wv__row">
+              <span class="wv__mark wv__mark--on" aria-hidden="true"></span>
+              <span class="wv__role">{t}</span>
+              <span class="wv__task">aus einer Hand</span>
+            </li>
+          ))}
+        </ul>
+        <p class="wv__side-note wv__side-note--on">Ein Briefing, ein Ansprechpartner, ein Look.</p>
+      </div>
+    </div>
+
+    <!-- Website + Content als Aufwertung, mit sichtbarem Material -->
+    <div class="wv__upsell">
+      <div class="wv__upsell-copy">
+        <p class="badge">Website + Content</p>
+        <h3 class="wv__upsell-title">Deine Website braucht nicht nur Design. Sie braucht Content.</h3>
+        <p class="wv__upsell-text">
+          Wir bauen nicht nur die Seite – wir produzieren auch, was darauf zu sehen ist.
+          Fotos, Videos und Social-Assets entstehen am selben Drehtag.
+        </p>
+        <ul class="chips wv__upsell-chips" role="list">
+          <li class="chip">Professionelle Fotos</li>
+          <li class="chip">Video</li>
+          <li class="chip">Social Assets</li>
+        </ul>
+        <a href="#anfrage" class="wv__upsell-cta">
+          <span>Website + Content anfragen</span>
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8H14M14 8L9 3M14 8L9 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+        </a>
+      </div>
+      <div class="wv__upsell-media">
+        <Media
+          media={{ type: 'placeholder', alt: 'Foto- und Videoproduktion für eine Website', label: '[WEBDESIGN] Content am Set' }}
+          ratio="square" sizes="(min-width: 1024px) 32vw, 100vw" widths={[480, 900]} hover
+        />
+      </div>
+    </div>
+
+    <!-- Risikoabbau: nur das, was wirklich zugesagt wird -->
+    <div class="wv__assure">
+      <p class="wv__assure-label t-label">Worauf du dich verlassen kannst</p>
+      <ul class="chips" role="list">
+        {assurances.map((a) => <li class="chip">{a}</li>)}
+      </ul>
+      <p class="wv__assure-note">
+        Websites starten bei {euro(websiteEntryPrice)} einmalig. Was dein Projekt konkret kostet,
+        sagen wir dir nach einem kurzen Gespräch – vor der Beauftragung.
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .wv { padding-block: clamp(2.5rem, 6vw, 5rem); }
+
+  .wv__head { display: grid; gap: var(--space-4); margin-bottom: clamp(1.75rem, 4vw, 3rem); }
+  .wv__title {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 110%;
+    text-transform: uppercase;
+    font-size: clamp(1.6rem, 0.8rem + 3.4vw, 3.5rem);
+    line-height: 1; letter-spacing: -0.038em;
+  }
+  .wv__lead { max-width: 54ch; color: var(--fg-muted); }
+
+  /* ---------- Vergleich ---------- */
+  .wv__compare { display: grid; gap: var(--space-4); align-items: stretch; }
+  @media (min-width: 900px) { .wv__compare { grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); gap: var(--space-3); } }
+
+  .wv__side {
+    padding: clamp(1.25rem, 3vw, 2rem);
+    border: 1px solid var(--line);
+    border-radius: clamp(0.6rem, 1.6vw, 1rem);
+    display: grid; align-content: start; gap: var(--space-4);
+  }
+  .wv__side--lamor { background: var(--c-paper); color: var(--c-ink); border-color: var(--c-paper); }
+
+  .wv__side-label {
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wider); text-transform: uppercase; color: var(--fg-muted);
+  }
+  .wv__side--lamor .wv__side-label { color: var(--c-accent-text); }
+
+  .wv__list { display: grid; }
+  .wv__row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: baseline; gap: 0.7em;
+    padding-block: 0.7rem;
+    border-top: 1px solid var(--line);
+    font-size: var(--fs-small);
+  }
+  .wv__row:first-child { border-top: 0; padding-top: 0; }
+  .wv__side--lamor .wv__row { border-color: var(--c-paper-3); }
+
+  .wv__mark { width: 0.9rem; height: 0.9rem; border-radius: 50%; flex: none; position: relative; align-self: center; }
+  .wv__mark--off { border: 1px solid var(--fg-muted); }
+  .wv__mark--off::after { content: ''; position: absolute; inset: 45% 22%; border-top: 1px solid var(--fg-muted); }
+  .wv__mark--on { background: var(--c-accent); }
+  .wv__mark--on::after {
+    content: ''; position: absolute; inset: 0;
+    background: no-repeat center / 0.5rem url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none'><path d='M2 6.5L4.8 9L10 3' stroke='white' stroke-width='2.2' stroke-linecap='square'/></svg>");
+  }
+
+  .wv__role { font-weight: var(--fw-semi); }
+  .wv__side--split .wv__role { color: var(--fg-muted); }
+  .wv__task { font-size: 0.8em; color: var(--fg-muted); text-align: right; white-space: nowrap; }
+
+  .wv__side-note { font-size: var(--fs-small); color: var(--fg-muted); }
+  .wv__side-note--on { color: var(--c-accent-text); font-weight: var(--fw-semi); }
+
+  .wv__vs { display: grid; place-items: center; }
+  .wv__vs span {
+    display: grid; place-items: center; width: 3rem; height: 3rem;
+    border: 1px solid var(--line); border-radius: 50%;
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi);
+    letter-spacing: var(--ls-wider); text-transform: uppercase; color: var(--fg-muted);
+  }
+
+  /* ---------- Upsell ---------- */
+  .wv__upsell {
+    display: grid; gap: clamp(1.5rem, 4vw, 2.5rem);
+    margin-top: clamp(2rem, 5vw, 3.5rem);
+    padding: clamp(1.25rem, 3vw, 2.25rem);
+    border: 1px solid var(--line);
+    border-radius: clamp(0.6rem, 1.6vw, 1rem);
+    background: var(--bg-2);
+  }
+  @media (min-width: 900px) { .wv__upsell { grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr); align-items: center; } }
+  .wv__upsell-copy { display: grid; gap: var(--space-4); justify-items: start; }
+  .wv__upsell-title {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 108%;
+    text-transform: uppercase;
+    font-size: clamp(1.25rem, 0.8rem + 1.8vw, 2.1rem);
+    line-height: 1.02; letter-spacing: -0.035em; max-width: 22ch;
+  }
+  .wv__upsell-text { color: var(--fg-muted); font-size: var(--fs-small); max-width: 48ch; }
+  .wv__upsell-cta {
+    display: inline-flex; align-items: center; gap: 0.6em; min-height: 44px;
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase;
+    border-bottom: 1px solid currentColor; padding-bottom: 0.25em;
+  }
+  .wv__upsell-cta svg { width: 1em; height: 1em; transition: transform var(--dur-base) var(--ease-out); }
+  .wv__upsell-cta:hover { color: var(--c-accent-on-dark); }
+  .wv__upsell-cta:hover svg { transform: translateX(0.3em); }
+  .wv__upsell-media { border-radius: clamp(0.5rem, 1.4vw, 0.8rem); overflow: hidden; }
+
+  /* ---------- Zusagen ---------- */
+  .wv__assure {
+    margin-top: clamp(2rem, 5vw, 3.5rem);
+    padding-top: clamp(1.5rem, 3.5vw, 2.5rem);
+    border-top: 1px solid var(--line);
+    display: grid; gap: var(--space-4);
+  }
+  .wv__assure-label { color: var(--fg-muted); }
+  .wv__assure-note { font-size: var(--fs-small); color: var(--fg-muted); max-width: 60ch; }
+</style>

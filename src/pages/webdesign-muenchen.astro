@@ -11,6 +11,8 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import WebsiteHero from '@/components/sections/WebsiteHero.astro';
 import Clients from '@/components/sections/Clients.astro';
 import WebsiteProblem from '@/components/sections/WebsiteProblem.astro';
+import WebsiteValue from '@/components/sections/WebsiteValue.astro';
+import StickyCta from '@/components/StickyCta.astro';
 import WebsiteProcess from '@/components/sections/WebsiteProcess.astro';
 import WebsitePricing from '@/components/sections/WebsitePricing.astro';
 import WebsiteContentUsp from '@/components/sections/WebsiteContentUsp.astro';
@@ -52,7 +54,8 @@ const description = `Webdesign aus ${site.address.city}: individuelle Websites a
   ]}
 >
   <WebsiteHero />
-  <Clients label="Vertrauen uns" title="Marken, für die wir bereits gearbeitet haben." />
+  <WebsiteValue />
+  <Clients label="Vertrauen uns" title="Marken, für die wir bereits gearbeitet haben." compact />
   <WebsiteProblem />
 
   <!-- Website-Beispiele -->
@@ -145,6 +148,7 @@ const description = `Webdesign aus ${site.address.city}: individuelle Websites a
       </p>
     </div>
   </section>
+  <StickyCta label="Website anfragen" />
 </BaseLayout>
 
 <style>

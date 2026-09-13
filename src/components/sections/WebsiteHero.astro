@@ -1,103 +1,152 @@
 ---
 /**
- * Hero der Website-Landingpage.
- * Für bezahlten Traffic gebaut: In den ersten Sekunden muss klar sein, WAS es
- * gibt, WAS es ungefähr kostet und WO man anfragt. Deshalb steht der
- * Preisanker direkt neben dem CTA – nicht erst weit unten auf der Seite.
+ * Hero der Website-Landingpage – für bezahlten Traffic gebaut.
+ *
+ * Reihenfolge nach Einwänden: Was ist das (Eyebrow) → Was kostet es
+ * (Headline mit Preis) → Was bekomme ich (Chips) → Was tue ich jetzt (CTA)
+ * → Wie läuft es (Schritte) → Wie sieht es aus (Mockup).
+ *
+ * Die Trennung einmalig / monatlich steht direkt im ersten Viewport, weil
+ * genau dort sonst das Missverständnis entsteht.
  */
 import Media from '@/components/Media.astro';
-import Words from '@/components/Words.astro';
 import { site } from '@/data/site';
-import { websiteEntryPrice, websiteEntryMonthly, euro } from '@/data/website-pricing';
----
-<section class="wh" data-hero data-theme="dark" data-bg="dark" aria-labelledby="wh-title">
-  <div class="container wh__inner">
-    <div class="wh__text">
-      <p class="wh__eyebrow t-label" data-reveal="fade">
-        <span class="wh__dot" aria-hidden="true"></span>
-        Webdesign · {site.address.city}
-      </p>
+import {
+  websitePricing, websiteEntryPrice, websiteEntryMonthly, euro, websiteProcess,
+} from '@/data/website-pricing';
 
-      <h1 class="wh__title t-hero" id="wh-title" data-hero-title>
-        <Words lines={['Websites, die nicht', 'nur gut aussehen.']} />
+const pages = websitePricing.length;
+---
+<section class="wh" data-theme="light" data-bg="light" aria-labelledby="wh-title">
+  <div class="container wh__grid">
+    <div class="wh__copy">
+      <p class="eyebrow">Website erstellen lassen · {site.address.city}</p>
+
+      <h1 class="wh__title" id="wh-title">
+        Deine neue Website.<br />
+        <span class="hl">Ab {euro(websiteEntryPrice)} netto.</span>
       </h1>
 
-      <p class="wh__lead t-lead" data-reveal style="--reveal-delay:200ms">
-        LAMOR entwickelt moderne Websites für Unternehmen, die professionell auftreten
-        und mehr Anfragen bekommen wollen. Individuell gestaltet, schnell, mobil zuerst.
+      <p class="wh__lead">
+        Individuell entwickelt, vollständig responsive und auf Anfragen ausgerichtet –
+        keine Vorlage von der Stange.
       </p>
 
-      <div class="wh__actions" data-reveal style="--reveal-delay:280ms">
-        <a href="#anfrage" class="btn" data-magnetic>
-          <span>Website anfragen</span>
+      <ul class="chips wh__chips" role="list">
+        <li class="chip">Keine Template-Massenware</li>
+        <li class="chip">Mobile optimiert</li>
+        <li class="chip">SEO-Grundoptimierung</li>
+        <li class="chip">Persönlicher Ansprechpartner</li>
+      </ul>
+
+      <!-- Der Punkt, an dem sonst Verwirrung entsteht: getrennt dargestellt. -->
+      <div class="split wh__split">
+        <div class="split__col split__col--lead">
+          <span class="split__label">Website-Erstellung</span>
+          <span class="split__value">ab {euro(websiteEntryPrice)}</span>
+          <span class="split__note">einmalig · das Projekt gehört danach dir</span>
+        </div>
+        <div class="split__col">
+          <span class="split__label">Betreuung</span>
+          <span class="split__value">ab {euro(websiteEntryMonthly)}</span>
+          <span class="split__note">optional pro Monat · jederzeit dazubuchbar</span>
+        </div>
+      </div>
+
+      <div class="wh__actions">
+        <a href="#anfrage" class="btn wh__cta" data-magnetic>
+          <span>Kostenlose Website-Beratung</span>
           <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
         </a>
-        <a href="#pakete" class="btn btn--ghost" data-magnetic>
-          <span>Preise ansehen</span>
-          <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8H14M14 8L9 3M14 8L9 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+        <a href="#pakete" class="wh__ghost">
+          <span>{pages} Pakete ansehen</span>
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2V14M8 14L3 9M8 14L13 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
         </a>
       </div>
 
-      <!-- Preisanker: früh, deutlich und richtig eingeordnet. -->
-      <div class="wh__anchor" data-reveal style="--reveal-delay:360ms">
-        <p class="wh__anchor-main">
-          Websites <strong>ab {euro(websiteEntryPrice)}</strong>
-          <span class="wh__anchor-unit">einmalig</span>
-        </p>
-        <p class="wh__anchor-sub t-small">
-          Betreuung optional ab {euro(websiteEntryMonthly)} / Monat – die Website selbst
-          ist ein einmaliges Projekt, kein Abo.
-        </p>
-      </div>
+      <p class="wh__vat">Alle Preise netto zzgl. gesetzlicher Umsatzsteuer.</p>
     </div>
 
-    <div class="wh__media" data-hero-media data-reveal="fade" style="--reveal-delay:320ms">
-      <Media
-        media={{ type: 'placeholder', alt: 'Website von LAMOR AGENCY auf Desktop und Smartphone', label: '[WEBDESIGN] Website-Mockup' }}
-        ratio="portrait"
-        priority
-        sizes="(min-width: 1024px) 42vw, 100vw"
-      />
+    <div class="wh__visual">
+      <div class="mock">
+        <div class="mock__frame">
+          <div class="mock__bar" aria-hidden="true"><span></span><span></span><span></span></div>
+          <Media
+            media={{ type: 'placeholder', alt: 'Beispiel einer von LAMOR gebauten Website', label: '[WEBDESIGN] Website-Mockup' }}
+            ratio="wide"
+            sizes="(min-width: 1024px) 44vw, 100vw"
+            widths={[560, 900, 1280]}
+          />
+        </div>
+        <span class="mock__tag mock__tag--tl"><i aria-hidden="true"></i>Conversion-Struktur</span>
+        <span class="mock__tag mock__tag--br">Desktop &amp; Mobile</span>
+      </div>
+
+      <!-- Ablauf kompakt: nimmt dem Erstkontakt die Unsicherheit. -->
+      <div class="wh__steps">
+        <p class="wh__steps-label t-label">So läuft es ab</p>
+        <ol class="steps" role="list">
+          {websiteProcess.map((s) => (
+            <li class="steps__item">
+              <span class="steps__n" aria-hidden="true">{s.index}</span>
+              <span>{s.title}{s.optional ? ' (optional)' : ''}</span>
+            </li>
+          ))}
+        </ol>
+      </div>
     </div>
   </div>
 </section>
 
 <style>
   .wh {
-    background: var(--c-ink);
-    color: var(--c-paper);
-    padding-top: calc(var(--header-h) + clamp(2rem, 7vh, 5.5rem));
-    padding-bottom: var(--space-9);
+    background: var(--c-paper);
+    color: var(--c-ink);
+    padding-top: calc(var(--header-h) + clamp(1.5rem, 5vh, 3rem));
+    padding-bottom: clamp(2.5rem, 6vw, 4.5rem);
     overflow: clip;
   }
-  .wh__inner { display: grid; gap: var(--space-7); align-items: center; }
+  .wh__grid { display: grid; gap: clamp(2rem, 5vw, 3.5rem); }
   @media (min-width: 1024px) {
-    .wh__inner { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--space-8); }
+    .wh__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: clamp(2.5rem, 5vw, 4.5rem); }
   }
 
-  .wh__eyebrow { display: inline-flex; align-items: center; gap: 0.7em; color: var(--c-grey-dark); }
-  .wh__dot { width: 0.45rem; height: 0.45rem; border-radius: 50%; background: var(--c-accent); flex-shrink: 0; }
-
-  .wh__title { margin-block: var(--space-3) var(--space-5); max-width: 15ch; }
-  .wh__lead { max-width: 46ch; color: var(--c-grey-dark); }
-
-  .wh__actions { display: flex; flex-wrap: wrap; gap: var(--space-4); margin-top: var(--space-6); }
-
-  .wh__anchor {
-    margin-top: var(--space-6);
-    padding-top: var(--space-5);
-    border-top: 1px solid var(--c-ink-3);
-    display: grid;
-    gap: 0.4rem;
-  }
-  .wh__anchor-main {
+  .wh__title {
+    margin-top: var(--space-4);
     font-family: var(--font-display);
-    font-weight: var(--fw-medium);
-    font-size: clamp(1.15rem, 1rem + 1.1vw, 1.75rem);
-    line-height: 1.1;
-    letter-spacing: var(--ls-snug);
+    font-weight: 900;
+    font-stretch: 108%;
+    text-transform: uppercase;
+    font-size: clamp(1.9rem, 0.5rem + 5.6vw, 4.5rem);
+    line-height: 0.98;
+    letter-spacing: -0.038em;
+    margin-left: -0.03em;
   }
-  .wh__anchor-main strong { font-weight: var(--fw-display); font-stretch: var(--wd-wide); color: var(--c-accent); }
-  .wh__anchor-unit { color: var(--c-grey-dark); font-size: 0.7em; margin-left: 0.4em; text-transform: uppercase; letter-spacing: var(--ls-wide); }
-  .wh__anchor-sub { color: var(--c-grey-dark); max-width: 48ch; }
+  .wh__lead { margin-top: var(--space-4); max-width: 46ch; color: var(--c-grey); font-size: var(--fs-body); line-height: 1.55; }
+
+  .wh__chips { margin-top: var(--space-5); }
+  .wh__split { margin-top: var(--space-5); background: var(--bg); }
+
+  .wh__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4) var(--space-6); margin-top: var(--space-5); }
+  .wh__cta { min-height: 3.25rem; }
+  .wh__ghost {
+    display: inline-flex; align-items: center; gap: 0.6em; min-height: 44px;
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase;
+    border-bottom: 1px solid currentColor; padding-bottom: 0.25em;
+  }
+  .wh__ghost svg { width: 1em; height: 1em; transition: transform var(--dur-base) var(--ease-out); }
+  .wh__ghost:hover { color: var(--c-accent-text); }
+  .wh__ghost:hover svg { transform: translateY(0.25em); }
+
+  .wh__vat { margin-top: var(--space-4); font-size: var(--fs-small); color: var(--fg-muted); }
+
+  .wh__visual { display: grid; gap: clamp(1.25rem, 3vw, 2rem); }
+  .wh__steps {
+    padding: clamp(1rem, 2.5vw, 1.5rem);
+    border: 1px solid var(--line);
+    border-radius: clamp(0.6rem, 1.6vw, 1rem);
+    background: var(--bg);
+  }
+  .wh__steps-label { color: var(--fg-muted); margin-bottom: var(--space-3); }
 </style>

@@ -1,236 +1,173 @@
 ---
 /**
- * Hero – Fullscreen-Einstieg.
+ * Hero – emotional UND verständlich.
  *
- * Aufbau: Das Showreel ist der GRUND der Section, nicht ein Kasten darunter.
- * Darüber liegt ein Verlaufsschleier, damit die Typografie trägt, und darauf
- * die Headline in Versal-Groteske mit einem kursiven Serif-Einwurf.
- * Abgeschlossen wird der Block von einem randlosen Laufband mit dem Claim –
- * der harte Schnitt von Schwarz auf Papier ist der erste Section-Übergang.
- *
- * Showreel eintragen (bestehendes LAMOR-Material, kein Stock):
- *   const showreel = { type: 'video', src: '/media/showreel.mp4',
- *                      poster: '/src/assets/brand/showreel-poster.jpg', alt: '…' };
+ * Aufbau nach Verkaufslogik statt nach Plakat: Einordnung (Eyebrow) →
+ * Aussage (Headline mit hervorgehobenem Kern) → Erklärung (Subline) →
+ * Handlung (CTAs) → Belege (Chips) und daneben sofort sichtbare Arbeit.
+ * Kein leerer Vollbildschirm: schon der erste Viewport zeigt, was LAMOR tut,
+ * für wen, und womit die Behauptung gedeckt ist.
  */
 import Media from '@/components/Media.astro';
 import Words from '@/components/Words.astro';
 import { site } from '@/data/site';
+import { stats } from '@/data/stats';
 
-// PLACEHOLDER: durch das bestehende LAMOR-Showreel ersetzen (siehe README).
-const showreel = {
-  type: 'placeholder' as const,
-  alt: 'LAMOR AGENCY Showreel',
-  label: '[SHOWREEL] Hero-Video',
-};
+// PLACEHOLDER: durch bestehendes LAMOR-Material ersetzen (siehe README).
+const heroMedia = { type: 'placeholder' as const, alt: 'Arbeit von LAMOR AGENCY', label: '[HERO] Kampagnenbild' };
+const sideA = { type: 'placeholder' as const, alt: 'Social Content von LAMOR', label: '[HERO] Social Still' };
+const sideB = { type: 'placeholder' as const, alt: 'Fotoproduktion von LAMOR', label: '[HERO] Fotoproduktion' };
 
-// Der Claim läuft als Endlosband – viermal im Markup, damit die Reihe breit genug ist.
-const claim = 'Feel the brand. Not the ad.';
-const claimRow = Array.from({ length: 4 }, () => claim);
+// Belege kommen aus den zentralen Zahlen – nichts doppelt gepflegt.
+const proof = [stats[0], stats[1], stats[3]];
 ---
-<section class="hero" data-hero data-theme="dark" data-bg="dark" aria-labelledby="hero-title">
-  <!-- Grund: Showreel über die volle Fläche, darüber der Schleier -->
-  <div class="hero__bg" data-hero-media aria-hidden="true">
-    <Media media={showreel} priority sizes="100vw" widths={[768, 1280, 1920, 2560]} class="hero__bg-media" />
-    <span class="hero__scrim"></span>
-    <span class="hero__grain"></span>
-  </div>
-
-  <div class="hero__frame container">
-    <!-- Kopfzeile: Ort links, Beleg rechts -->
-    <div class="hero__top">
-      <p class="t-label hero__where">
-        <span class="hero__dot" aria-hidden="true"></span>
-        Creative Studio · {site.address.city}
-      </p>
-      <p class="t-label hero__reach">{site.reachClaim}</p>
+<section class="hx" data-hero data-theme="dark" data-bg="dark" aria-labelledby="hero-title">
+  <div class="container">
+    <!-- Aussage ueber die volle Breite: lange deutsche Woerter brauchen Platz. -->
+    <div class="hx__top">
+      <p class="eyebrow hx__eyebrow">Creative Studio · {site.address.city}</p>
+      <h1 class="hx__title" id="hero-title" data-hero-title>
+        <Words text="Content, Websites &" />
+        <Words text="Markenauftritte," delay={80} />
+        <span class="hx__hl">die <span class="hl">hängen bleiben.</span></span>
+      </h1>
     </div>
 
-    <!-- Die Aussage. Drei Zeilen, kursiver Einwurf in der Mitte. -->
-    <h1 class="hero__title" id="hero-title" data-hero-title>
-      <span class="hero__line hero__line--1"><Words text="Marken," /></span>
-      <span class="hero__line hero__line--2">
-        <Words text="die man" delay={90} />
-        <em class="t-serif-i hero__em">nicht</em>
-      </span>
-      <span class="hero__line hero__line--3"><Words text="übersieht." delay={180} /></span>
-    </h1>
+    <div class="hx__grid">
+      <div class="hx__copy">
+        <p class="hx__claim t-serif-i">feel the brand not the ad</p>
 
-    <!-- Fusszeile: Lead, CTAs, Scroll-Hinweis -->
-    <div class="hero__foot">
-      <p class="hero__lead">
-        Video, Fotografie, Social Media, Branding und Webdesign – zu Markenauftritten,
-        die gesehen, verstanden und erinnert werden.
+      <p class="hx__lead">
+        LAMOR verbindet Video, Fotografie, Social Media, Webdesign und Branding
+        zu einem einheitlichen Markenauftritt – aus einem Studio in {site.address.city}.
       </p>
-      <div class="hero__actions">
-        <a href="/contact/" class="btn" data-magnetic>
+
+      <div class="hx__actions">
+        <a href="/contact/" class="btn hx__cta" data-magnetic>
           <span>Projekt anfragen</span>
           <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
         </a>
-        <a href="/work/" class="hero__ghost" data-magnetic>
+        <a href="/work/" class="hx__ghost">
           <span>Arbeiten ansehen</span>
           <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8H14M14 8L9 3M14 8L9 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
         </a>
       </div>
-      <p class="hero__cue t-label" aria-hidden="true"><span>Scroll</span></p>
+
+      <ul class="chips hx__chips" role="list">
+        <li class="chip">Video & Foto im eigenen Haus</li>
+        <li class="chip">Eigene Models & Talents</li>
+        <li class="chip">Website & Branding</li>
+      </ul>
+
+      <ul class="hx__proof" role="list">
+        {proof.map((s) => (
+          <li class="hx__proof-item">
+            <span class="hx__proof-value">{s.prefix ?? ''}{s.value}{s.suffix ?? ''}</span>
+            <span class="hx__proof-label">{s.label}</span>
+          </li>
+        ))}
+        </ul>
+      </div>
+
+      <!-- Arbeit steht schon im ersten Viewport, nicht erst nach dem Scrollen. -->
+    <div class="hx__visual" data-hero-media>
+      <div class="hx__main mock">
+        <Media media={heroMedia} ratio="portrait" sizes="(min-width: 1024px) 34vw, 62vw" widths={[480, 900]} hover />
+        <span class="mock__tag mock__tag--br"><i aria-hidden="true"></i>Commercial · München</span>
+      </div>
+      <div class="hx__stack">
+        <div class="hx__small"><Media media={sideA} ratio="square" sizes="(min-width: 1024px) 16vw, 30vw" widths={[320, 640]} hover /></div>
+        <div class="hx__small"><Media media={sideB} ratio="square" sizes="(min-width: 1024px) 16vw, 30vw" widths={[320, 640]} hover /></div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- Claim als randloses Laufband. Harter Schnitt Schwarz → Papier. -->
-<div class="claim" data-theme="light" data-bg="light" role="presentation">
-  <div class="marquee claim__marquee" style="--marquee-speed:34s; --marquee-gap:clamp(1.5rem,4vw,4rem)">
-    <ul class="marquee__row">
-      {claimRow.map(() => (
-        <li class="claim__item">
-          <span class="claim__text">Feel the brand.</span>
-          <em class="claim__text claim__text--em t-serif-i">Not the ad.</em>
-          <span class="claim__star" aria-hidden="true">✳</span>
-        </li>
-      ))}
-    </ul>
-    <ul class="marquee__row" aria-hidden="true">
-      {claimRow.map(() => (
-        <li class="claim__item">
-          <span class="claim__text">Feel the brand.</span>
-          <em class="claim__text claim__text--em t-serif-i">Not the ad.</em>
-          <span class="claim__star" aria-hidden="true">✳</span>
-        </li>
-      ))}
-    </ul>
-  </div>
-</div>
-
 <style>
-  /* ---------- Bühne ---------- */
-  .hero {
-    position: relative;
-    min-height: 100svh;
-    display: flex;
+  .hx {
     background: var(--c-ink);
     color: var(--c-paper);
+    padding-top: calc(var(--header-h) + clamp(1.5rem, 5vh, 3.5rem));
+    padding-bottom: clamp(2.5rem, 6vw, 4.5rem);
     overflow: clip;
-    isolation: isolate;
   }
+  .hx__top { margin-bottom: clamp(1.5rem, 3.5vw, 2.5rem); }
+  .hx__grid { display: grid; gap: clamp(2rem, 5vw, 3.5rem); }
 
-  .hero__bg { position: absolute; inset: 0; z-index: 0; }
-  .hero__bg :global(.media) { position: absolute; inset: 0; height: 100%; aspect-ratio: auto; }
-  .hero__bg :global(.media > *) { height: 100%; }
+  .hx__eyebrow { margin-bottom: var(--space-4); }
 
-  /* Zwei Schleier: einer von unten für die Fusszeile, einer diagonal für die
-     Headline. Zusammen halten sie den Kontrast, ohne das Bild abzutöten. */
-  .hero__scrim {
-    position: absolute; inset: 0; z-index: 1;
-    background:
-      linear-gradient(to top, rgba(11,10,9,0.94) 0%, rgba(11,10,9,0.55) 38%, rgba(11,10,9,0.15) 70%),
-      linear-gradient(105deg, rgba(11,10,9,0.82) 0%, rgba(11,10,9,0.3) 55%, transparent 85%);
-  }
-  /* Feines Korn – nimmt dem Verlauf das Digitale. */
-  .hero__grain {
-    position: absolute; inset: 0; z-index: 2; pointer-events: none;
-    opacity: 0.2; mix-blend-mode: overlay;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-    background-size: 160px 160px;
-  }
-
-  .hero__frame {
-    position: relative;
-    z-index: 3;
-    flex: 1;
-    display: grid;
-    grid-template-rows: auto 1fr auto;
-    gap: var(--space-6);
-    padding-top: calc(var(--header-h) + var(--space-5));
-    padding-bottom: clamp(1.5rem, 4vh, 3rem);
-  }
-
-  /* ---------- Kopfzeile ---------- */
-  .hero__top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-3) var(--space-5); }
-  .hero__where { display: inline-flex; align-items: center; gap: 0.7em; color: var(--c-paper); }
-  .hero__reach { color: var(--c-grey-dark); }
-  .hero__dot { width: 0.4rem; height: 0.4rem; border-radius: 50%; background: var(--c-accent-on-dark); flex: none; }
-  @media (prefers-reduced-motion: no-preference) {
-    .hero__dot { animation: hero-pulse 2.6s var(--ease-in-out) infinite; }
-    @keyframes hero-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
-  }
-
-  /* ---------- Headline ---------- */
-  .hero__title {
-    align-self: center;
+  .hx__title {
     font-family: var(--font-display);
     font-weight: 900;
     font-stretch: 100%;
     text-transform: uppercase;
-    /* Eigene Grösse: das längste Wort ("ÜBERSIEHT.") muss in jeder
-       Viewportbreite in den Container passen. */
-    font-size: clamp(2.75rem, 0.1rem + 10vw, 8rem);
-    /* 0.98 statt 0.9: darunter stossen die Umlautpunkte von Ü/Ä/Ö in die
-       Zeile darueber. Deutscher Versalsatz braucht diesen Millimeter. */
-    line-height: 0.98;
-    letter-spacing: -0.04em;
-    /* Optischer Ausgleich: Versalien wirken sonst eingerückt. */
-    margin-left: -0.04em;
+    /* Laengstes Wort ("MARKENAUFTRITTE,") muss in jeder Breite passen. */
+    /* Bezug ist die volle Containerbreite, deshalb darf die Schrift gross
+       werden. Geprueft am laengsten Wort: "MARKENAUFTRITTE,". */
+    font-size: clamp(1.55rem, 0.2rem + 6.4vw, 7rem);
+    line-height: 0.96;
+    letter-spacing: -0.035em;
+    margin-left: -0.03em;
+    /* Rueckfalllinie fuer lange Komposita wie "Markenauftritte" auf sehr
+       schmalen Geraeten – greift nur, wenn ein Wort sonst ueberlaufen wuerde. */
+    hyphens: auto;
   }
-  .hero__line { display: block; }
-  .hero__line--2 { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.24em; }
-  /* Der kursive Einwurf – die eine Stelle, an der die Serif spricht. */
-  .hero__em { color: var(--c-accent-on-dark); }
+  .hx__hl { display: block; }
 
-  /* ---------- Fusszeile ---------- */
-  .hero__foot { display: grid; gap: var(--space-5); align-content: end; padding-top: var(--space-5); }
-  .hero__lead { max-width: 40ch; color: var(--c-grey-dark); font-size: var(--fs-body); line-height: 1.5; }
-  .hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4) var(--space-6); }
+  .hx__claim {
+    font-size: clamp(1.15rem, 0.9rem + 1.2vw, 1.9rem);
+    color: var(--c-paper);
+    opacity: 0.9;
+  }
 
-  .hero__ghost {
-    display: inline-flex; align-items: center; gap: 0.7em;
-    min-height: 44px;
+  .hx__lead {
+    margin-top: var(--space-4);
+    max-width: 52ch;
+    color: var(--c-grey-dark);
+    font-size: var(--fs-body);
+    line-height: 1.55;
+  }
+
+  .hx__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4) var(--space-6); margin-top: var(--space-5); }
+  .hx__cta { min-height: 3.25rem; }
+  .hx__ghost {
+    display: inline-flex; align-items: center; gap: 0.7em; min-height: 44px;
     font-size: var(--fs-eyebrow); font-weight: var(--fw-semi);
     font-stretch: var(--wd-tight); letter-spacing: var(--ls-wide); text-transform: uppercase;
-    border-bottom: 1px solid currentColor; padding-bottom: 0.35em;
+    border-bottom: 1px solid currentColor; padding-bottom: 0.3em;
     transition: color var(--dur-base) var(--ease-out);
   }
-  .hero__ghost svg { width: 1em; height: 1em; transition: transform var(--dur-base) var(--ease-out); }
-  .hero__ghost:hover { color: var(--c-accent-on-dark); }
-  .hero__ghost:hover svg { transform: translateX(0.35em); }
+  .hx__ghost svg { width: 1em; height: 1em; transition: transform var(--dur-base) var(--ease-out); }
+  .hx__ghost:hover { color: var(--c-accent-on-dark); }
+  .hx__ghost:hover svg { transform: translateX(0.3em); }
 
-  .hero__cue { color: var(--c-grey-dark); display: none; }
-  .hero__cue span { display: inline-block; }
-  @media (prefers-reduced-motion: no-preference) {
-    .hero__cue span { animation: hero-cue 2.4s var(--ease-in-out) infinite; }
-    @keyframes hero-cue { 0%, 100% { transform: translateY(0); opacity: 0.6; } 50% { transform: translateY(0.4rem); opacity: 1; } }
+  .hx__chips { margin-top: var(--space-5); }
+
+  /* Belege als Zahlenreihe – Social Proof ohne eigene Section. */
+  .hx__proof {
+    display: flex; flex-wrap: wrap; gap: var(--space-4) clamp(1.5rem, 4vw, 3rem);
+    margin-top: var(--space-6); padding-top: var(--space-5);
+    border-top: 1px solid var(--c-ink-3);
+  }
+  .hx__proof-item { display: grid; gap: 0.1rem; }
+  .hx__proof-value {
+    font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: var(--wd-wide);
+    font-size: clamp(1.35rem, 1rem + 1.5vw, 2.1rem); line-height: 1; letter-spacing: var(--ls-tight);
+    font-variant-numeric: tabular-nums;
+  }
+  .hx__proof-label {
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--c-grey-dark);
   }
 
-  @media (min-width: 600px) {
-    .hero__title { font-stretch: 118%; }
-  }
-  @media (min-width: 900px) {
-    .hero__foot {
-      grid-template-columns: minmax(0, 1fr) auto auto;
-      align-items: center;
-      gap: var(--space-7);
-    }
-    .hero__cue { display: block; justify-self: end; }
-    .hero__title { font-stretch: 125%; }
-  }
+  /* ---------- Bildseite ---------- */
+  .hx__visual { display: grid; grid-template-columns: 1.55fr 1fr; gap: clamp(0.5rem, 1.5vw, 0.9rem); align-items: start; }
+  .hx__stack { display: grid; gap: clamp(0.5rem, 1.5vw, 0.9rem); }
+  .hx__main, .hx__small { border-radius: clamp(0.5rem, 1.5vw, 0.9rem); overflow: hidden; }
 
-  /* ---------- Claim-Laufband ---------- */
-  .claim {
-    background: var(--c-paper);
-    color: var(--c-ink);
-    padding-block: clamp(0.6rem, 1.6vw, 1.2rem);
-    overflow: clip;
-    border-bottom: 1px solid var(--c-paper-3);
+  @media (min-width: 1024px) {
+    .hx__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr); align-items: start; gap: clamp(2.5rem, 5vw, 4.5rem); }
+    .hx__title { font-stretch: 112%; }
   }
-  .claim__item { display: flex; align-items: baseline; gap: clamp(0.5rem, 1.5vw, 1.2rem); flex: none; }
-  .claim__text {
-    font-family: var(--font-display);
-    font-weight: 900;
-    font-stretch: 118%;
-    text-transform: uppercase;
-    font-size: clamp(1.6rem, 0.6rem + 4.6vw, 5rem);
-    line-height: 1.05;
-    letter-spacing: -0.04em;
-    white-space: nowrap;
-  }
-  .claim__text--em { color: var(--c-accent); }
-  .claim__star { color: var(--c-accent); font-size: clamp(0.9rem, 2vw, 2rem); }
 </style>
