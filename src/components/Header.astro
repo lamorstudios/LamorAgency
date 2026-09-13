@@ -205,47 +205,86 @@ const isActive = (href: string) => (norm(href) === '/' ? path === '/' : path.sta
 </style>
 
 <script>
-  function initNav() {
-    const btn = document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
-    const nav = document.querySelector<HTMLElement>('[data-nav]');
-    if (!btn || !nav || (btn as any).__init) return;
-    (btn as any).__init = true;
+  /**
+   * Mobile-Navigation.
+   *
+   * Achtung beim Seitenwechsel: Der Header traegt transition:persist und
+   * ueberlebt den Swap, das Overlay darunter NICHT – es wird ersetzt.
+   * Wer den Button nur einmal verdrahtet, schaltet danach ein Overlay um,
+   * das nicht mehr im Dokument haengt: aria-expanded springt, sichtbar
+   * passiert nichts. Deshalb wird bei jedem Seitenaufbau geprueft, ob das
+   * Overlay noch dasselbe ist, und bei Bedarf neu verdrahtet.
+   */
+  let globalsBound = false;
 
-    const focusables = () => Array.from(nav.querySelectorAll<HTMLElement>('a[href], button, [tabindex]:not([tabindex="-1"])'));
+  function currentNav() { return document.querySelector<HTMLElement>('[data-nav]'); }
+  function currentBtn() { return document.querySelector<HTMLButtonElement>('[data-nav-toggle]'); }
+
+  function closeNav(refocus = true) {
+    const nav = currentNav();
+    const btn = currentBtn();
+    if (!nav || !btn) return;
+    nav.classList.remove('is-open');
+    nav.setAttribute('aria-hidden', 'true');
+    btn.setAttribute('aria-expanded', 'false');
     const label = btn.querySelector('.visually-hidden');
-    const open = () => {
-      nav.classList.add('is-open');
-      nav.setAttribute('aria-hidden', 'false');
-      btn.setAttribute('aria-expanded', 'true');
-      if (label) label.textContent = 'Menü schließen';
-      document.body.classList.add('nav-open');
-      setTimeout(() => focusables()[0]?.focus(), 200);
-    };
-    const close = (refocus = true) => {
-      nav.classList.remove('is-open');
-      nav.setAttribute('aria-hidden', 'true');
-      btn.setAttribute('aria-expanded', 'false');
-      if (label) label.textContent = 'Menü öffnen';
-      document.body.classList.remove('nav-open');
-      if (refocus) btn.focus();
-    };
+    if (label) label.textContent = 'Menü öffnen';
+    document.body.classList.remove('nav-open');
+    if (refocus) btn.focus();
+  }
 
-    btn.addEventListener('click', () => (nav.classList.contains('is-open') ? close() : open()));
+  function openNav() {
+    const nav = currentNav();
+    const btn = currentBtn();
+    if (!nav || !btn) return;
+    nav.classList.add('is-open');
+    nav.setAttribute('aria-hidden', 'false');
+    btn.setAttribute('aria-expanded', 'true');
+    const label = btn.querySelector('.visually-hidden');
+    if (label) label.textContent = 'Menü schließen';
+    document.body.classList.add('nav-open');
+    setTimeout(() => nav.querySelector<HTMLElement>('a[href], button')?.focus(), 200);
+  }
+
+  function initNav() {
+    const btn = currentBtn();
+    const nav = currentNav();
+    if (!btn || !nav) return;
+
+    // Nur neu verdrahten, wenn der Button ein anderes Overlay bedienen muss.
+    if ((btn as any).__nav !== nav) {
+      const prev = (btn as any).__onClick;
+      if (prev) btn.removeEventListener('click', prev);
+      const onClick = () => (nav.classList.contains('is-open') ? closeNav() : openNav());
+      btn.addEventListener('click', onClick);
+      (btn as any).__onClick = onClick;
+      (btn as any).__nav = nav;
+      // Links im frisch eingesetzten Overlay schliessen es wieder.
+      nav.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => closeNav(false)));
+    }
+
+    // Dokumentweite Handler nur einmal – sie holen sich ihre Elemente selbst.
+    if (globalsBound) return;
+    globalsBound = true;
+
     document.addEventListener('keydown', (e) => {
-      if (!nav.classList.contains('is-open')) return;
-      if (e.key === 'Escape') { close(); return; }
+      const n = currentNav();
+      const b = currentBtn();
+      if (!n || !b || !n.classList.contains('is-open')) return;
+      if (e.key === 'Escape') { closeNav(); return; }
       if (e.key === 'Tab') {
-        const f = focusables();
+        const f = Array.from(n.querySelectorAll<HTMLElement>('a[href], button, [tabindex]:not([tabindex="-1"])'));
         if (!f.length) return;
         const first = f[0], last = f[f.length - 1];
-        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); (btn as HTMLElement).focus(); }
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); b.focus(); }
         else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-        else if (!e.shiftKey && document.activeElement === btn) { e.preventDefault(); first.focus(); }
+        else if (!e.shiftKey && document.activeElement === b) { e.preventDefault(); first.focus(); }
       }
     });
-    nav.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => close(false)));
-    matchMedia('(min-width: 1040px)').addEventListener('change', (e) => { if (e.matches) close(false); });
-    document.addEventListener('astro:before-swap', () => close(false));
+
+    matchMedia('(min-width: 1040px)').addEventListener('change', (e) => { if (e.matches) closeNav(false); });
+    document.addEventListener('astro:before-swap', () => closeNav(false));
   }
+
   document.addEventListener('astro:page-load', initNav);
 </script>
