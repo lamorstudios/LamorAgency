@@ -22,6 +22,67 @@ export interface MonthlyRange {
   max: number;
 }
 
+
+/**
+ * Betreuungsstufen.
+ * Die EINZIGE Quelle für monatliche Preise. Die Spannen an den Paketen
+ * (`monthlyPrice`) werden daraus berechnet – nichts doppelt pflegen.
+ *
+ * Leistungsumfang bewusst nah an dem, was zugesagt ist: Hosting, technische
+ * Wartung, Backups, Monitoring, kleinere Änderungen. Höhere Stufen ergänzen,
+ * sie ersetzen nichts.
+ */
+export type CareId = 'none' | 'basic' | 'business' | 'premium';
+
+export interface CarePlan {
+  id: CareId;
+  name: string;
+  /** Preis pro Monat in Euro (netto). 0 = keine Betreuung. */
+  price: number;
+  note: string;
+  includes: string[];
+}
+
+export const carePlans: CarePlan[] = [
+  {
+    id: 'none',
+    name: 'Keine',
+    price: 0,
+    note: 'Du kümmerst dich selbst um Hosting und Pflege.',
+    includes: ['Website gehört dir', 'Jederzeit später dazubuchbar'],
+  },
+  {
+    id: 'basic',
+    name: 'Basic',
+    price: 39,
+    note: 'Die Seite bleibt online, aktuell und gesichert.',
+    includes: ['Hosting', 'Backups', 'Monitoring', 'Technische Wartung'],
+  },
+  {
+    id: 'business',
+    name: 'Business',
+    price: 69,
+    note: 'Dazu kleinere Änderungen, ohne dass du nachfragen musst.',
+    includes: ['Alles aus Basic', 'Kleinere Textänderungen', 'SSL & Updates', 'Ansprechpartner per Mail'],
+  },
+  {
+    id: 'premium',
+    name: 'Premium',
+    price: 119,
+    note: 'Für Seiten, die laufend mitwachsen sollen.',
+    includes: ['Alles aus Business', 'Laufende Optimierung', 'Monatliche Inhaltspflege', 'Priorisierte Bearbeitung'],
+  },
+];
+
+export const getCarePlan = (id: CareId) => carePlans.find((c) => c.id === id) ?? carePlans[0];
+
+/** Monatsspanne aus den Stufen ableiten, die zu einem Paket passen. */
+const rangeFromTiers = (tiers: CareId[]): MonthlyRange | null => {
+  const prices = tiers.map((t) => getCarePlan(t).price).filter((n) => n > 0);
+  if (!prices.length) return null;
+  return { min: Math.min(...prices), max: Math.max(...prices) };
+};
+
 export interface WebsitePackage {
   id: string;
   name: string;
@@ -33,7 +94,9 @@ export interface WebsitePackage {
   priceFrom: boolean;
   /** Zusatz, wenn kein fester Preis genannt wird. */
   priceNote?: string;
-  /** Optionale monatliche Betreuung. */
+  /** Betreuungsstufen, die zu diesem Paket passen (Quelle der Monatspreise). */
+  careTiers: CareId[];
+  /** Abgeleitet aus `careTiers` – nicht von Hand pflegen. */
   monthlyPrice: MonthlyRange | null;
   /** Ein Satz: worum es in diesem Paket geht. */
   description: string;
@@ -45,14 +108,16 @@ export interface WebsitePackage {
   cta: { label: string; href: string };
 }
 
-export const websitePricing: WebsitePackage[] = [
+type RawPackage = Omit<WebsitePackage, 'monthlyPrice'>;
+
+const rawPackages: RawPackage[] = [
   {
     id: 'onepage',
     name: 'LAMOR ONEPAGE',
     label: 'Landing Page',
     price: 1490,
     priceFrom: true,
-    monthlyPrice: { min: 39, max: 59 },
+    careTiers: ['basic', 'business'],
     description: 'Eine starke Seite, die alles Wichtige zeigt und zur Anfrage führt.',
     for: ['Selbstständige', 'Restaurants', 'Lokale Unternehmen', 'Dienstleister', 'Einzelne Angebote', 'Kampagnen / Meta Ads'],
     features: [
@@ -82,7 +147,7 @@ export const websitePricing: WebsitePackage[] = [
     label: 'Meistgewählt',
     price: 2490,
     priceFrom: true,
-    monthlyPrice: { min: 59, max: 89 },
+    careTiers: ['basic', 'business', 'premium'],
     description: 'Der vollständige Auftritt für kleinere und mittlere Unternehmen.',
     for: ['Kleine und mittlere Unternehmen', 'Mehrere Leistungen', 'Lokale Sichtbarkeit'],
     features: [
@@ -113,7 +178,7 @@ export const websitePricing: WebsitePackage[] = [
     label: 'Markenauftritt',
     price: 3990,
     priceFrom: true,
-    monthlyPrice: { min: 89, max: 149 },
+    careTiers: ['business', 'premium'],
     description: 'Für Unternehmen, die digital deutlich stärker auftreten wollen.',
     for: ['Wachsende Unternehmen', 'Marken mit Anspruch', 'Mehr Inhalte und Struktur'],
     features: [
@@ -145,7 +210,7 @@ export const websitePricing: WebsitePackage[] = [
     price: 5900,
     priceFrom: true,
     priceNote: 'Endpreis nach Aufwand',
-    monthlyPrice: null,
+    careTiers: ['business', 'premium'],
     description: 'Wenn Standard nicht reicht: komplexe Websites und eigene technische Lösungen.',
     for: ['Größere Unternehmen', 'Hochwertige Marken', 'Mehrere Standorte'],
     features: [
@@ -162,6 +227,12 @@ export const websitePricing: WebsitePackage[] = [
     cta: { label: 'Projekt besprechen', href: '/webdesign-muenchen/#anfrage' },
   },
 ];
+
+/** Pakete mit abgeleiteter Monatsspanne – das ist der Export für die Seite. */
+export const websitePricing: WebsitePackage[] = rawPackages.map((p) => ({
+  ...p,
+  monthlyPrice: rangeFromTiers(p.careTiers),
+}));
 
 /**
  * Bundles / Upsells.

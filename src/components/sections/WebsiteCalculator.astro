@@ -1,0 +1,401 @@
+---
+/**
+ * Website-Rechner.
+ *
+ * Beantwortet die Frage, die vor jeder Anfrage steht: Was kostet das über die
+ * Zeit? Einmalige Erstellung und optionale Betreuung werden getrennt gezeigt
+ * und dann zusammengerechnet – genau die Trennung, an der sonst
+ * Missverständnisse entstehen.
+ *
+ * ALLE Preise kommen aus src/data/website-pricing.ts und stehen als
+ * data-Attribute im Markup. Im Skript wird kein einziger Betrag geschrieben.
+ *
+ * Bedienung: Paket und Betreuung sind echte Radiogruppen, die Laufzeit ist
+ * ein natives <input type="range">. Beides ist damit von Haus aus per
+ * Tastatur bedienbar; der Range meldet min/max/aktuell automatisch, ergänzt
+ * um aria-valuetext für eine sprechende Ansage ("12 Monate").
+ */
+import { websitePricing, carePlans, euro } from '@/data/website-pricing';
+
+const maxMonths = 24;
+const defaultMonths = 12;
+// Empfehlung als Startwert – dasselbe Paket, das auch in den Karten markiert ist.
+const defaultPkg = websitePricing.find((p) => p.highlighted) ?? websitePricing[0];
+const defaultCare = carePlans.find((c) => c.id === (defaultPkg.careTiers[1] ?? defaultPkg.careTiers[0])) ?? carePlans[0];
+---
+<section class="ca" id="rechner" data-theme="light" data-bg="light" aria-labelledby="ca-title">
+  <div class="container">
+    <div class="ca__head">
+      <p class="eyebrow">Kostenrechner</p>
+      <h2 class="ca__title" id="ca-title">
+        Was kostet deine Website <span class="hl">wirklich?</span>
+      </h2>
+      <p class="ca__lead">
+        Einmalige Erstellung und optionale Betreuung transparent durchrechnen –
+        ohne Anfrage, ohne E-Mail-Adresse.
+      </p>
+    </div>
+
+    <div class="ca__card" data-calc
+         data-max={maxMonths}
+         data-default-months={defaultMonths}>
+      <div class="ca__controls">
+        <!-- Paketwahl -->
+        <fieldset class="ca__group">
+          <legend class="ca__legend">Paket</legend>
+          <div class="ca__seg">
+            {websitePricing.map((p) => (
+              <label class="ca__opt">
+                <input
+                  type="radio"
+                  name="calc-package"
+                  value={p.id}
+                  data-price={p.price ?? 0}
+                  data-from={p.priceFrom ? '1' : '0'}
+                  data-care={(p.careTiers[1] ?? p.careTiers[0] ?? 'none')}
+                  checked={p.id === defaultPkg.id}
+                />
+                <span class="ca__opt-box">
+                  <span class="ca__opt-name">{p.name.replace('LAMOR ', '').split(' ')[0]}</span>
+                  <span class="ca__opt-price">{p.priceFrom ? 'ab ' : ''}{euro(p.price ?? 0)}</span>
+                </span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        <!-- Betreuung -->
+        <fieldset class="ca__group">
+          <legend class="ca__legend">Betreuung</legend>
+          <div class="ca__seg ca__seg--care">
+            {carePlans.map((c) => (
+              <label class="ca__opt" data-note={c.note}>
+                <input
+                  type="radio"
+                  name="calc-care"
+                  value={c.id}
+                  data-price={c.price}
+                  checked={c.id === defaultCare.id}
+                />
+                <span class="ca__opt-box">
+                  <span class="ca__opt-name">{c.name}</span>
+                  <span class="ca__opt-price">{c.price === 0 ? '0 €' : `${euro(c.price)} / Mon.`}</span>
+                </span>
+              </label>
+            ))}
+          </div>
+          <p class="ca__care-note" data-care-note>{defaultCare.note}</p>
+        </fieldset>
+
+        <!-- Laufzeit -->
+        <div class="ca__group">
+          <label class="ca__legend" for="calc-months">
+            Betreuung für <output class="ca__months" data-months-out for="calc-months">{defaultMonths}</output> Monate
+          </label>
+          <div class="ca__slider">
+            <input
+              type="range"
+              id="calc-months"
+              min="0"
+              max={maxMonths}
+              step="1"
+              value={defaultMonths}
+              data-months
+              aria-valuetext={`${defaultMonths} Monate`}
+              style={`--fill:${(defaultMonths / maxMonths) * 100}%`}
+            />
+            <div class="ca__ticks" aria-hidden="true">
+              <span>0</span><span>6</span><span>12</span><span>18</span><span>{maxMonths}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ergebnis -->
+      <div class="ca__result" role="status" aria-live="polite">
+        <p class="ca__result-label">Gesamt nach <span data-months-echo>{defaultMonths}</span> Monaten</p>
+        <p class="ca__total" data-total>–</p>
+        <p class="ca__avg" data-avg-wrap>
+          <span data-avg>–</span> <span class="ca__avg-note">rechnerisch pro Monat über die Laufzeit</span>
+        </p>
+
+        <dl class="ca__rows">
+          <div class="ca__row">
+            <dt>Website-Erstellung</dt>
+            <dd data-once>–</dd>
+          </div>
+          <div class="ca__row">
+            <dt>Betreuung pro Monat</dt>
+            <dd data-monthly>–</dd>
+          </div>
+          <div class="ca__row ca__row--sum">
+            <dt>Betreuung über <span data-months-echo>{defaultMonths}</span> Monate</dt>
+            <dd data-care-total>–</dd>
+          </div>
+        </dl>
+
+        <p class="ca__hint" data-hint hidden></p>
+
+        <a href="#anfrage" class="btn ca__cta" data-magnetic>
+          <span>Projekt anfragen</span>
+          <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+        </a>
+        <p class="ca__vat">Alle Beträge netto zzgl. USt. Richtwert – der verbindliche Preis kommt aus dem Angebot.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .ca { padding-block: clamp(2.5rem, 6vw, 5rem); }
+
+  .ca__head { display: grid; gap: var(--space-4); margin-bottom: clamp(1.5rem, 4vw, 2.5rem); }
+  .ca__title {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 110%;
+    text-transform: uppercase;
+    font-size: clamp(1.6rem, 0.8rem + 3.4vw, 3.5rem);
+    line-height: 1; letter-spacing: -0.038em; max-width: 20ch;
+  }
+  .ca__lead { max-width: 52ch; color: var(--fg-muted); }
+
+  /* Dunkle Karte auf hellem Grund – liest sich als Werkzeug, nicht als Text. */
+  .ca__card {
+    display: grid;
+    gap: clamp(1.5rem, 3.5vw, 2.5rem);
+    padding: clamp(1.25rem, 3vw, 2.25rem);
+    border-radius: clamp(0.9rem, 2.2vw, 1.5rem);
+    background: var(--c-ink);
+    color: var(--c-paper);
+    box-shadow: 0 24px 60px -30px rgba(11, 10, 9, 0.55);
+  }
+  @media (min-width: 900px) {
+    .ca__card { grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.85fr); align-items: start; gap: clamp(2rem, 4vw, 3.5rem); }
+  }
+
+  .ca__controls { display: grid; gap: clamp(1.25rem, 3vw, 2rem); align-content: start; }
+  .ca__group { border: 0; padding: 0; margin: 0; display: grid; gap: var(--space-3); min-width: 0; }
+  .ca__legend {
+    padding: 0;
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--c-grey-dark);
+  }
+
+  /* ---------- Segmentierte Auswahl ---------- */
+  .ca__seg { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
+  @media (min-width: 620px) { .ca__seg { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+  .ca__opt { position: relative; display: block; min-width: 0; }
+  .ca__opt input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+  .ca__opt-box {
+    display: grid; gap: 0.2rem; align-content: center;
+    min-height: 3.5rem;
+    padding: 0.7rem 0.8rem;
+    border: 1px solid var(--c-ink-3);
+    border-radius: 0.6rem;
+    background: var(--c-ink-2);
+    transition: border-color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
+  }
+  .ca__opt-name {
+    font-family: var(--font-display); font-weight: var(--fw-bold); font-stretch: 105%;
+    font-size: 0.82rem; text-transform: uppercase; letter-spacing: -0.01em;
+    overflow-wrap: anywhere;
+  }
+  .ca__opt-price { font-size: 0.72rem; color: var(--c-grey-dark); font-variant-numeric: tabular-nums; }
+
+  .ca__opt input:checked + .ca__opt-box { border-color: var(--c-accent); background: color-mix(in srgb, var(--c-accent) 16%, var(--c-ink-2)); }
+  .ca__opt input:checked + .ca__opt-box .ca__opt-price { color: var(--c-paper); }
+  .ca__opt input:focus-visible + .ca__opt-box { outline: 2px solid var(--c-paper); outline-offset: 2px; }
+  @media (hover: hover) { .ca__opt:hover .ca__opt-box { border-color: var(--c-grey-dark); } }
+
+  .ca__care-note { font-size: var(--fs-small); color: var(--c-grey-dark); }
+
+  /* ---------- Schieberegler ---------- */
+  .ca__months { font-family: var(--font-display); font-weight: var(--fw-display); color: var(--c-accent-on-dark); font-variant-numeric: tabular-nums; }
+
+  .ca__slider { display: grid; gap: 0.5rem; }
+  .ca__slider input[type='range'] {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 2.75rem; margin: 0; background: transparent; cursor: pointer;
+  }
+  /* Spur: gefuellter Teil kommt aus --fill, das JS mitschreibt. */
+  .ca__slider input[type='range']::-webkit-slider-runnable-track {
+    height: 0.5rem; border-radius: var(--radius-pill);
+    background: linear-gradient(to right, var(--c-accent) 0 var(--fill, 50%), var(--c-ink-3) var(--fill, 50%) 100%);
+  }
+  .ca__slider input[type='range']::-moz-range-track {
+    height: 0.5rem; border-radius: var(--radius-pill);
+    background: linear-gradient(to right, var(--c-accent) 0 var(--fill, 50%), var(--c-ink-3) var(--fill, 50%) 100%);
+  }
+  /* Griff: 2rem sichtbar, die Spurhoehe von 2.75rem gibt die Trefferflaeche. */
+  .ca__slider input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 2rem; height: 2rem; margin-top: -0.75rem;
+    border-radius: 50%; border: 3px solid var(--c-ink);
+    background: var(--c-paper);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+    transition: transform var(--dur-fast) var(--ease-out);
+  }
+  .ca__slider input[type='range']::-moz-range-thumb {
+    width: 2rem; height: 2rem;
+    border-radius: 50%; border: 3px solid var(--c-ink);
+    background: var(--c-paper);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+  }
+  .ca__slider input[type='range']:active::-webkit-slider-thumb { transform: scale(1.12); }
+  .ca__slider input[type='range']:focus-visible { outline: none; }
+  .ca__slider input[type='range']:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--c-accent-on-dark); outline-offset: 2px; }
+  .ca__slider input[type='range']:focus-visible::-moz-range-thumb { outline: 2px solid var(--c-accent-on-dark); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) {
+    .ca__slider input[type='range']::-webkit-slider-thumb { transition: none; }
+  }
+
+  .ca__ticks {
+    display: flex; justify-content: space-between;
+    font-size: 0.7rem; font-variant-numeric: tabular-nums; color: var(--c-grey-dark);
+    padding-inline: 0.25rem;
+  }
+
+  /* ---------- Ergebnis ---------- */
+  .ca__result {
+    display: grid; gap: var(--space-3); align-content: start;
+    padding: clamp(1rem, 2.5vw, 1.5rem);
+    border: 1px solid var(--c-ink-3);
+    border-radius: clamp(0.6rem, 1.6vw, 1rem);
+    background: var(--c-ink-2);
+  }
+  .ca__result-label {
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--c-grey-dark);
+  }
+  .ca__total {
+    font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: 118%;
+    font-size: clamp(2.25rem, 1.2rem + 4.6vw, 4rem);
+    line-height: 0.95; letter-spacing: -0.045em;
+    font-variant-numeric: tabular-nums;
+    color: var(--c-paper);
+    overflow-wrap: break-word;
+  }
+  .ca__avg { font-size: var(--fs-small); color: var(--c-grey-dark); font-variant-numeric: tabular-nums; }
+  .ca__avg span[data-avg] { color: var(--c-accent-on-dark); font-weight: var(--fw-semi); }
+  .ca__avg-note { color: var(--c-grey-dark); font-weight: var(--fw-regular); }
+
+  .ca__rows { display: grid; margin-top: var(--space-2); }
+  .ca__row {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
+    padding-block: 0.65rem;
+    border-top: 1px solid var(--c-ink-3);
+    font-size: var(--fs-small);
+  }
+  .ca__row dt { color: var(--c-grey-dark); }
+  .ca__row dd { margin: 0; font-weight: var(--fw-semi); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .ca__row--sum dd { color: var(--c-accent-on-dark); }
+
+  .ca__hint {
+    padding: 0.7rem 0.85rem; border-radius: 0.5rem;
+    background: color-mix(in srgb, var(--c-accent) 16%, transparent);
+    border: 1px solid color-mix(in srgb, var(--c-accent) 40%, transparent);
+    font-size: var(--fs-small); color: var(--c-paper);
+  }
+
+  .ca__cta { width: 100%; justify-content: space-between; margin-top: var(--space-2); --btn-bg: var(--c-paper); --btn-fg: var(--c-ink); border-color: var(--c-paper); }
+  .ca__vat { font-size: 0.72rem; color: var(--c-grey-dark); }
+</style>
+
+<script>
+  function initCalc() {
+    const root = document.querySelector<HTMLElement>('[data-calc]');
+    if (!root || (root as any).__init) return;
+    (root as any).__init = true;
+
+    const months = root.querySelector<HTMLInputElement>('[data-months]')!;
+    const maxMonths = Number(root.dataset.max || 24);
+    const pkgs = Array.from(root.querySelectorAll<HTMLInputElement>('input[name="calc-package"]'));
+    const cares = Array.from(root.querySelectorAll<HTMLInputElement>('input[name="calc-care"]'));
+
+    const out = {
+      once: root.querySelector<HTMLElement>('[data-once]')!,
+      monthly: root.querySelector<HTMLElement>('[data-monthly]')!,
+      careTotal: root.querySelector<HTMLElement>('[data-care-total]')!,
+      total: root.querySelector<HTMLElement>('[data-total]')!,
+      avg: root.querySelector<HTMLElement>('[data-avg]')!,
+      avgWrap: root.querySelector<HTMLElement>('[data-avg-wrap]')!,
+      monthsOut: root.querySelector<HTMLElement>('[data-months-out]')!,
+      echoes: Array.from(root.querySelectorAll<HTMLElement>('[data-months-echo]')),
+      careNote: root.querySelector<HTMLElement>('[data-care-note]')!,
+      hint: root.querySelector<HTMLElement>('[data-hint]')!,
+    };
+
+    const eur = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
+    const checked = (list: HTMLInputElement[]) => list.find((i) => i.checked) ?? list[0];
+
+    function render() {
+      const pkg = checked(pkgs);
+      const care = checked(cares);
+      const m = Number(months.value);
+      // Alle Betraege stammen aus den data-Attributen, also aus der Preisdatei.
+      const once = Number(pkg.dataset.price || 0);
+      const perMonth = Number(care.dataset.price || 0);
+      const careSum = perMonth * m;
+      const total = once + careSum;
+      const from = pkg.dataset.from === '1';
+      const prefix = from ? 'ab ' : '';
+
+      out.once.textContent = prefix + eur.format(once);
+      out.monthly.textContent = perMonth === 0 ? '–' : eur.format(perMonth);
+      out.careTotal.textContent = eur.format(careSum);
+      out.total.textContent = prefix + eur.format(total);
+
+      // Durchschnitt ergibt bei 0 Monaten keinen Sinn.
+      if (m > 0) {
+        out.avgWrap.hidden = false;
+        out.avg.textContent = prefix + eur.format(Math.round(total / m));
+      } else {
+        out.avgWrap.hidden = true;
+      }
+
+      out.monthsOut.textContent = String(m);
+      out.echoes.forEach((e) => (e.textContent = String(m)));
+      months.setAttribute('aria-valuetext', m === 1 ? '1 Monat' : `${m} Monate`);
+      months.style.setProperty('--fill', `${(m / maxMonths) * 100}%`);
+
+      if (perMonth === 0) {
+        out.hint.hidden = false;
+        out.hint.textContent = 'Ohne Betreuung zahlst du nur die Erstellung. Die Website gehört dir – Betreuung lässt sich jederzeit später dazubuchen.';
+      } else if (m === 0) {
+        out.hint.hidden = false;
+        out.hint.textContent = 'Bei 0 Monaten fällt nur die einmalige Erstellung an.';
+      } else {
+        out.hint.hidden = true;
+      }
+    }
+
+    // Paketwechsel schlaegt die dazu passende Betreuungsstufe vor.
+    pkgs.forEach((p) =>
+      p.addEventListener('change', () => {
+        const suggested = p.dataset.care;
+        const match = cares.find((c) => c.value === suggested);
+        if (match) match.checked = true;
+        syncCareNote();
+        render();
+      }),
+    );
+
+    function syncCareNote() {
+      const care = checked(cares);
+      const label = care.closest('.ca__opt');
+      const note = label?.getAttribute('data-note');
+      if (note) out.careNote.textContent = note;
+    }
+
+    cares.forEach((c) =>
+      c.addEventListener('change', () => {
+        syncCareNote();
+        render();
+      }),
+    );
+    months.addEventListener('input', render);
+
+    render();
+  }
+  document.addEventListener('astro:page-load', initCalc);
+</script>
