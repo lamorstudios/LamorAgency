@@ -1,90 +1,148 @@
 ---
 /**
- * Problem → Lösung für die Website-Landingpage.
- * Links das, was Besucher an ihrer aktuellen Seite stört; rechts das Gegenstück.
+ * Problem -> Loesung als EINE Komposition, nicht als Liste von Paaren.
+ *
+ * Links liegt der Ist-Zustand flach auf dem Papier: durchgestrichen, ruhig,
+ * ohne Flaeche. Rechts steht das Gegenstueck als angehobene dunkle Tafel –
+ * der optische Sprung zwischen beiden Haelften ist das eigentliche Argument.
  * Die Paare stehen in derselben Reihenfolge in src/data/website-pricing.ts.
  */
 import Words from '@/components/Words.astro';
-import { websiteProblems, websiteSolutions } from '@/data/website-pricing';
-
-const pairs = websiteProblems.map((p, i) => ({ problem: p, solution: websiteSolutions[i] }));
+import Button from '@/components/Button.astro';
+import { websiteProblems, websiteSolutions, websiteEntryPrice, euro } from '@/data/website-pricing';
 ---
-<section class="wpr section" data-theme="light" data-bg="light" aria-labelledby="wpr-title">
+<section class="wpr" data-theme="light" data-bg="light" aria-labelledby="wpr-title">
   <div class="container">
     <div class="wpr__head">
-      <p class="t-label wpr__label" data-reveal="fade">Ausgangslage</p>
-      <h2 class="t-say wpr__title" id="wpr-title"><Words text="Deine Website sieht aus wie 2018?" /></h2>
-      <p class="t-lead t-muted wpr__lead" data-reveal style="--reveal-delay:140ms">
-        Das ist kein Schönheitsproblem. Eine Seite, die langsam lädt, auf dem Handy
-        nicht funktioniert und keinen klaren Weg zur Anfrage hat, kostet dich Kunden –
-        jeden Tag, ohne dass du es merkst.
-      </p>
+      <p class="eyebrow wpr__label" data-reveal="fade">Ausgangslage</p>
+      <h2 class="wpr__title" id="wpr-title">
+        <Words text="Sieht aus wie 2018?" />
+        <span class="wpr__title-em t-serif-i">Das kostet dich Anfragen.</span>
+      </h2>
     </div>
 
-    <ul class="wpr__list" role="list">
-      {pairs.map((pair, i) => (
-        <li class="wpr__row" data-reveal style={`--reveal-delay:${Math.min(i * 50, 320)}ms`}>
-          <span class="wpr__problem">
-            <span class="wpr__icon wpr__icon--bad" aria-hidden="true"></span>
-            <span class="wpr__problem-text">{pair.problem}</span>
-          </span>
-          <span class="wpr__arrow" aria-hidden="true">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8H14M14 8L9 3M14 8L9 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
-          </span>
-          <span class="wpr__solution">
-            <span class="wpr__icon wpr__icon--good" aria-hidden="true"></span>
-            <span class="wpr__solution-text">{pair.solution}</span>
-          </span>
-        </li>
-      ))}
-    </ul>
+    <div class="wpr__pair">
+      <!-- Ist-Zustand: bewusst flach, ohne eigene Flaeche. -->
+      <div class="wpr__side wpr__side--before">
+        <p class="wpr__side-label">Aktueller Stand</p>
+        <ul class="wpr__list" role="list">
+          {websiteProblems.map((p) => (
+            <li class="wpr__item">
+              <span class="wpr__mark wpr__mark--bad" aria-hidden="true">
+                <svg viewBox="0 0 16 16" fill="none"><path d="M4 8H12" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"/></svg>
+              </span>
+              <span class="wpr__text">{p}</span>
+            </li>
+          ))}
+        </ul>
+        <p class="wpr__lead">
+          Das ist kein Schönheitsproblem. Eine Seite, die langsam lädt, auf dem Handy
+          nicht funktioniert und keinen klaren Weg zur Anfrage hat, arbeitet jeden Tag
+          gegen dich – ohne dass du es in einer Statistik siehst.
+        </p>
+      </div>
 
-    <p class="wpr__outro t-h3" data-reveal>Wir machen daraus einen digitalen Markenauftritt.</p>
+      <!-- Soll-Zustand: angehobene dunkle Tafel als Gegenstueck. -->
+      <div class="wpr__side wpr__side--after">
+        <p class="wpr__side-label">Mit LAMOR</p>
+        <ul class="wpr__list" role="list">
+          {websiteSolutions.map((s) => (
+            <li class="wpr__item">
+              <span class="wpr__mark wpr__mark--good" aria-hidden="true">
+                <svg viewBox="0 0 16 16" fill="none"><path d="M3.5 8.5L6.5 11.5L12.5 4.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="square"/></svg>
+              </span>
+              <span class="wpr__text">{s}</span>
+            </li>
+          ))}
+        </ul>
+        <div class="wpr__foot">
+          <p class="wpr__outro">Aus einer alten Seite wird ein digitaler Markenauftritt.</p>
+          <div class="wpr__cta">
+            <Button href="#pakete" label={`Pakete ab ${euro(websiteEntryPrice)}`} />
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
 <style>
-  .wpr__head { display: grid; gap: var(--space-4); margin-bottom: var(--space-8); }
-  .wpr__label { color: var(--c-accent); }
-  .wpr__title { max-width: 18ch; }
-  .wpr__lead { max-width: 56ch; }
+  .wpr { padding-block: clamp(2.5rem, 6vw, 5rem); }
 
-  .wpr__list { display: grid; border-top: 1px solid var(--line); }
-  .wpr__row {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-2);
-    padding-block: var(--space-4);
+  .wpr__head { display: grid; gap: var(--space-4); margin-bottom: clamp(1.75rem, 4vw, 3rem); }
+  .wpr__label { color: var(--c-accent-text); }
+  .wpr__title {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 118%;
+    text-transform: uppercase;
+    font-size: clamp(1.8rem, 0.7rem + 4.2vw, 4.2rem);
+    line-height: 0.95; letter-spacing: -0.045em;
+  }
+  .wpr__title-em { display: block; color: var(--c-accent-text); text-transform: none; letter-spacing: -0.02em; }
+  /* Der Absatz steht unter der Ist-Liste, nicht im Kopf – so traegt die linke
+     Haelfte bis zur Unterkante der Tafel gegenueber. */
+  .wpr__lead {
+    color: var(--fg-muted); max-width: 46ch;
+    font-size: var(--fs-small); line-height: 1.6;
+    margin-top: var(--space-5); padding-top: var(--space-5);
+    border-top: 1px solid var(--line);
+  }
+
+  /* ---------- Die zwei Haelften ---------- */
+  .wpr__pair { display: grid; gap: var(--space-5); }
+  @media (min-width: 900px) {
+    .wpr__pair { grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr); gap: clamp(1.5rem, 3vw, 3rem); align-items: start; }
+  }
+
+  .wpr__side-label {
+    font-size: var(--fs-eyebrow); letter-spacing: var(--ls-wide); text-transform: uppercase;
+    font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    padding-bottom: var(--space-3); margin-bottom: var(--space-3);
     border-bottom: 1px solid var(--line);
   }
-  .wpr__problem, .wpr__solution { display: flex; align-items: flex-start; gap: 0.7em; min-width: 0; }
-  .wpr__problem-text { color: var(--fg-muted); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--fg-muted) 45%, transparent); }
-  .wpr__solution-text { font-weight: var(--fw-semi); }
 
-  .wpr__icon { width: 1.1rem; height: 1.1rem; margin-top: 0.25em; border-radius: 50%; flex-shrink: 0; position: relative; }
-  .wpr__icon--bad { border: 1px solid var(--fg-muted); }
-  .wpr__icon--bad::after { content: ''; position: absolute; inset: 45% 22%; border-top: 1px solid var(--fg-muted); }
-  .wpr__icon--good { background: var(--c-accent); }
-  .wpr__icon--good::after { content: ''; position: absolute; inset: 0; background: no-repeat center / 0.55rem url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none'><path d='M2 6.5L4.8 9L10 3' stroke='white' stroke-width='2' stroke-linecap='square'/></svg>"); }
-
-  .wpr__arrow { display: none; width: 1rem; color: var(--fg-muted); align-self: center; }
-  .wpr__arrow svg { width: 100%; height: auto; }
-
-  @media (min-width: 768px) {
-    .wpr__row { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: var(--space-5); align-items: center; }
-    .wpr__arrow { display: block; }
+  .wpr__list { display: grid; }
+  .wpr__item {
+    display: grid; grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--space-3); align-items: center;
+    padding-block: clamp(0.55rem, 1.3vw, 0.85rem);
   }
-  /* Ab hier stehen die acht Paare in zwei Spalten statt acht Zeilen –
-     halbe Hoehe bei gleicher Information. */
-  @media (min-width: 1200px) {
-    .wpr__list {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      column-gap: clamp(2rem, 4vw, 4rem);
-      border-top: 0;
-    }
-    .wpr__row { border-top: 1px solid var(--line); border-bottom: 0; }
+  .wpr__item + .wpr__item { border-top: 1px solid var(--line); }
+  .wpr__mark { width: 1.1rem; height: 1.1rem; flex: none; }
+  .wpr__mark svg { width: 100%; height: 100%; }
+  .wpr__text { font-size: var(--fs-small); line-height: 1.4; }
+
+  /* Ist-Zustand */
+  .wpr__side--before .wpr__side-label { color: var(--fg-muted); }
+  .wpr__side--before .wpr__mark { color: var(--fg-muted); opacity: 0.55; }
+  .wpr__side--before .wpr__text { color: var(--fg-muted); text-decoration: line-through; text-decoration-thickness: 1px; text-decoration-color: color-mix(in srgb, currentColor 45%, transparent); }
+
+  /* Soll-Zustand: eigene Flaeche, leicht angehoben. */
+  .wpr__side--after {
+    background: var(--c-ink); color: var(--c-paper);
+    border-radius: clamp(0.8rem, 2vw, 1.2rem);
+    padding: clamp(1.25rem, 2.8vw, 2rem);
+  }
+  .wpr__side--after .wpr__side-label { color: var(--c-accent-on-dark); border-bottom-color: rgba(242, 237, 228, 0.16); }
+  .wpr__side--after .wpr__item + .wpr__item { border-top-color: rgba(242, 237, 228, 0.12); }
+  .wpr__side--after .wpr__mark { color: var(--c-accent-on-dark); }
+  .wpr__side--after .wpr__text { font-weight: var(--fw-semi); }
+  @media (min-width: 900px) {
+    /* Der Versatz nach oben erzeugt den Sprung zwischen den Haelften. */
+    .wpr__side--after { margin-top: -1.75rem; }
+    .wpr__side--before { padding-top: 0.35rem; }
   }
 
-  .wpr__outro { margin-top: var(--space-7); max-width: 24ch; }
+  .wpr__foot {
+    margin-top: var(--space-5); padding-top: var(--space-5);
+    border-top: 1px solid rgba(242, 237, 228, 0.16);
+    display: grid; gap: var(--space-4);
+  }
+  .wpr__outro {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 112%;
+    text-transform: uppercase; font-size: clamp(1.05rem, 0.85rem + 0.9vw, 1.6rem);
+    line-height: 1.05; letter-spacing: -0.025em; max-width: 22ch;
+  }
+  @media (min-width: 620px) {
+    .wpr__foot { grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--space-5); }
+  }
 </style>

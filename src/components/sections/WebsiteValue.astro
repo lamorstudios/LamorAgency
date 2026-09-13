@@ -1,14 +1,18 @@
 ---
 /**
- * Der eigentliche Verkaufsgrund: fünf Gewerke oder ein Studio.
+ * "Alles aus einer Hand" – eine zusammenhängende Vergleichs-Komposition.
  *
- * Bewusst KEIN Vergleich mit Wettbewerbern und keine Preisbehauptungen über
- * Dritte – verglichen wird die Art zu beauftragen, und das ist belegbar.
- * Darunter Risikoabbau ausschliesslich mit dem, was LAMOR wirklich zusagt:
- * keine erfundene Garantie.
+ * Der entscheidende visuelle Griff: Die LAMOR-Spalte ist EINE durchgehende
+ * Akzentfläche über alle Kategorien hinweg, nicht fünf einzelne Karten.
+ * Links bleibt bewusst zurückhaltend (keine Fläche, gedämpfte Schrift),
+ * rechts trägt Fläche, Haken und Kontrast. Das Auge liest in einem Zug
+ * "das alles gehört zusammen" statt "hier sind fünf Vergleiche".
+ *
+ * REGEL: keine erfundenen Marktpreise, keine Wertung über Dritte. Links steht
+ * ausschliesslich, wie die Beauftragung üblicherweise AUFGETEILT ist.
  */
 import Media from '@/components/Media.astro';
-import { websiteEntryPrice, euro, websiteComparison } from '@/data/website-pricing';
+import { websiteComparison, websiteEntryPrice, euro } from '@/data/website-pricing';
 
 const assurances = [
   'Transparente Preise ab Erstgespräch',
@@ -19,231 +23,260 @@ const assurances = [
   'Betreuung bleibt optional',
 ];
 ---
-<section class="wv" data-theme="dark" data-bg="dark" aria-labelledby="wv-title">
+<section class="one" data-theme="dark" data-bg="dark" aria-labelledby="one-title">
   <div class="container">
-    <div class="wv__head">
+    <header class="one__head">
       <p class="eyebrow">Der Unterschied</p>
-      <h2 class="wv__title" id="wv-title">
-        Ein Partner statt<br />
-        <span class="hl">fünf einzelner Dienstleister.</span>
+      <h2 class="one__title" id="one-title">
+        <span class="one__title-a">Woanders sind es fünf Aufträge.</span>
+        <span class="one__title-b">Bei LAMOR ist es einer.</span>
       </h2>
-      <p class="wv__lead">
+      <p class="one__lead">
         Gute Freelancer und Agenturen gibt es viele. Der Aufwand entsteht nicht
-        durch sie, sondern dadurch, dass fünf Gewerke aufeinander abgestimmt
-        werden müssen – bevor überhaupt etwas online geht.
+        durch sie, sondern durch die Aufteilung: fünf Briefings, fünf Zeitpläne,
+        fünf Bildsprachen – bevor überhaupt etwas online geht.
       </p>
-    </div>
+    </header>
 
-    <!-- Kategorie-Vergleich: links die uebliche Aufteilung, rechts unser Umfang.
-         Auf jedem Viewport zwei Spalten unter einer Kategoriezeile – das haelt
-         den Block kurz und die Gegenueberstellung sofort lesbar. -->
-    <div class="cmpt" role="table" aria-label="Vergleich: üblicher Weg und LAMOR AGENCY">
-      <div class="cmpt__head" role="row" aria-hidden="true">
-        <span class="cmpt__head-cat"></span>
-        <span class="cmpt__head-a">Üblicherweise</span>
-        <span class="cmpt__head-b">LAMOR Agency</span>
-      </div>
+    <div class="one__wrap">
+      <span class="one__glow" aria-hidden="true"></span>
+      <span class="one__stamp">Alles aus einer Hand</span>
 
-      {websiteComparison.map((row) => (
-        <div class="cmpt__group" role="rowgroup">
-          <p class="cmpt__cat">{row.category}</p>
-          <div class="cmpt__pair" role="row">
-            <div class="cmpt__cell cmpt__cell--a" role="cell">
-              <span class="cmpt__label">Üblicherweise</span>
-              <span class="cmpt__mark cmpt__mark--off" aria-hidden="true"></span>
-              <p class="cmpt__text">{row.others}</p>
+      <div class="one__matrix" role="table" aria-label="Vergleich: übliche Aufteilung und LAMOR AGENCY">
+        <span class="one__col-a" role="columnheader">Üblicherweise</span>
+        <span class="one__col-b" role="columnheader">LAMOR Agency</span>
+
+        {websiteComparison.map((row) => (
+          <>
+            <p class="one__cat" role="rowheader">{row.category}</p>
+
+            <div class="one__a" role="cell">
+              <span class="one__mini">Üblicherweise</span>
+              <p class="one__a-text">
+                <span class="one__dash" aria-hidden="true"></span>
+                {row.others}
+              </p>
             </div>
-            <div class="cmpt__cell cmpt__cell--b" role="cell">
-              <span class="cmpt__label cmpt__label--on">LAMOR</span>
-              <ul class="cmpt__list" role="list">
+
+            <div class="one__b" role="cell">
+              <span class="one__mini one__mini--on">LAMOR</span>
+              <ul class="one__list" role="list">
                 {row.lamor.map((item) => (
-                  <li class="cmpt__item">
-                    <span class="cmpt__mark cmpt__mark--on" aria-hidden="true"></span>
+                  <li class="one__item">
+                    <span class="one__check" aria-hidden="true"></span>
                     <span>{item}</span>
                   </li>
                 ))}
               </ul>
-              {row.note && <p class="cmpt__note">{row.note}</p>}
+              {row.note && <p class="one__note">{row.note}</p>}
             </div>
-          </div>
-        </div>
-      ))}
+          </>
+        ))}
+      </div>
     </div>
 
-    <!-- Website + Content als Aufwertung, mit sichtbarem Material -->
-    <div class="wv__upsell">
-      <div class="wv__upsell-copy">
-        <p class="badge">Website + Content</p>
-        <h3 class="wv__upsell-title">Deine Website braucht nicht nur Design. Sie braucht Content.</h3>
-        <p class="wv__upsell-text">
-          Wir bauen nicht nur die Seite – wir produzieren auch, was darauf zu sehen ist.
-          Fotos, Videos und Social-Assets entstehen am selben Drehtag.
-        </p>
-        <ul class="chips wv__upsell-chips" role="list">
-          <li class="chip">Professionelle Fotos</li>
-          <li class="chip">Video</li>
-          <li class="chip">Social Assets</li>
+    <!-- Abbinder: Zusagen und der Einstiegspreis, ohne neue Kartenreihe -->
+    <div class="one__foot">
+      <div class="one__foot-copy">
+        <p class="one__foot-label t-label">Worauf du dich verlassen kannst</p>
+        <ul class="chips" role="list">
+          {assurances.map((a) => <li class="chip">{a}</li>)}
         </ul>
-        <a href="#anfrage" class="wv__upsell-cta">
-          <span>Website + Content anfragen</span>
-          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8H14M14 8L9 3M14 8L9 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
-        </a>
       </div>
-      <div class="wv__upsell-media">
-        <Media
-          media={{ type: 'placeholder', alt: 'Foto- und Videoproduktion für eine Website', label: '[WEBDESIGN] Content am Set' }}
-          ratio="square" sizes="(min-width: 1024px) 32vw, 100vw" widths={[480, 900]} hover
-        />
-      </div>
-    </div>
-
-    <!-- Risikoabbau: nur das, was wirklich zugesagt wird -->
-    <div class="wv__assure">
-      <p class="wv__assure-label t-label">Worauf du dich verlassen kannst</p>
-      <ul class="chips" role="list">
-        {assurances.map((a) => <li class="chip">{a}</li>)}
-      </ul>
-      <p class="wv__assure-note">
-        Websites starten bei {euro(websiteEntryPrice)} einmalig. Was dein Projekt konkret kostet,
-        sagen wir dir nach einem kurzen Gespräch – vor der Beauftragung.
-      </p>
+      <a href="#anfrage" class="one__foot-cta">
+        <span class="one__foot-price">ab {euro(websiteEntryPrice)}</span>
+        <span class="one__foot-sub">Website anfragen</span>
+        <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"/></svg>
+      </a>
     </div>
   </div>
 </section>
 
 <style>
-  .wv { padding-block: clamp(2.5rem, 6vw, 5rem); }
+  .one { padding-block: clamp(2.5rem, 6vw, 5rem); overflow: clip; }
 
-  .wv__head { display: grid; gap: var(--space-4); margin-bottom: clamp(1.75rem, 4vw, 3rem); }
-  .wv__title {
-    font-family: var(--font-display); font-weight: 900; font-stretch: 110%;
+  /* ---------- Kopf ---------- */
+  .one__head { display: grid; gap: var(--space-4); margin-bottom: clamp(2rem, 5vw, 3.5rem); }
+  .one__title {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-stretch: 110%;
     text-transform: uppercase;
-    font-size: clamp(1.6rem, 0.8rem + 3.4vw, 3.5rem);
-    line-height: 1; letter-spacing: -0.038em;
-  }
-  .wv__lead { max-width: 54ch; color: var(--fg-muted); }
-
-  /* ---------- Vergleichstabelle ---------- */
-  .cmpt {
-    border: 1px solid var(--line);
-    border-radius: clamp(0.6rem, 1.6vw, 1rem);
-    overflow: hidden;
-  }
-
-  /* Kopfzeile nur auf Desktop – auf Mobile stehen die Labels in den Zellen. */
-  .cmpt__head { display: none; }
-
-  .cmpt__group + .cmpt__group { border-top: 1px solid var(--line); }
-
-  .cmpt__cat {
-    padding: 0.7rem clamp(0.9rem, 2.5vw, 1.4rem);
-    background: var(--bg-2);
-    font-size: var(--fs-eyebrow);
-    font-weight: var(--fw-semi);
-    font-stretch: var(--wd-tight);
-    letter-spacing: var(--ls-wider);
-    text-transform: uppercase;
-    color: var(--fg-muted);
-  }
-
-  /* Zwei Spalten ab der kleinsten Breite – das ist der Kern der Darstellung. */
-  .cmpt__pair { display: grid; grid-template-columns: 1fr 1fr; }
-  .cmpt__cell {
+    font-size: clamp(1.7rem, 0.7rem + 3.9vw, 4rem);
+    line-height: 0.98;
+    letter-spacing: -0.04em;
     display: grid;
-    align-content: start;
-    gap: 0.4rem;
-    padding: clamp(0.8rem, 2.2vw, 1.25rem) clamp(0.7rem, 2vw, 1.4rem);
-    min-width: 0;
+    max-width: 20ch;
   }
-  .cmpt__cell--a { border-right: 1px solid var(--line); }
-  .cmpt__cell--b { background: color-mix(in srgb, var(--c-accent) 7%, transparent); }
+  /* Erste Zeile zurueckgenommen, zweite traegt den Akzent – die Aussage
+     steht im Kontrast der beiden Zeilen, nicht in einem Ausrufezeichen. */
+  .one__title-a { color: var(--c-grey-dark); }
+  .one__title-b { color: var(--c-accent-on-dark); }
+  .one__lead { max-width: 56ch; color: var(--fg-muted); }
 
-  .cmpt__label {
-    font-size: 0.66rem;
+  /* ---------- Matrix ---------- */
+  .one__wrap { position: relative; padding-top: 0.9rem; }
+
+  /* Sehr zurueckhaltender Schein hinter der Akzentspalte – gibt Tiefe,
+     ohne in Neon zu kippen. */
+  .one__glow {
+    position: absolute;
+    inset: -10% -6% -10% 40%;
+    background: radial-gradient(60% 50% at 70% 50%, color-mix(in srgb, var(--c-accent) 22%, transparent), transparent 70%);
+    filter: blur(40px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .one__stamp {
+    position: absolute;
+    z-index: 3;
+    top: 0;
+    right: clamp(0.75rem, 3vw, 2rem);
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5em 1em;
+    border-radius: var(--radius-pill);
+    background: var(--c-accent);
+    color: #fff;
+    font-size: var(--fs-eyebrow);
     font-weight: var(--fw-semi);
     font-stretch: var(--wd-tight);
     letter-spacing: var(--ls-wide);
     text-transform: uppercase;
-    color: var(--fg-muted);
+    /* Sitzt bewusst halb auf der Oberkante der Akzentflaeche. */
+    transform: translateY(-50%);
+    box-shadow: 0 6px 18px -6px rgba(0, 0, 0, 0.6);
   }
-  .cmpt__label--on { color: var(--c-accent-on-dark); }
 
-  .cmpt__text { font-size: var(--fs-small); color: var(--fg-muted); overflow-wrap: break-word; }
-
-  .cmpt__list { display: grid; gap: 0.35rem; }
-  .cmpt__item { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.5em; align-items: baseline; font-size: var(--fs-small); }
-
-  .cmpt__mark { width: 0.85rem; height: 0.85rem; border-radius: 50%; flex: none; position: relative; align-self: center; }
-  .cmpt__mark--off { border: 1px solid var(--fg-muted); opacity: 0.7; }
-  .cmpt__mark--off::after { content: ''; position: absolute; inset: 45% 22%; border-top: 1px solid var(--fg-muted); }
-  .cmpt__mark--on { background: var(--c-accent); }
-  .cmpt__mark--on::after {
-    content: ''; position: absolute; inset: 0;
-    background: no-repeat center / 0.5rem url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none'><path d='M2 6.5L4.8 9L10 3' stroke='white' stroke-width='2.2' stroke-linecap='square'/></svg>");
+  .one__matrix {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 1px solid var(--line);
+    border-radius: clamp(0.7rem, 1.8vw, 1.1rem);
+    overflow: hidden;
+    background: color-mix(in srgb, var(--c-ink-2) 70%, transparent);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
   }
-  .cmpt__cell--a .cmpt__mark--off { justify-self: start; }
 
-  .cmpt__note { font-size: 0.72rem; color: var(--fg-muted); margin-top: 0.2rem; }
+  .one__col-a, .one__col-b { display: none; }
+
+  .one__cat {
+    grid-column: 1 / -1;
+    padding: 0.65rem clamp(0.8rem, 2.2vw, 1.3rem);
+    background: var(--c-ink);
+    border-top: 1px solid var(--line);
+    font-family: var(--font-display);
+    font-size: var(--fs-eyebrow);
+    font-weight: var(--fw-bold);
+    font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wider);
+    text-transform: uppercase;
+    color: var(--c-paper);
+  }
+  .one__cat:first-of-type { border-top: 0; }
+
+  .one__a, .one__b {
+    display: grid;
+    align-content: start;
+    gap: 0.4rem;
+    padding: clamp(0.75rem, 2.2vw, 1.2rem) clamp(0.7rem, 2vw, 1.3rem);
+    min-width: 0;
+  }
+  /* Die rechte Spalte ist durchgehend eingefaerbt – dadurch liest sie sich
+     als EINE Flaeche und nicht als Reihe einzelner Karten. */
+  .one__b { background: color-mix(in srgb, var(--c-accent) 13%, transparent); }
+  .one__a { border-right: 1px solid var(--line); }
+
+  .one__mini {
+    font-size: 0.66rem; font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--fg-muted);
+  }
+  .one__mini--on { color: var(--c-accent-on-dark); }
+
+  .one__a-text {
+    display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.5em; align-items: baseline;
+    font-size: var(--fs-small); color: var(--fg-muted); overflow-wrap: break-word;
+  }
+  .one__dash { width: 0.75rem; height: 1px; background: currentColor; opacity: 0.6; align-self: start; margin-top: 0.62em; }
+
+  .one__list { display: grid; gap: 0.35rem; }
+  .one__item { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.55em; align-items: baseline; font-size: var(--fs-small); }
+  .one__check {
+    width: 0.9rem; height: 0.9rem; border-radius: 50%; align-self: start; margin-top: 0.15em; flex: none;
+    background: var(--c-accent) no-repeat center / 0.52rem
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none'><path d='M2 6.5L4.8 9L10 3' stroke='white' stroke-width='2.2' stroke-linecap='square'/></svg>");
+  }
+  .one__note { font-size: 0.72rem; color: var(--c-accent-on-dark); }
 
   @media (min-width: 900px) {
-    /* Ab hier tragen Kategorie und beide Spalten EINE Zeile – das spart
-       gegenueber der gestapelten Variante rund ein Drittel Hoehe. */
-    .cmpt__head {
-      display: grid;
-      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr) minmax(0, 1fr);
-      background: var(--bg-2);
+    /* Kategorie links, beide Spalten daneben – die Akzentflaeche laeuft
+       jetzt ununterbrochen von oben nach unten durch. */
+    .one__matrix { grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.15fr) minmax(0, 1.15fr); }
+    .one__col-a, .one__col-b {
+      display: block;
+      padding: 0.7rem 1.3rem;
+      font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+      letter-spacing: var(--ls-wider); text-transform: uppercase;
       border-bottom: 1px solid var(--line);
     }
-    .cmpt__head span {
-      padding: 0.7rem 1.4rem;
-      font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
-      letter-spacing: var(--ls-wider); text-transform: uppercase; color: var(--fg-muted);
+    .one__col-a { grid-column: 2; color: var(--fg-muted); }
+    .one__col-b { grid-column: 3; color: var(--c-accent-on-dark); background: color-mix(in srgb, var(--c-accent) 13%, transparent); }
+    .one__cat {
+      grid-column: 1;
+      display: grid; align-content: center;
+      background: transparent;
+      border-right: 1px solid var(--line);
+      font-size: 0.8rem;
+      letter-spacing: var(--ls-wide);
     }
-    .cmpt__head-b { color: var(--c-accent-on-dark); }
-
-    .cmpt__group { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 2fr); align-items: stretch; }
-    .cmpt__cat { display: grid; align-content: center; background: transparent; border-right: 1px solid var(--line); }
-    .cmpt__pair { grid-template-columns: 1fr 1fr; }
-    .cmpt__label { display: none; }
-    .cmpt__cell { gap: 0.5rem; }
+    .one__mini { display: none; }
+    .one__a, .one__b { border-top: 1px solid var(--line); }
+    .one__cat + .one__a { border-top: 1px solid var(--line); }
   }
 
-  /* ---------- Upsell ---------- */
-  .wv__upsell {
-    display: grid; gap: clamp(1.5rem, 4vw, 2.5rem);
-    margin-top: clamp(2rem, 5vw, 3.5rem);
-    padding: clamp(1.25rem, 3vw, 2.25rem);
-    border: 1px solid var(--line);
-    border-radius: clamp(0.6rem, 1.6vw, 1rem);
-    background: var(--bg-2);
-  }
-  @media (min-width: 900px) { .wv__upsell { grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr); align-items: center; } }
-  .wv__upsell-copy { display: grid; gap: var(--space-4); justify-items: start; }
-  .wv__upsell-title {
-    font-family: var(--font-display); font-weight: 900; font-stretch: 108%;
-    text-transform: uppercase;
-    font-size: clamp(1.25rem, 0.8rem + 1.8vw, 2.1rem);
-    line-height: 1.02; letter-spacing: -0.035em; max-width: 22ch;
-  }
-  .wv__upsell-text { color: var(--fg-muted); font-size: var(--fs-small); max-width: 48ch; }
-  .wv__upsell-cta {
-    display: inline-flex; align-items: center; gap: 0.6em; min-height: 44px;
-    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
-    letter-spacing: var(--ls-wide); text-transform: uppercase;
-    border-bottom: 1px solid currentColor; padding-bottom: 0.25em;
-  }
-  .wv__upsell-cta svg { width: 1em; height: 1em; transition: transform var(--dur-base) var(--ease-out); }
-  .wv__upsell-cta:hover { color: var(--c-accent-on-dark); }
-  .wv__upsell-cta:hover svg { transform: translateX(0.3em); }
-  .wv__upsell-media { border-radius: clamp(0.5rem, 1.4vw, 0.8rem); overflow: hidden; }
-
-  /* ---------- Zusagen ---------- */
-  .wv__assure {
+  /* ---------- Abbinder ---------- */
+  .one__foot {
+    display: grid;
+    gap: var(--space-5);
     margin-top: clamp(2rem, 5vw, 3.5rem);
     padding-top: clamp(1.5rem, 3.5vw, 2.5rem);
     border-top: 1px solid var(--line);
-    display: grid; gap: var(--space-4);
+    align-items: center;
   }
-  .wv__assure-label { color: var(--fg-muted); }
-  .wv__assure-note { font-size: var(--fs-small); color: var(--fg-muted); max-width: 60ch; }
+  .one__foot-label { color: var(--fg-muted); margin-bottom: var(--space-3); }
+
+  .one__foot-cta {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.75rem;
+    padding: clamp(0.9rem, 2vw, 1.25rem) clamp(1.1rem, 2.5vw, 1.6rem);
+    border: 1px solid var(--c-accent);
+    border-radius: clamp(0.6rem, 1.6vw, 1rem);
+    background: color-mix(in srgb, var(--c-accent) 12%, transparent);
+    transition: background var(--dur-base) var(--ease-out);
+  }
+  .one__foot-cta:hover { background: color-mix(in srgb, var(--c-accent) 22%, transparent); }
+  .one__foot-price {
+    grid-column: 1;
+    font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: 118%;
+    font-size: clamp(1.5rem, 1rem + 1.8vw, 2.25rem); line-height: 1;
+    letter-spacing: var(--ls-tight); font-variant-numeric: tabular-nums;
+    color: var(--c-paper);
+  }
+  .one__foot-sub {
+    grid-column: 2;
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--c-accent-on-dark);
+  }
+  .one__foot-cta svg { grid-column: 3; width: 1.1rem; height: 1.1rem; color: var(--c-accent-on-dark); transition: transform var(--dur-base) var(--ease-out); }
+  .one__foot-cta:hover svg { transform: translate(0.25em, -0.25em); }
+
+  @media (min-width: 900px) {
+    .one__foot { grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-7); }
+  }
 </style>

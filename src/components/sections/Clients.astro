@@ -1,10 +1,11 @@
 ---
 /**
- * Trust – kommt früh, nicht nach fünfzehn Sections.
+ * Trust als EINE Komposition, nicht als drei gestapelte Bloecke.
  *
- * Drei Belege in einem hellen Block: mit wem gearbeitet wurde (Karten),
- * wie viel daraus entstanden ist (Zahlen), und wofür (Kategorien).
- * Helle Fläche als bewusster Bruch zum dunklen Hero-/Showreel-Block.
+ * Eine Tafel, innen durch Haarlinien geteilt: links der Anspruch mit der
+ * groessten Zahl als Anker, rechts das Markenraster, unten die uebrigen
+ * Kennzahlen als durchgehender Streifen. Logos und Zahlen belegen sich
+ * gegenseitig, statt nacheinander zu behaupten.
  *
  * Logos: sobald in src/data/clients.ts ein `logo` hinterlegt ist, ersetzt das
  * Bild den Schriftzug. Ohne Logo steht der Name typografisch – gestaltet,
@@ -26,127 +27,184 @@ const logos = import.meta.glob<{ default: ImageMetadata }>('/src/assets/brand/cl
 const resolved = await Promise.all(
   clients.map(async (c) => ({ ...c, img: c.logo && logos[c.logo] ? (await logos[c.logo]()).default : undefined })),
 );
-const shown = compact ? resolved.slice(0, 10) : resolved;
-const figures = stats.slice(0, 4);
+const shown = compact ? resolved.slice(0, 9) : resolved;
+/** Die groesste Zahl traegt die linke Spalte, die uebrigen den Fussstreifen. */
+const [lead, ...rest] = stats.slice(0, 4);
 ---
 <section class="tr" data-theme={theme} data-bg={theme} aria-labelledby="clients-title">
   <div class="container">
-    <div class="tr__head">
-      <div>
+    <div class="tr__panel">
+      <!-- Anspruch + groesste Zahl -->
+      <div class="tr__claim">
         <p class="eyebrow tr__label">{label}</p>
         <h2 class="tr__title" id="clients-title">{title}</h2>
-      </div>
-      <p class="tr__note">
-        Von lokalen Unternehmen bis Major Label – <strong>{resolved.length}</strong> Marken im Auszug.
-      </p>
-    </div>
+        <p class="tr__note">
+          Von lokalen Unternehmen bis Major Label – <strong>{resolved.length}</strong> Marken im Auszug.
+        </p>
 
-    <ul class="tr__grid" role="list">
-      {shown.map((c) => (
-        <li class="tr__cell">
-          {c.img ? (
-            <Picture src={c.img} formats={['webp']} widths={[220, 440]} sizes="180px" alt={c.name} class="tr__logo" loading="lazy" />
-          ) : (
-            <span class="tr__name">{c.name}</span>
-          )}
-          {c.note && <span class="tr__kind">{c.note}</span>}
-        </li>
-      ))}
-    </ul>
-
-    <!-- Social Proof direkt darunter: die Zahlen sind der zweite Beleg. -->
-    <ul class="tr__figures" role="list">
-      {figures.map((s) => (
-        <li class="tr__fig">
-          <span class="tr__fig-value">
-            {s.prefix ?? ''}<span data-count={s.value} data-grouped={s.grouped ? '' : undefined}>{s.grouped ? new Intl.NumberFormat('de-DE').format(s.value) : s.value}</span>{s.suffix ?? ''}
+        <div class="tr__lead">
+          <span class="tr__lead-value">
+            {lead.prefix ?? ''}<span data-count={lead.value} data-grouped={lead.grouped ? '' : undefined}>{lead.grouped ? new Intl.NumberFormat('de-DE').format(lead.value) : lead.value}</span>{lead.suffix ?? ''}
           </span>
-          <span class="tr__fig-label">{s.label}</span>
-          {s.note && <span class="tr__fig-note">{s.note}</span>}
-        </li>
-      ))}
-    </ul>
+          <span class="tr__lead-label">{lead.label}</span>
+          {lead.note && <span class="tr__lead-note">{lead.note}</span>}
+        </div>
+      </div>
+
+      <!-- Markenraster -->
+      <ul class="tr__grid" role="list">
+        {shown.map((c) => (
+          <li class="tr__cell">
+            {c.img ? (
+              <Picture src={c.img} formats={['webp']} widths={[220, 440]} sizes="180px" alt={c.name} class="tr__logo" loading="lazy" />
+            ) : (
+              <span class="tr__name">{c.name}</span>
+            )}
+            {c.note && <span class="tr__kind">{c.note}</span>}
+          </li>
+        ))}
+      </ul>
+
+      <!-- Kennzahlenstreifen ueber die volle Breite der Tafel -->
+      <ul class="tr__figures" role="list">
+        {rest.map((s) => (
+          <li class="tr__fig">
+            <span class="tr__fig-value">
+              {s.prefix ?? ''}<span data-count={s.value} data-grouped={s.grouped ? '' : undefined}>{s.grouped ? new Intl.NumberFormat('de-DE').format(s.value) : s.value}</span>{s.suffix ?? ''}
+            </span>
+            <span class="tr__fig-label">{s.label}</span>
+            {s.note && <span class="tr__fig-note">{s.note}</span>}
+          </li>
+        ))}
+      </ul>
+    </div>
   </div>
 </section>
 
 <style>
   .tr { padding-block: clamp(2.5rem, 6vw, 5rem); }
 
-  .tr__head { display: grid; gap: var(--space-4); margin-bottom: clamp(1.5rem, 4vw, 2.5rem); }
-  .tr__label { margin-bottom: var(--space-3); }
+  /* Eine Tafel: die Haarlinien im Inneren halten alles zusammen. */
+  .tr__panel {
+    display: grid;
+    border: 1px solid var(--line);
+    border-radius: clamp(0.7rem, 1.8vw, 1.1rem);
+    overflow: hidden;
+  }
+  @media (min-width: 1000px) {
+    .tr__panel { grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr); }
+    .tr__figures { grid-column: 1 / -1; }
+  }
+
+  /* ---------- Linke Spalte ---------- */
+  .tr__claim {
+    display: grid; align-content: start;
+    gap: var(--space-3);
+    padding: clamp(1.25rem, 3vw, 2.25rem);
+  }
+  .tr__label { margin-bottom: var(--space-2); }
   .tr__title {
     font-family: var(--font-display); font-weight: 900; font-stretch: 112%;
     text-transform: uppercase;
-    font-size: clamp(1.4rem, 0.8rem + 2.4vw, 2.75rem);
-    line-height: 1.02; letter-spacing: -0.035em; max-width: 20ch;
+    font-size: clamp(1.35rem, 0.85rem + 2vw, 2.5rem);
+    line-height: 1.02; letter-spacing: -0.035em; max-width: 16ch;
   }
-  .tr__note { font-size: var(--fs-small); color: var(--fg-muted); max-width: 32ch; }
+  .tr__note { font-size: var(--fs-small); color: var(--fg-muted); max-width: 34ch; }
   .tr__note strong { color: var(--fg); font-weight: var(--fw-bold); }
-  @media (min-width: 900px) {
-    .tr__head { grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: var(--space-7); }
-    .tr__note { text-align: right; }
+
+  /* Die groesste Zahl haengt am unteren Rand der Spalte – sie ist der Anker. */
+  .tr__lead {
+    display: grid; gap: 0.2rem; align-content: end;
+    margin-top: var(--space-5); padding-top: var(--space-5);
+    border-top: 1px solid var(--line);
+  }
+  .tr__lead-value {
+    font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: 118%;
+    font-size: clamp(2.6rem, 1.4rem + 5vw, 5.5rem);
+    line-height: 0.88; letter-spacing: -0.05em;
+    font-variant-numeric: tabular-nums;
+    color: var(--c-accent);
+    white-space: nowrap;
+  }
+  .tr__lead-label {
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; margin-top: 0.35rem;
+  }
+  .tr__lead-note { font-size: var(--fs-small); color: var(--fg-muted); max-width: 30ch; }
+  @media (min-width: 1000px) {
+    .tr__claim { align-content: space-between; }
   }
 
-  /* Karten statt Laufband: lesbar, sofort erfassbar, ohne Bewegung. */
+  /* ---------- Markenraster ---------- */
   .tr__grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1px;
     background: var(--line);
-    border: 1px solid var(--line);
-    border-radius: clamp(0.6rem, 1.6vw, 1rem);
-    overflow: hidden;
+    border-top: 1px solid var(--line);
+  }
+  /* Die letzte Zeile darf keine Luecke lassen – sonst steht dort die
+     Linienfarbe als leeres Feld. Die Restkachel fuellt die Zeile auf. */
+  .tr__cell:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  @media (min-width: 620px) {
+    .tr__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .tr__cell:last-child:nth-child(odd) { grid-column: auto; }
+    .tr__cell:last-child:nth-child(3n + 1) { grid-column: span 3; }
+    .tr__cell:last-child:nth-child(3n + 2) { grid-column: span 2; }
+  }
+  @media (min-width: 1000px) {
+    .tr__grid { border-top: 0; border-left: 1px solid var(--line); }
   }
   .tr__cell {
-    display: grid; place-items: center; align-content: center; gap: 0.35rem;
-    padding: clamp(1rem, 2.6vw, 1.75rem) 0.75rem;
+    display: grid; place-items: center; align-content: center; gap: 0.3rem;
+    padding: clamp(0.9rem, 2.2vw, 1.5rem) 0.75rem;
     background: var(--bg);
-    min-height: clamp(5rem, 12vw, 7rem);
+    min-height: clamp(4.5rem, 10vw, 6.25rem);
     text-align: center;
     transition: background var(--dur-base) var(--ease-out);
   }
   @media (hover: hover) and (pointer: fine) {
     .tr__cell:hover { background: var(--bg-2); }
     .tr__cell:hover .tr__name { color: var(--c-accent-text); }
+    .tr__cell:hover .tr__logo { filter: none; opacity: 1; }
   }
   .tr__name {
     font-family: var(--font-display); font-weight: 800; font-stretch: 105%;
     text-transform: uppercase;
-    font-size: clamp(0.85rem, 0.65rem + 0.9vw, 1.25rem);
+    font-size: clamp(0.8rem, 0.62rem + 0.8vw, 1.15rem);
     line-height: 1.05; letter-spacing: -0.025em;
     transition: color var(--dur-base) var(--ease-out);
   }
   .tr__kind {
-    font-size: 0.7rem; font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    font-size: 0.68rem; font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
     letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--fg-muted);
   }
-  .tr__logo { width: auto; height: clamp(1.4rem, 3vw, 2.25rem); object-fit: contain; filter: grayscale(1); opacity: 0.75; }
-  .tr__cell:hover .tr__logo { filter: none; opacity: 1; }
+  .tr__logo { width: auto; height: clamp(1.3rem, 2.8vw, 2.1rem); object-fit: contain; filter: grayscale(1); opacity: 0.75; }
 
-  @media (min-width: 620px) { .tr__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-  @media (min-width: 1024px) { .tr__grid { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
-
-  /* ---------- Zahlen ---------- */
+  /* ---------- Kennzahlenstreifen ---------- */
   .tr__figures {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: clamp(1.25rem, 3vw, 2rem);
-    margin-top: clamp(1.75rem, 4vw, 3rem);
-    padding-top: clamp(1.5rem, 3.5vw, 2.5rem);
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    gap: 1px;
+    background: var(--line);
     border-top: 1px solid var(--line);
   }
-  .tr__fig { display: grid; gap: 0.2rem; align-content: start; }
+  .tr__fig {
+    display: grid; gap: 0.15rem; align-content: start;
+    background: var(--bg);
+    /* Gleiche Gasse wie die Anspruchsspalte, damit die linke Kante durchlaeuft. */
+    padding: clamp(1rem, 2.4vw, 1.6rem) clamp(1.25rem, 3vw, 2.25rem);
+  }
   .tr__fig-value {
     font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: 118%;
-    font-size: clamp(1.85rem, 1.1rem + 3.2vw, 3.75rem);
+    font-size: clamp(1.7rem, 1rem + 2.4vw, 3rem);
     line-height: 0.95; letter-spacing: -0.045em;
     font-variant-numeric: tabular-nums;
     color: var(--c-accent);
   }
   .tr__fig-label {
     font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
-    letter-spacing: var(--ls-wide); text-transform: uppercase;
+    letter-spacing: var(--ls-wide); text-transform: uppercase; margin-top: 0.3rem;
   }
   .tr__fig-note { font-size: var(--fs-small); color: var(--fg-muted); max-width: 26ch; }
-  @media (min-width: 900px) { .tr__figures { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 </style>

@@ -356,25 +356,30 @@ export interface ComparisonRow {
 
 export const websiteComparison: ComparisonRow[] = [
   {
-    category: 'Website-Erstellung',
-    others: 'Separat beauftragt, je nach Anbieter unterschiedliche Kostenmodelle',
-    lamor: ['Komplette Website-Erstellung', 'Klar definierter Paketpreis'],
+    category: 'Website',
+    others: 'Design und Umsetzung separat beauftragt',
+    lamor: ['Konzept, Design und Umsetzung', 'Klar definierter Paketpreis'],
   },
   {
-    category: 'Einrichtung & Start',
-    others: 'Setup- oder Projektkosten können zusätzlich anfallen',
-    lamor: ['Keine versteckten Setup-Kosten', 'Was im Paket steht, ist der Preis'],
+    category: 'Content',
+    others: 'Foto und Video extra beauftragt und koordiniert',
+    lamor: ['Fotos und Videos aus dem eigenen Haus', 'Am selben Drehtag geplant'],
+  },
+  {
+    category: 'Branding',
+    others: 'Grafik und Identity getrennt vergeben',
+    lamor: ['Logo, Farben, Typografie', 'Passend zur Website entwickelt'],
   },
   {
     category: 'Betreuung',
-    others: 'Separate Ansprechpartner je Gewerk',
-    lamor: ['Website', 'Hosting', 'Wartung', 'Änderungen', 'Persönlicher Ansprechpartner'],
-    note: 'Umfang je nach gebuchter Betreuungsstufe',
+    others: 'Eigener Vertrag, eigener Ansprechpartner',
+    lamor: ['Änderungen und Pflege', 'Ein fester Ansprechpartner'],
+    note: 'Umfang je nach Betreuungsstufe',
   },
   {
-    category: 'Weitere Leistungen',
-    others: 'Webdesign, Content, Foto/Video und Branding werden getrennt koordiniert',
-    lamor: ['Webdesign', 'Branding', 'Foto', 'Video', 'Social Media'],
-    note: 'Alles aus einer Agentur verfügbar',
+    category: 'Hosting & Wartung',
+    others: 'Technik liegt bei dir oder beim nächsten Dienstleister',
+    lamor: ['Hosting, Backups, Monitoring', 'Updates ohne Nachfragen'],
+    note: 'Optional ab 39 € / Monat',
   },
 ];

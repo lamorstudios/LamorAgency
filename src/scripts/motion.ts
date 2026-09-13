@@ -25,6 +25,22 @@ export const onCleanup = (fn: () => void) => cleanups.push(fn);
 
 const REVEAL_SELECTOR = '[data-reveal], .words, .rule, .media--reveal';
 
+/**
+ * Liegt ein Element in einer waagerecht scrollbaren Leiste (.swipe, Prozess-
+ * Leisten), meldet es nie eine Intersection, solange es rechts ausserhalb des
+ * Bildschirms steht – es bliebe dauerhaft unsichtbar. Deshalb wird in dem Fall
+ * die Leiste selbst beobachtet und mit ihr die ganze Reihe aufgedeckt.
+ */
+function railHost(el: HTMLElement): HTMLElement | null {
+  let node = el.parentElement;
+  while (node && node !== document.body) {
+    const ox = getComputedStyle(node).overflowX;
+    if ((ox === 'auto' || ox === 'scroll') && node.scrollWidth > node.clientWidth + 1) return node;
+    node = node.parentElement;
+  }
+  return null;
+}
+
 function reveal() {
   const targets = document.querySelectorAll<HTMLElement>(REVEAL_SELECTOR);
 
@@ -45,7 +61,8 @@ function reveal() {
   // → stattdessen das Elternelement beobachten.
   const proxies = new Map<Element, HTMLElement[]>();
   targets.forEach((t) => {
-    const key = t.classList.contains('media--reveal') && t.parentElement ? t.parentElement : t;
+    const rail = railHost(t);
+    const key = rail ?? (t.classList.contains('media--reveal') && t.parentElement ? t.parentElement : t);
     proxies.set(key, [...(proxies.get(key) ?? []), t]);
   });
 
@@ -69,8 +86,9 @@ function reveal() {
  */
 function safetyNet() {
   if (reduced()) return;
-  const inViewport = (el: Element) => {
-    const r = el.getBoundingClientRect();
+  const inViewport = (el: HTMLElement) => {
+    // Fuer Elemente in einer Leiste zaehlt, ob die Leiste sichtbar ist.
+    const r = (railHost(el) ?? el).getBoundingClientRect();
     return r.top < innerHeight * 1.1 && r.bottom > 0;
   };
   const sweep = (all: boolean) => {
@@ -81,7 +99,31 @@ function safetyNet() {
   };
   const t1 = setTimeout(() => sweep(false), 1400);
   const t2 = setTimeout(() => sweep(true), 8000); // letzte Instanz
-  cleanups.push(() => { clearTimeout(t1); clearTimeout(t2); });
+
+  /**
+   * Beim schnellen Wischen kann der IntersectionObserver einen Abschnitt
+   * ueberspringen: Er wird zwischen zwei Frames von unterhalb nach oberhalb des
+   * Bildschirms befoerdert und meldet nie eine Ueberschneidung. Deshalb prueft
+   * das Scrollen selbst mit – und traegt alles nach, was bereits erreicht ist.
+   */
+  let scheduled = false;
+  const onScroll = () => {
+    if (scheduled) return;
+    scheduled = true;
+    requestAnimationFrame(() => {
+      scheduled = false;
+      sweep(false);
+      if (!document.querySelector(`${REVEAL_SELECTOR}`.split(', ').map((sel) => `${sel}:not(.is-inview)`).join(', '))) {
+        window.removeEventListener('scroll', onScroll);
+      }
+    });
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  cleanups.push(() => {
+    clearTimeout(t1); clearTimeout(t2);
+    window.removeEventListener('scroll', onScroll);
+  });
 }
 
 function header() {

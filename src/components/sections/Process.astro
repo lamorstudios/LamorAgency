@@ -1,118 +1,163 @@
 ---
 /**
- * Der USP-Bereich: alles läuft über ein Studio.
- * Die Kette Strategie → … → Website wird als durchgehende Linie gezeigt –
- * das ist der eigentliche Unterschied zu Agenturen, die zukaufen müssen.
+ * Der USP-Bereich: alles laeuft ueber ein Studio.
+ *
+ * Komposition: keine Karten, sondern eine durchgehende waagerechte Leiste.
+ * Ueber der Leiste liegen die drei Phasen als Spannen (Denken / Produzieren /
+ * Ausspielen), darunter die zehn Schritte. Beides teilt dasselbe Raster, also
+ * sitzt jede Phase exakt ueber ihren Schritten. Die Leiste scrollt waagerecht –
+ * nativ, ohne Skript, damit sie auch ohne JS bedienbar bleibt.
  */
 import Words from '@/components/Words.astro';
 import Button from '@/components/Button.astro';
 import { processSteps } from '@/data/process';
 
-const phases = ['Denken', 'Produzieren', 'Ausspielen'] as const;
+/** Phasen aus den Daten ableiten, damit die Spannen nie auseinanderlaufen. */
+const phaseOrder = ['Denken', 'Produzieren', 'Ausspielen'] as const;
+const phases = phaseOrder.map((name) => {
+  const steps = processSteps.filter((s) => s.phase === name);
+  return { name, span: steps.length, from: steps[0].index, to: steps[steps.length - 1].index };
+});
 ---
-<section class="proc section" data-theme="dark" data-bg="dark" aria-labelledby="proc-title">
+<section class="proc" data-theme="dark" data-bg="dark" aria-labelledby="proc-title">
   <div class="container">
     <div class="proc__head">
-      <p class="t-label proc__label" data-reveal="fade">Der Ablauf</p>
-      <h2 class="t-display proc__title" id="proc-title">
-        <Words lines={['One agency.', 'One look.', 'Every touchpoint.']} />
-      </h2>
-      <div class="proc__intro" data-reveal style="--reveal-delay:200ms">
-        <p class="t-lead">Von der Idee bis zum fertigen Markenauftritt.</p>
-        <p class="t-body t-muted">
+      <div class="proc__headline">
+        <p class="eyebrow proc__label" data-reveal="fade">Der Ablauf</p>
+        <h2 class="proc__title" id="proc-title">
+          <Words lines={['One agency.', 'One look.']} />
+          <span class="proc__title-em t-serif-i">Every touchpoint.</span>
+        </h2>
+      </div>
+      <div class="proc__intro" data-reveal style="--reveal-delay:160ms">
+        <p class="proc__lead">Von der Idee bis zum fertigen Markenauftritt – zehn Schritte, ein Haus.</p>
+        <p class="proc__body">
           Strategie, Konzept, Talent, Produktion, Schnitt, Design, Social und Website
           laufen bei uns über denselben Tisch. Keine Übergabeverluste, keine drei
           Dienstleister, die sich gegenseitig erklären müssen – ein Look über alles.
         </p>
+        <div class="proc__cta"><Button href="/contact/" label="Projekt anfragen" /></div>
       </div>
     </div>
 
-    <ol class="proc__chain" role="list">
-      {processSteps.map((s, i) => (
-        <li class="proc__step" data-reveal style={`--reveal-delay:${Math.min(i * 55, 440)}ms`}>
-          <span class="proc__dot" aria-hidden="true"></span>
-          <span class="proc__index t-label">{s.index}</span>
-          <h3 class="proc__name t-h4">{s.title}</h3>
-          <p class="proc__text t-small t-muted">{s.text}</p>
-        </li>
-      ))}
-    </ol>
+    <div class="proc__railwrap">
+      <div class="proc__rail" tabindex="0" role="group" aria-label="Ablauf in zehn Schritten, waagerecht scrollbar">
+        <div class="proc__track">
+          <!-- Zeile 1: die Phasen als Spannen ueber ihren Schritten. -->
+          {phases.map((p) => (
+            <div class="proc__phase" style={`--span:${p.span}`}>
+              <span class="proc__phase-name">{p.name}</span>
+              <span class="proc__phase-range">{p.from}–{p.to}</span>
+            </div>
+          ))}
 
-    <div class="proc__phases" aria-hidden="true">
-      {phases.map((p) => <span class="proc__phase t-label">{p}</span>)}
-    </div>
-
-    <div class="proc__cta" data-reveal>
-      <Button href="/contact/" label="Projekt anfragen" />
+          <!-- Zeile 2: die zehn Schritte auf derselben Spur. -->
+          {processSteps.map((s) => (
+            <div class="proc__step">
+              <span class="proc__dot" aria-hidden="true"></span>
+              <span class="proc__index">{s.index}</span>
+              <h3 class="proc__name">{s.title}</h3>
+              <p class="proc__text">{s.text}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+      <span class="proc__hint" aria-hidden="true">Leiste seitlich scrollen</span>
     </div>
   </div>
 </section>
 
 <style>
-  .proc__head { display: grid; gap: var(--space-5); margin-bottom: var(--space-9); }
-  .proc__label { color: var(--c-accent); }
-  .proc__title { max-width: 14ch; }
-  .proc__intro { display: grid; gap: var(--space-4); max-width: 56ch; }
+  .proc { padding-block: clamp(2.5rem, 6vw, 5rem); }
 
-  /* Mobile: senkrechte Kette mit durchgehender Linie. */
-  .proc__chain { display: grid; gap: 0; position: relative; counter-reset: step; }
-  .proc__step {
-    position: relative;
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    grid-template-areas: 'dot index' 'line name' 'line text';
-    column-gap: var(--space-4);
-    row-gap: 0.25rem;
-    padding-bottom: var(--space-6);
+  .proc__head { display: grid; gap: var(--space-5); margin-bottom: clamp(1.75rem, 4vw, 3rem); }
+  .proc__label { color: var(--c-accent-on-dark); }
+  .proc__title {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 118%;
+    text-transform: uppercase;
+    font-size: clamp(1.9rem, 0.6rem + 5vw, 5rem);
+    line-height: 0.94; letter-spacing: -0.045em;
   }
-  .proc__step::before {
-    content: '';
-    grid-area: line;
-    position: absolute;
-    left: 0.3rem;
-    top: 1.1rem;
-    bottom: 0;
-    width: 1px;
-    background: var(--line);
-  }
-  .proc__step:last-child::before { display: none; }
-  .proc__dot { grid-area: dot; width: 0.65rem; height: 0.65rem; margin-top: 0.45rem; border-radius: 50%; background: var(--c-accent); flex-shrink: 0; }
-  .proc__index { grid-area: index; color: var(--fg-muted); }
-  .proc__name { grid-area: name; }
-  .proc__text { grid-area: text; max-width: 44ch; }
+  .proc__title-em { display: block; color: var(--c-accent-on-dark); text-transform: none; letter-spacing: -0.02em; }
+  .proc__intro { display: grid; gap: var(--space-4); align-content: start; max-width: 58ch; }
+  .proc__lead { font-size: var(--fs-lead); line-height: 1.35; }
+  .proc__body { color: var(--fg-muted); font-size: var(--fs-small); line-height: 1.6; }
+  .proc__cta { margin-top: var(--space-2); }
 
-  .proc__phases { display: none; }
-
-  /* Desktop: waagerechte Kette über drei Phasen. */
   @media (min-width: 900px) {
-    .proc__chain {
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      column-gap: var(--space-5);
-      row-gap: var(--space-8);
-      padding-top: var(--space-5);
-    }
-    .proc__step {
-      grid-template-columns: minmax(0, 1fr);
-      grid-template-areas: 'dot' 'index' 'name' 'text';
-      row-gap: 0.5rem;
-      padding-bottom: 0;
-      padding-top: var(--space-5);
-      border-top: 1px solid var(--line);
-    }
-    .proc__step::before { display: none; }
-    .proc__dot { margin-top: 0; position: absolute; top: -0.32rem; left: 0; }
-    .proc__phases {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: var(--space-5);
-      margin-top: var(--space-8);
-      padding-top: var(--space-5);
-      border-top: 1px solid var(--line);
-      color: var(--fg-muted);
-    }
-    .proc__phase:nth-child(2) { justify-self: center; }
-    .proc__phase:nth-child(3) { justify-self: end; }
+    .proc__head { grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr); gap: var(--space-8); align-items: end; }
   }
 
-  .proc__cta { margin-top: var(--space-8); }
+  /* ---------- Die Leiste ---------- */
+  .proc__railwrap { position: relative; }
+  .proc__rail {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    /* Ohne das schnappt der erste Schritt an den Rand und frisst die Gasse. */
+    scroll-padding-inline-start: var(--gutter);
+    scrollbar-width: thin;
+    /* Auf der vollen Breite ausbrechen, damit die Leiste den Rand beruehrt. */
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+    padding-bottom: var(--space-4);
+  }
+  .proc__rail:focus-visible { outline: 2px solid var(--c-accent-on-dark); outline-offset: 4px; }
+
+  .proc__track {
+    --col: clamp(11.5rem, 17vw, 14.5rem);
+    display: grid;
+    grid-template-columns: repeat(10, var(--col));
+    grid-template-rows: auto auto;
+    width: max-content;
+  }
+
+  .proc__phase {
+    grid-row: 1;
+    grid-column: span var(--span);
+    display: flex; align-items: baseline; gap: var(--space-3);
+    border-top: 2px solid var(--c-accent);
+    padding: 0.55rem 1.25rem 1.1rem 0;
+    font-size: var(--fs-eyebrow); letter-spacing: var(--ls-wide); text-transform: uppercase;
+  }
+  .proc__phase-name { font-weight: var(--fw-semi); font-stretch: var(--wd-tight); }
+  .proc__phase-range { color: var(--fg-muted); font-variant-numeric: tabular-nums; }
+
+  .proc__step {
+    grid-row: 2;
+    position: relative;
+    scroll-snap-align: start;
+    border-top: 1px solid var(--line);
+    padding: 1.1rem 1.25rem 0 0;
+    display: grid; gap: 0.35rem; align-content: start;
+  }
+  .proc__dot {
+    position: absolute; top: -0.3rem; left: 0;
+    width: 0.55rem; height: 0.55rem; border-radius: 50%;
+    background: var(--c-accent);
+  }
+  /* Nur der erste Schritt einer Phase bekommt den vollen Punkt. */
+  .proc__step:not(:nth-child(4)):not(:nth-child(6)):not(:nth-child(11)) .proc__dot {
+    background: var(--fg-muted); opacity: 0.5; width: 0.35rem; height: 0.35rem; top: -0.2rem;
+  }
+  .proc__index {
+    font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: 118%;
+    font-size: 0.8rem; letter-spacing: var(--ls-wide); color: var(--fg-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .proc__name {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 112%;
+    text-transform: uppercase; font-size: clamp(1rem, 0.85rem + 0.5vw, 1.25rem);
+    line-height: 1.05; letter-spacing: -0.02em;
+  }
+  .proc__text { font-size: 0.82rem; line-height: 1.5; color: var(--fg-muted); }
+
+  .proc__hint {
+    display: block; margin-top: var(--space-3);
+    font-size: var(--fs-eyebrow); letter-spacing: var(--ls-wide);
+    text-transform: uppercase; color: var(--fg-muted);
+  }
+  /* Ab der Breite, auf der die Leiste ohnehin fast vollstaendig sichtbar ist,
+     braucht es den Hinweis nicht mehr. */
+  @media (min-width: 1600px) { .proc__hint { display: none; } }
 </style>

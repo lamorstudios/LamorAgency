@@ -6,14 +6,16 @@
 import Words from '@/components/Words.astro';
 import { comparison } from '@/data/comparison';
 ---
-<section class="cmp section" data-theme="light" data-bg="light" aria-labelledby="cmp-title">
+<section class="cmp" data-theme="light" data-bg="light" aria-labelledby="cmp-title">
   <div class="container">
     <div class="cmp__head">
-      <p class="t-label cmp__label" data-reveal="fade">Problem → Lösung</p>
-      <h2 class="t-say cmp__title" id="cmp-title">
-        <Words text={comparison.headline} />
-      </h2>
-      <p class="t-lead t-muted cmp__lead" data-reveal style="--reveal-delay:160ms">{comparison.lead}</p>
+      <div>
+        <p class="eyebrow cmp__label" data-reveal="fade">Problem → Lösung</p>
+        <h2 class="cmp__title" id="cmp-title">
+          <Words text={comparison.headline} />
+        </h2>
+      </div>
+      <p class="cmp__lead" data-reveal style="--reveal-delay:160ms">{comparison.lead}</p>
     </div>
 
     <div class="cmp__cards">
@@ -43,10 +45,19 @@ import { comparison } from '@/data/comparison';
 </section>
 
 <style>
-  .cmp__head { display: grid; gap: var(--space-4); margin-bottom: var(--space-8); }
-  .cmp__label { color: var(--c-accent); }
-  .cmp__title { max-width: 18ch; }
-  .cmp__lead { max-width: 52ch; }
+  .cmp { padding-block: clamp(2.5rem, 6vw, 5rem); }
+  .cmp__head { display: grid; gap: var(--space-4); margin-bottom: clamp(1.75rem, 4vw, 3rem); }
+  .cmp__label { color: var(--c-accent-text); }
+  .cmp__title {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 118%;
+    text-transform: uppercase;
+    font-size: clamp(1.8rem, 0.7rem + 4.2vw, 4.2rem);
+    line-height: 0.95; letter-spacing: -0.045em; max-width: 16ch;
+  }
+  .cmp__lead { max-width: 46ch; color: var(--fg-muted); font-size: var(--fs-small); line-height: 1.6; }
+  @media (min-width: 1024px) {
+    .cmp__head { grid-template-columns: minmax(0, 1fr) minmax(0, 0.78fr); gap: var(--space-8); align-items: end; }
+  }
 
   .cmp__cards { display: grid; gap: var(--space-5); align-items: stretch; }
   .cmp__card {

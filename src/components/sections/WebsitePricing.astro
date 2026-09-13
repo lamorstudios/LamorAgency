@@ -10,44 +10,51 @@ import Words from '@/components/Words.astro';
 import { websitePricing, websiteBundles, websitePriceLine, monthlyLine, euro } from '@/data/website-pricing';
 import { priceNote } from '@/data/pricing';
 ---
-<section class="wp section" id="pakete" data-theme="light" data-bg="light" aria-labelledby="wp-title">
+<section class="wp" id="pakete" data-theme="light" data-bg="light" aria-labelledby="wp-title">
   <div class="container">
     <div class="wp__head">
-      <p class="t-label wp__label" data-reveal="fade">Website-Pakete</p>
-      <h2 class="t-say wp__title" id="wp-title"><Words text="Was deine Website kostet." /></h2>
-      <p class="swipe-hint wp__hint" aria-hidden="true">Wischen für alle Pakete</p>
-      <p class="t-lead t-muted wp__lead" data-reveal style="--reveal-delay:140ms">
-        Die Website ist ein einmaliges Projekt. Die monatliche Betreuung ist optional
-        und übernimmt danach Hosting, Wartung und kleine Änderungen.
-      </p>
+      <div>
+        <p class="eyebrow wp__label" data-reveal="fade">Website-Pakete</p>
+        <h2 class="wp__title" id="wp-title">
+          <Words text="Was deine Website" />
+          <span class="wp__title-em t-serif-i">wirklich kostet.</span>
+        </h2>
+      </div>
+      <div class="wp__head-side">
+        <p class="wp__lead" data-reveal style="--reveal-delay:140ms">
+          Die Website ist ein einmaliges Projekt. Die monatliche Betreuung ist optional
+          und übernimmt danach Hosting, Wartung und kleine Änderungen.
+        </p>
+        <p class="swipe-hint wp__hint" aria-hidden="true">Wischen für alle Pakete</p>
+      </div>
     </div>
 
-    <ul class="wp__grid swipe" role="list">
-      {websitePricing.map((p, i) => (
-        <li class={`wp__card ${p.highlighted ? 'wp__card--featured' : ''}`} data-reveal style={`--reveal-delay:${i * 90}ms`}>
-          {p.highlighted && <span class="wp__badge t-label">{p.label}</span>}
-          <header class="wp__card-head">
-            {!p.highlighted && <span class="wp__card-label t-label">{p.label}</span>}
+    <ol class="wp__rows swipe" role="list">
+      {websitePricing.map((p) => (
+        <li class={`wp__row ${p.highlighted ? 'wp__row--featured' : ''}`} data-reveal>
+          {/* Links die Zahl, rechts der Umfang – die Zahl traegt die Zeile. */}
+          <div class="wp__figure">
+            {!p.highlighted && <p class="wp__card-label">{p.label}</p>}
             <h3 class="wp__name">{p.name}</h3>
-            <p class="wp__desc t-small">{p.description}</p>
-          </header>
-
-          <div class="wp__price">
             <p class="wp__once">
               <span class="wp__once-value">{websitePriceLine(p)}</span>
-              <span class="wp__once-unit t-label">einmalig</span>
+              <span class="wp__once-unit">einmalig</span>
             </p>
-            {p.priceNote && <p class="wp__price-note t-small t-muted">{p.priceNote}</p>}
-            <p class="wp__monthly t-small">
+            {p.priceNote && <p class="wp__price-note">{p.priceNote}</p>}
+            <p class="wp__monthly">
               {monthlyLine(p.monthlyPrice)
                 ? <>Betreuung optional: <span class="wp__monthly-value">{monthlyLine(p.monthlyPrice)}</span></>
-                : <span class="t-muted">Betreuung auf Anfrage</span>}
+                : <span class="wp__monthly-muted">Betreuung auf Anfrage</span>}
             </p>
+            <a href={p.cta.href} class={`btn wp__cta ${p.highlighted ? '' : 'btn--ghost'}`}>
+              <span>{p.cta.label}</span>
+              <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+            </a>
           </div>
 
-          <div class="wp__body">
-            <p class="wp__for-label t-label t-muted">Passend für</p>
-            <p class="wp__for t-small">{p.for.join(' · ')}</p>
+          <div class="wp__scope">
+            <p class="wp__desc">{p.description}</p>
+            <p class="wp__for"><span class="wp__for-label">Passend für</span> {p.for.join(' · ')}</p>
             <ul class="wp__features" role="list">
               {p.features.slice(0, 6).map((f) => (
                 <li class="wp__feature">
@@ -74,13 +81,10 @@ import { priceNote } from '@/data/pricing';
             )}
           </div>
 
-          <a href={p.cta.href} class={`btn wp__cta ${p.highlighted ? '' : 'btn--ghost'}`}>
-            <span>{p.cta.label}</span>
-            <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
-          </a>
+          {p.highlighted && <span class="wp__badge">{p.label}</span>}
         </li>
       ))}
-    </ul>
+    </ol>
 
     <p class="wp__note t-small t-muted" data-reveal="fade">
       {priceNote} Die Website-Erstellung ist ein einmaliges Projekt – der monatliche
@@ -116,18 +120,31 @@ import { priceNote } from '@/data/pricing';
 </section>
 
 <style>
-  .wp__head { display: grid; gap: var(--space-4); margin-bottom: var(--space-8); }
-  .wp__label { color: var(--c-accent); }
-  .wp__title { max-width: 18ch; }
-  .wp__lead { max-width: 52ch; }
+  .wp { padding-block: clamp(2.5rem, 6vw, 5rem); }
+  .wp__head { display: grid; gap: var(--space-4); margin-bottom: clamp(1.75rem, 4vw, 3rem); }
+  .wp__label { color: var(--c-accent-text); }
+  .wp__title {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 118%;
+    text-transform: uppercase;
+    font-size: clamp(1.9rem, 0.7rem + 4.6vw, 4.5rem);
+    line-height: 0.95; letter-spacing: -0.045em;
+  }
+  .wp__title-em { display: block; color: var(--c-accent-text); text-transform: none; letter-spacing: -0.02em; }
+  .wp__head-side { display: grid; gap: var(--space-3); align-content: end; }
+  .wp__lead { max-width: 48ch; color: var(--fg-muted); font-size: var(--fs-small); line-height: 1.6; }
+  @media (min-width: 1000px) {
+    .wp__head { grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr); gap: var(--space-8); align-items: end; }
+  }
 
-  /* Unter 700px waagerechte Swipe-Reihe (siehe .swipe in global.css),
-     darueber ein normales Raster. Das spart auf dem Telefon rund vier
-     Bildschirme, ohne eine einzige Leistung zu verstecken. */
+  /* ---------- Preiszeilen statt Kartenwand ----------
+     Jedes Paket ist eine Zeile: links die Zahl, rechts der Umfang. Das
+     Meistgewaehlte bricht als dunkle Flaeche aus der Reihe aus. */
+  /* Unter 700px bleibt die bekannte Wisch-Reihe (.swipe in global.css) –
+     vier volle Preiszeilen untereinander waeren auf dem Telefon drei Bildschirme.
+     Ab 700px stehen die Zeilen untereinander. */
   @media (min-width: 700px) {
-    .wp__grid {
+    .wp__rows {
       grid-auto-flow: row;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
       grid-auto-columns: auto;
       gap: var(--space-4);
       overflow: visible;
@@ -135,69 +152,105 @@ import { priceNote } from '@/data/pricing';
       padding-inline: 0;
       padding-bottom: 0;
     }
+    .wp__hint { display: none; }
   }
-  @media (min-width: 1200px) { .wp__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-  @media (min-width: 700px) { .wp__hint { display: none; } }
+  @media (max-width: 699px) {
+    /* In der Wisch-Reihe muessen alle Karten gleich hoch sein. */
+    .wp__row { height: 100%; align-content: start; }
+  }
 
-  .wp__card {
+  .wp__row {
     position: relative;
     display: grid;
-    grid-template-rows: auto auto 1fr auto;
-    gap: var(--space-5);
-    padding: clamp(1.4rem, 3vw, 2rem);
+    gap: clamp(1.1rem, 2.5vw, 2rem);
+    padding: clamp(1.4rem, 3vw, 2.25rem);
     border: 1px solid var(--line);
-    background: var(--c-paper);
+    border-radius: clamp(0.7rem, 1.8vw, 1.1rem);
+    background: var(--bg);
     transition: border-color var(--dur-base) var(--ease-out);
   }
-  @media (hover: hover) and (pointer: fine) { .wp__card:hover { border-color: var(--fg); } }
+  @media (hover: hover) and (pointer: fine) { .wp__row:hover { border-color: var(--fg); } }
+  @media (min-width: 860px) {
+    .wp__row { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: clamp(1.75rem, 4vw, 3.5rem); }
+  }
 
-  .wp__card--featured { background: var(--c-ink); color: var(--c-paper); border-color: var(--c-ink); }
-  .wp__card--featured .wp__feature { border-color: var(--c-ink-3); }
-  .wp__card--featured .wp__price { border-color: var(--c-ink-3); }
-  .wp__card--featured .wp__desc, .wp__card--featured .t-muted { color: var(--c-grey-dark); }
-  .wp__card--featured .wp__cta { --btn-bg: var(--c-paper); --btn-fg: var(--c-ink); border-color: var(--c-paper); }
+  .wp__row--featured { background: var(--c-ink); color: var(--c-paper); border-color: var(--c-ink); }
+  .wp__row--featured .wp__card-label,
+  .wp__row--featured .wp__once-unit,
+  .wp__row--featured .wp__price-note,
+  .wp__row--featured .wp__desc,
+  .wp__row--featured .wp__for,
+  .wp__row--featured .wp__monthly-muted { color: var(--c-grey-dark); }
+  .wp__row--featured .wp__feature,
+  .wp__row--featured .wp__more,
+  .wp__row--featured .wp__figure { border-color: var(--c-ink-3); }
+  .wp__row--featured .wp__check { color: var(--c-accent-on-dark); }
+  .wp__row--featured .wp__more-sum { color: var(--c-accent-on-dark); }
+  .wp__row--featured .wp__cta { --btn-bg: var(--c-paper); --btn-fg: var(--c-ink); border-color: var(--c-paper); }
 
   .wp__badge {
-    position: absolute; top: 0; left: clamp(1.4rem, 3vw, 2rem);
+    position: absolute; top: 0; right: clamp(1.4rem, 3vw, 2.25rem);
     transform: translateY(-50%);
     padding: 0.5em 0.9em; background: var(--c-accent); color: #fff; border-radius: var(--radius-pill);
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; white-space: nowrap;
   }
 
-  .wp__card-head { display: grid; gap: var(--space-2); }
-  .wp__card-label { color: var(--fg-muted); }
+  /* Linke Haelfte: die Zahl. */
+  .wp__figure { display: grid; gap: var(--space-2); align-content: start; }
+  .wp__card-label {
+    color: var(--fg-muted);
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase;
+  }
   .wp__name {
-    font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: var(--wd-wide);
-    font-size: clamp(1.15rem, 1rem + 0.9vw, 1.6rem); line-height: 1.05;
-    letter-spacing: var(--ls-tight); text-transform: uppercase;
+    font-family: var(--font-display); font-weight: 900; font-stretch: 112%;
+    font-size: clamp(1.15rem, 1rem + 0.9vw, 1.6rem); line-height: 1.02;
+    letter-spacing: -0.03em; text-transform: uppercase;
     overflow-wrap: break-word;
   }
-  .wp__desc { color: var(--fg-muted); }
-
-  .wp__price { display: grid; gap: 0.35rem; padding-block: var(--space-4); border-block: 1px solid var(--line); }
-  .wp__once { display: grid; gap: 0.15rem; margin: 0; }
+  .wp__once { display: grid; gap: 0.1rem; margin-top: var(--space-3); }
   .wp__once-value {
-    font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: var(--wd-wide);
-    font-size: clamp(1.6rem, 1.1rem + 1.7vw, 2.4rem); line-height: 1.05;
-    letter-spacing: var(--ls-tight); font-variant-numeric: tabular-nums;
+    font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: 118%;
+    font-size: clamp(2.1rem, 1.2rem + 3.4vw, 4rem); line-height: 0.92;
+    letter-spacing: -0.05em; font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
-  .wp__once-unit { color: var(--fg-muted); }
+  .wp__once-unit {
+    color: var(--fg-muted);
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase;
+  }
+  .wp__price-note { font-size: var(--fs-small); color: var(--fg-muted); }
+  .wp__monthly { font-size: var(--fs-small); }
   .wp__monthly-value { font-weight: var(--fw-semi); }
+  .wp__cta { justify-self: start; margin-top: var(--space-4); }
 
-  .wp__body { display: grid; gap: var(--space-3); align-content: start; }
-  .wp__for { color: var(--fg-muted); }
-  .wp__features { display: grid; margin-top: var(--space-2); }
-  .wp__feature { display: flex; align-items: flex-start; gap: 0.6em; padding-block: 0.5rem; border-top: 1px solid var(--line); font-size: var(--fs-small); }
-  .wp__feature:first-child { border-top: 0; }
+  /* Rechte Haelfte: der Umfang. */
+  .wp__scope { display: grid; gap: var(--space-3); align-content: start; }
+  .wp__desc { color: var(--fg-muted); font-size: var(--fs-small); line-height: 1.55; max-width: 54ch; }
+  .wp__for { font-size: var(--fs-small); color: var(--fg-muted); }
+  .wp__for-label {
+    display: block; margin-bottom: 0.15rem;
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--fg);
+  }
+  .wp__row--featured .wp__for-label { color: var(--c-paper); }
+  .wp__features { display: grid; margin-top: var(--space-1); }
+  @media (min-width: 620px) {
+    /* Zwei Spalten Leistungen – spart Hoehe und fuellt die rechte Haelfte. */
+    .wp__features { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--space-5); }
+  }
+  .wp__feature { display: flex; align-items: flex-start; gap: 0.6em; padding-block: 0.45rem; border-top: 1px solid var(--line); font-size: var(--fs-small); }
   .wp__check { width: 0.8rem; height: 0.8rem; margin-top: 0.35em; flex-shrink: 0; color: var(--c-accent); }
 
   /* Aufklappbare Restliste – nativ, funktioniert auch ohne JavaScript. */
-  .wp__more { margin-top: var(--space-3); border-top: 1px solid var(--line); padding-top: var(--space-3); }
-  .wp__card--featured .wp__more { border-color: var(--c-ink-3); }
+  .wp__more { margin-top: var(--space-2); border-top: 1px solid var(--line); }
   .wp__more-sum {
     display: flex; align-items: center; justify-content: space-between; gap: 0.75em;
     cursor: pointer; list-style: none; min-height: 44px;
     font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
-    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--c-accent);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--c-accent-text);
   }
   .wp__more-sum::-webkit-details-marker { display: none; }
   .wp__more-icon { position: relative; width: 0.75rem; height: 0.75rem; flex: none; }
@@ -207,9 +260,8 @@ import { priceNote } from '@/data/pricing';
   }
   .wp__more-icon::after { transform: rotate(90deg); }
   .wp__more[open] .wp__more-icon::after { transform: rotate(0deg); }
-  .wp__features--rest { margin-top: var(--space-3); }
+  .wp__features--rest { margin-top: 0; }
 
-  .wp__cta { width: 100%; justify-content: space-between; }
   .wp__note { margin-top: var(--space-5); max-width: 70ch; }
 
   /* ---------- Bundles */

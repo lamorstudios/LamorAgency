@@ -676,6 +676,8 @@ a:hover .media--hover > img, a:hover .media--hover > picture img, a:hover .media
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scroll-snap-type: x mandatory;
+  /* Ohne das schnappt die erste Karte an den Rand und frisst die Gasse. */
+  scroll-padding-inline-start: var(--gutter);
   scrollbar-width: none;
   /* Karten beginnen und enden buendig am Containerrand. */
   margin-inline: calc(-1 * var(--gutter));
