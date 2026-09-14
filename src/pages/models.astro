@@ -5,6 +5,8 @@ import Media from '@/components/Media.astro';
 import Words from '@/components/Words.astro';
 import Button from '@/components/Button.astro';
 import ContactCta from '@/components/ContactCta.astro';
+import TalentProfiles from '@/components/sections/TalentProfiles.astro';
+import Icon from '@/components/Icon.astro';
 import { talentCategories, bookingSteps, publishedTalents } from '@/data/models';
 import { breadcrumb } from '@/lib/schema';
 ---
@@ -13,13 +15,39 @@ import { breadcrumb } from '@/lib/schema';
   description="Models und Talents direkt über LAMOR AGENCY buchen: Commercials, Social Content, UGC, Musikvideos, Fashion, Fitness, Beauty und Lifestyle – Casting, Booking und Produktion aus einer Hand."
   jsonLd={[breadcrumb([{ name: 'Models & Talents', path: '/models/' }])]}
 >
-  <PageHeader
-    kicker="Models & Talents"
-    title="Models"
-    titleLines={['Die Gesichter', 'für deine Kampagne.']}
-    lead="Casting, Booking und Produktion laufen über dasselbe Studio. Du brauchst keine zweite Agentur – und am Set steht niemand, der nicht zur Marke passt."
-    meta="Buchbar ab Konzept"
-  />
+  <!-- Hero: grosse Bildflaeche, Typografie daneben. -->
+  <section class="mh" data-theme="dark" data-bg="dark" aria-labelledby="mh-title">
+    <div class="container mh__grid">
+      <div class="mh__copy">
+        <p class="eyebrow mh__label">Models &amp; Talents</p>
+        <h1 class="mh__title" id="mh-title">
+          <span>Models</span>
+          <span class="mh__slash">/</span>
+          <span class="mh__em">Talents</span>
+        </h1>
+        <ul class="mh__tags" role="list">
+          <li>Casting</li>
+          <li>Creators</li>
+          <li>Campaigns</li>
+        </ul>
+        <p class="mh__lead">Casting, Booking und Produktion über dasselbe Studio.</p>
+        <a class="mh__cta" href="#talents">
+          <span>Talents ansehen</span>
+          <Icon name="arrow" class="mh__cta-icon" />
+        </a>
+      </div>
+
+      <div class="mh__visual">
+        <Media
+          media={{ type: 'placeholder', alt: 'Talent von LAMOR AGENCY', label: '[TALENT] Editorial · src/assets/talents/' }}
+          ratio="portrait"
+          sizes="(min-width: 900px) 42vw, 92vw"
+          widths={[480, 768, 1080]}
+          priority
+        />
+      </div>
+    </div>
+  </section>
 
   <section class="mp section" data-theme="light" data-bg="light" aria-labelledby="mp-cats">
     <div class="container">
@@ -64,32 +92,55 @@ import { breadcrumb } from '@/lib/schema';
     </div>
   </section>
 
-  {publishedTalents.length > 0 && (
-    <section class="mp-list section" data-theme="light" data-bg="light" aria-labelledby="mp-list">
-      <div class="container">
-        <h2 class="t-say" id="mp-list" data-reveal>Unsere Talents</h2>
-        <ul class="mp-list__grid" role="list">
-          {publishedTalents.map((t, i) => (
-            <li class="mp-list__item" data-reveal style={`--reveal-delay:${i * 70}ms`}>
-              <Media
-                media={{ type: t.image ? 'image' : 'placeholder', src: t.image, alt: t.name, label: '[TALENT] Portrait' }}
-                ratio="portrait"
-                hover
-                sizes="(min-width: 900px) 25vw, 50vw"
-              />
-              <p class="mp-list__name t-h4">{t.name}</p>
-              <p class="t-label t-muted">{t.categories.join(' · ')}</p>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
-  )}
+  <TalentProfiles />
 
   <ContactCta />
 </BaseLayout>
 
 <style>
+  /* ---------- Models-Hero ---------- */
+  .mh {
+    padding-top: calc(var(--header-h) + clamp(1.5rem, 5vh, 3rem));
+    padding-bottom: clamp(2rem, 5vw, 4rem);
+    overflow: clip;
+  }
+  .mh__grid { display: grid; gap: clamp(1.25rem, 4vw, 2.5rem); align-items: center; }
+  @media (min-width: 900px) {
+    .mh__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr); gap: clamp(2rem, 5vw, 4rem); }
+  }
+  .mh__copy { display: grid; gap: var(--space-3); align-content: center; }
+  .mh__label { color: var(--c-accent-on-dark); }
+  .mh__title {
+    display: grid;
+    font-family: var(--font-display); font-weight: 900; font-stretch: 118%;
+    font-size: clamp(2.6rem, 1rem + 9vw, 7.5rem);
+    line-height: 0.86; letter-spacing: -0.05em; text-transform: uppercase;
+  }
+  .mh__slash { color: var(--fg-muted); }
+  .mh__em { color: var(--c-accent-on-dark); }
+  .mh__tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: var(--space-2); }
+  .mh__tags li {
+    padding: 0.4em 0.8em; border-radius: var(--radius-pill);
+    border: 1px solid var(--card-dark-line); background: var(--tile-dark-bg);
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase;
+  }
+  .mh__lead { color: var(--fg-muted); font-size: var(--fs-small); line-height: 1.5; max-width: 38ch; }
+  .mh__cta {
+    display: inline-flex; align-items: center; gap: 0.5em; justify-self: start;
+    margin-top: var(--space-3); min-height: 3rem;
+    color: var(--c-paper); text-decoration: none;
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase;
+    border-bottom: 1px solid rgba(242, 237, 228, 0.35);
+  }
+  .mh__cta-icon { width: 1.1em; height: 1.1em; transition: transform var(--dur-base) var(--ease-out); }
+  @media (hover: hover) and (pointer: fine) {
+    .mh__cta:hover { color: var(--c-accent-on-dark); border-bottom-color: var(--c-accent-on-dark); }
+    .mh__cta:hover .mh__cta-icon { transform: translateX(0.25em); }
+  }
+  .mh__visual { border-radius: var(--radius-card); overflow: hidden; }
+
   .mp__title { max-width: 18ch; margin-bottom: var(--space-7); }
   .mp__cats { display: grid; border-top: 1px solid var(--line); }
   .mp__cat { display: flex; align-items: baseline; gap: var(--space-4); padding-block: clamp(0.9rem, 2.2vw, 1.4rem); border-bottom: 1px solid var(--line); }

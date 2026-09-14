@@ -1,14 +1,27 @@
 /**
  * Models & Talents – der USP-Bereich.
- * Es werden KEINE Models erfunden. `talents` bleibt leer, bis echte Profile
- * (Name, Foto, Kategorie) aus dem bestehenden Models-Bereich übernommen sind.
- * Die Seite funktioniert auch ohne Profile: sie erklärt dann das Angebot und
- * führt zur Anfrage.
+ *
+ * ES WIRD KEIN PROFIL ERFUNDEN. Hier stehen ausschliesslich Angaben, die vom
+ * Auftraggeber kommen. Fehlt ein Foto, rendert die Seite die Medienflaeche als
+ * klar gekennzeichneten Slot – das Profil bleibt trotzdem vollstaendig
+ * (Name, Groesse, Kategorien, Anfrage).
+ *
+ * NEUES TALENT ERGAENZEN:
+ *   1. Bilder unter src/assets/talents/<slug>/ ablegen
+ *   2. hier einen Eintrag mit `published: true` anlegen
+ *   3. `images` mit '/src/assets/talents/<slug>/<datei>.jpg' fuellen
+ * Reihenfolge auf der Seite = Reihenfolge in diesem Array.
  */
 export interface Talent {
+  /** Kleingeschrieben, ohne Umlaute – dient als Anker und als Formularwert. */
+  slug: string;
   name: string;
+  /** Koerpergroesse in cm. Weglassen, wenn nicht freigegeben. */
+  heightCm?: number;
+  /** Einsatzbereiche – werden als Chips gezeigt, nicht als Liste. */
   categories: string[];
-  image?: string;
+  /** Erste Datei ist das Hauptbild. Leer = Slot-Darstellung. */
+  images?: string[];
   /** Nur echte, freigegebene Profile auf true setzen. */
   published?: boolean;
 }
@@ -33,7 +46,20 @@ export const bookingSteps = [
   { index: '04', title: 'Produktion', text: 'Gedreht wird direkt mit unserem Team: Kamera, Licht, Regie und Schnitt inklusive.' },
 ];
 
-/** TODO: echte Profile aus dem bestehenden Models-Bereich übernehmen. */
-export const talents: Talent[] = [];
+/**
+ * Freigegebene Profile.
+ * TODO_CONTENT: Die weiteren Talents aus dem bestehenden Models-Bereich
+ * ergänzen – Name, Größe und Kategorien liegen dort bereits vor.
+ */
+export const talents: Talent[] = [
+  {
+    slug: 'dominique',
+    name: 'Dominique',
+    heightCm: 173,
+    categories: ['Ads & Commercials', 'Fashion & Beauty', 'Sport & Fitness', 'Musikvideos', 'UGC & Social Content'],
+    images: [],
+    published: true,
+  },
+];
 
 export const publishedTalents = talents.filter((t) => t.published);

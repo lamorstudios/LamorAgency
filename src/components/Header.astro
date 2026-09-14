@@ -88,6 +88,16 @@ const isActive = (href: string) => (norm(href) === '/' ? path === '/' : path.sta
   }
   .header.is-hidden { transform: translateY(-100%); }
 
+  /* Ueber bewegtem, farbigem Material rechnet "difference" unvorhersehbar
+     (auf Rot wird Weiss zu Cyan). Ueber dem Video-Hero steht der Header
+     deshalb einfach hell – bis er beim Scrollen ohnehin seine eigene
+     Leiste bekommt. */
+  body:has([data-video-hero]) .header:not(.is-scrolled) {
+    mix-blend-mode: normal;
+    color: var(--c-paper);
+    text-shadow: 0 1px 12px rgba(11, 10, 9, 0.5);
+  }
+
   /* Beim Scrollen wird aus der Überlagerung eine eigene, unscharfe Leiste. */
   .header.is-scrolled {
     mix-blend-mode: normal;

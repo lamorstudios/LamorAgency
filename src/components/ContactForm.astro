@@ -9,6 +9,7 @@
  *   /contact/?leistung=models    → Dienstleistung
  */
 import { packages } from '@/data/pricing';
+import { publishedTalents } from '@/data/models';
 
 // Auswahl der Dienstleistungen – bewusst nah an der Sprache der Anfragenden.
 const serviceOptions = [
@@ -33,6 +34,8 @@ const budgetOptions = [
 
 // Für das JS-Prefill: gültige Paket-IDs.
 const packageIds = packages.map((p) => p.id).join(',');
+/** Erlaubte Talent-Slugs – nur diese werden aus der URL uebernommen. */
+const talentIds = publishedTalents.map((t) => t.slug).join(',');
 ---
 <form
   class="form"
@@ -44,9 +47,16 @@ const packageIds = packages.map((p) => p.id).join(',');
   novalidate
   data-contact-form
   data-packages={packageIds}
+  data-talents={talentIds}
 >
   <input type="hidden" name="form-name" value="contact" />
   <input type="hidden" name="paket" value="" data-prefill-package />
+  <input type="hidden" name="talent" value="" data-prefill-talent />
+  <!-- Sichtbar, sobald ueber ein Talent-Profil angefragt wird. -->
+  <p class="form__talent" data-talent-note hidden>
+    <span class="form__talent-label">Talent</span>
+    <span class="form__talent-name" data-talent-name></span>
+  </p>
   <p class="visually-hidden" aria-hidden="true">
     <label>Bitte leer lassen: <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
   </p>
@@ -152,6 +162,19 @@ const packageIds = packages.map((p) => p.id).join(',');
       const hidden = form.querySelector<HTMLInputElement>('[data-prefill-package]');
       if (hidden) hidden.value = paket;
     }
+    // ?talent=<slug> aus einem Talent-Profil: nur bekannte Slugs uebernehmen.
+    const talent = params.get('talent');
+    const talents = (form.dataset.talents || '').split(',').filter(Boolean);
+    if (talent && talents.includes(talent)) {
+      const hidden = form.querySelector<HTMLInputElement>('[data-prefill-talent]');
+      const note = form.querySelector<HTMLElement>('[data-talent-note]');
+      const label = form.querySelector<HTMLElement>('[data-talent-name]');
+      const pretty = talent.charAt(0).toUpperCase() + talent.slice(1);
+      if (hidden) hidden.value = pretty;
+      if (label) label.textContent = pretty;
+      if (note) note.hidden = false;
+    }
+
     const leistung = params.get('leistung');
     if (leistung) {
       const match = chips.find((c) => c.dataset.service === leistung);

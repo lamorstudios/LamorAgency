@@ -1,0 +1,144 @@
+---
+/**
+ * Zwei grosse Medienflaechen: Bewegtbild und Talents.
+ *
+ * Der Punkt dieser Section ist zeigen statt erklaeren. Pro Flaeche nur:
+ * Disziplin, drei Einsatzbereiche, ein Weg. Kein Absatz.
+ *
+ * ASSET-SLOTS: Sobald Bilder unter src/assets/work/ liegen, hier die `media`
+ * auf { type: 'image', src: '/src/assets/work/<datei>.jpg' } umstellen – die
+ * Komposition bleibt gleich. Videos analog ueber /public/media.
+ */
+import Media from '@/components/Media.astro';
+import Icon from '@/components/Icon.astro';
+import Words from '@/components/Words.astro';
+
+const panels = [
+  {
+    kicker: 'Bewegtbild',
+    title: 'Videografie',
+    tags: ['Commercials', 'Music', 'Social'],
+    href: '/work/',
+    cta: 'Projekte ansehen',
+    ratio: 'portrait' as const,
+    media: { type: 'placeholder' as const, alt: 'Videoproduktion von LAMOR AGENCY', label: '[WORK] Videografie – Still aus einem Dreh' },
+  },
+  {
+    kicker: 'Gesichter',
+    title: 'Talent Shoots',
+    tags: ['Models', 'Creator', 'Campaign'],
+    href: '/models/',
+    cta: 'Talents ansehen',
+    ratio: 'portrait' as const,
+    media: { type: 'placeholder' as const, alt: 'Talent Shoot von LAMOR AGENCY', label: '[WORK] Talent Shoot – Editorial' },
+  },
+];
+---
+<section class="ed" data-theme="dark" data-bg="dark" aria-labelledby="ed-title">
+  <div class="container">
+    <div class="ed__head">
+      <p class="eyebrow ed__label" data-reveal="fade">Aus dem Studio</p>
+      <h2 class="ed__title" id="ed-title"><Words text="Statt Erklärung: Arbeit." /></h2>
+    </div>
+
+    <ul class="ed__grid" role="list">
+      {panels.map((p) => (
+        <li class="ed__panel" data-reveal>
+          <a class="ed__link" href={p.href}>
+            <span class="ed__media">
+              <Media
+                media={p.media}
+                ratio={p.ratio}
+                sizes="(min-width: 900px) 46vw, 92vw"
+                widths={[480, 768, 1080]}
+                hover
+              />
+              <span class="ed__veil" aria-hidden="true"></span>
+            </span>
+
+            <span class="ed__copy">
+              <span class="ed__kicker">{p.kicker}</span>
+              <span class="ed__name">{p.title}</span>
+              <span class="ed__tags">
+                {p.tags.map((t) => <span class="ed__tag">{t}</span>)}
+              </span>
+              <span class="ed__cta">
+                <span>{p.cta}</span>
+                <Icon name="arrow" class="ed__cta-icon" />
+              </span>
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .ed { padding-block: clamp(2rem, 5vw, 4rem); }
+  .ed__head { display: grid; gap: var(--space-3); margin-bottom: clamp(1.25rem, 3vw, 2rem); }
+  .ed__label { color: var(--c-accent-on-dark); }
+  .ed__title {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 112%;
+    font-size: clamp(1.7rem, 0.9rem + 3.4vw, 3.4rem);
+    line-height: 1; letter-spacing: -0.04em; text-transform: uppercase; text-wrap: balance;
+  }
+
+  /* Zwei Flaechen nebeneinander – auch auf dem Telefon, dort schmaler. */
+  .ed__grid {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(0.5rem, 1.5vw, 1.25rem);
+  }
+
+  .ed__panel {
+    position: relative; min-width: 0;
+    border-radius: var(--radius-card); overflow: hidden;
+    border: 1px solid var(--card-dark-line);
+    background: var(--c-ink-2);
+    transition: transform var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .ed__panel:hover { transform: translateY(-4px); border-color: rgba(242, 237, 228, 0.28); }
+  }
+  .ed__link { display: block; position: relative; color: inherit; text-decoration: none; }
+
+  .ed__media { display: block; position: relative; }
+  .ed__veil {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(11, 10, 9, 0.94) 6%, rgba(11, 10, 9, 0.55) 42%, rgba(11, 10, 9, 0.12) 78%);
+  }
+
+  /* Die Typografie liegt IM Bild – das ist der editoriale Moment. */
+  .ed__copy {
+    position: absolute; inset: auto 0 0 0;
+    display: grid; gap: 0.35rem;
+    padding: clamp(0.75rem, 2.2vw, 1.6rem);
+  }
+  .ed__kicker {
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--c-accent-on-dark);
+  }
+  .ed__name {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 112%;
+    font-size: clamp(1.05rem, 0.7rem + 2.6vw, 2.6rem);
+    line-height: 0.98; letter-spacing: -0.04em; text-transform: uppercase;
+  }
+  .ed__tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+  .ed__tag {
+    padding: 0.3em 0.6em; border-radius: var(--radius-pill);
+    border: 1px solid rgba(242, 237, 228, 0.28);
+    font-size: clamp(0.56rem, 1.5vw, 0.68rem); font-weight: var(--fw-semi);
+    font-stretch: var(--wd-tight); letter-spacing: var(--ls-wide); text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .ed__cta {
+    display: inline-flex; align-items: center; gap: 0.4em; margin-top: 0.2rem;
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase;
+  }
+  .ed__cta-icon { width: 1.1em; height: 1.1em; transition: transform var(--dur-base) var(--ease-out); }
+  @media (hover: hover) and (pointer: fine) {
+    .ed__panel:hover .ed__cta-icon { transform: translateX(0.3em); }
+    .ed__panel:hover .ed__cta { color: var(--c-accent-on-dark); }
+  }
+</style>

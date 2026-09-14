@@ -1,15 +1,18 @@
 ---
 /**
  * Startseite – die Dramaturgie:
- * Hero → Showreel → Vertrauen (Kunden) → Problem/Lösung (inkl. Zahlen) → Leistungen
- * → Webdesign → Arbeiten → Prozess → Models → Branchen → Zahlen → Stimmen
- * → Preise → FAQ → Kontakt.
+ * Video-Hero → Featured on → Showreel → Arbeit (Video/Talents) → Leistungen
+ * → Projekte → Problem/Lösung → Webdesign → Prozess → Models → Kunden
+ * → Branchen → Stimmen → Preise → FAQ → Kontakt.
  *
- * Showreel und Trust stehen bewusst ganz vorn: Wer hier abspringt, soll die
- * Arbeit gesehen und die Referenzen gelesen haben.
+ * Wer visuelle Dienstleistungen verkauft, muss sie zeigen, bevor er sie
+ * erklärt: Die ersten vier Bereiche sind Bild und Bewegtbild, erst danach
+ * kommt Text.
  */
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import Hero from '@/components/sections/Hero.astro';
+import HeroVideo from '@/components/sections/HeroVideo.astro';
+import FeaturedOn from '@/components/sections/FeaturedOn.astro';
+import EditorialWork from '@/components/sections/EditorialWork.astro';
 import Clients from '@/components/sections/Clients.astro';
 import Comparison from '@/components/sections/Comparison.astro';
 import Services from '@/components/sections/Services.astro';
@@ -32,15 +35,17 @@ import { offerCatalog } from '@/lib/schema';
   theme="dark"
   jsonLd={[offerCatalog()]}
 >
-  <Hero />
+  <HeroVideo />
+  <FeaturedOn />
   <Showreel />
-  <Clients figures={false} />
-  <Comparison />
+  <EditorialWork />
   <Services />
-  <WebsiteTeaser />
   <SelectedWork />
+  <Comparison />
+  <WebsiteTeaser />
   <Process />
   <ModelsTeaser />
+  <Clients figures={false} />
   <Industries />
   <Testimonials />
   <Pricing compact />
