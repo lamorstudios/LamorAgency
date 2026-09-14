@@ -1,392 +1,542 @@
 ---
 /**
- * Website-Rechner.
+ * RATENZAHLUNGS-RECHNER
  *
- * Beantwortet die Frage, die vor jeder Anfrage steht: Was kostet das über die
- * Zeit? Einmalige Erstellung und optionale Betreuung werden getrennt gezeigt
- * und dann zusammengerechnet – genau die Trennung, an der sonst
- * Missverständnisse entstehen.
+ * Beantwortet in dieser Reihenfolge genau vier Fragen:
+ *   1. Was kostet meine Website?          -> Paketwahl
+ *   2. Was zahle ich monatlich?           -> Rate aus Preis / Laufzeit
+ *   3. Wann ist sie bezahlt?              -> Ende der Laufzeit, sichtbar markiert
+ *   4. Was zahle ich danach noch?         -> Hosting ODER Betreuung
  *
- * ALLE Preise kommen aus src/data/website-pricing.ts und stehen als
- * data-Attribute im Markup. Im Skript wird kein einziger Betrag geschrieben.
+ * TRENNUNG DER BETRÄGE (der eigentliche Punkt dieses Moduls):
+ * Website-Rate und Hosting werden getrennt ausgewiesen und erst am Ende zu
+ * einer Monatsbelastung addiert. Nach der letzten Rate faellt der
+ * Website-Anteil auf 0 € und taucht nirgends mehr als laufende Kosten auf.
  *
- * Bedienung: Paket und Betreuung sind echte Radiogruppen, die Laufzeit ist
- * ein natives <input type="range">. Beides ist damit von Haus aus per
- * Tastatur bedienbar; der Range meldet min/max/aktuell automatisch, ergänzt
- * um aria-valuetext für eine sprechende Ansage ("12 Monate").
+ * ALLE Betraege stammen aus src/data/website-pricing.ts und stehen als
+ * data-Attribute im Markup. Im Skript wird kein einziger Betrag geschrieben –
+ * nur gerechnet und formatiert.
+ *
+ * OHNE JAVASCRIPT: Der Startzustand (Empfehlungspaket, Standardlaufzeit) ist
+ * serverseitig ausgerechnet und steht vollstaendig im HTML. Der Rechner zeigt
+ * dann einen gueltigen Fall statt Platzhalter.
  */
-import { websitePricing, carePlans, euro } from '@/data/website-pricing';
+import Icon from '@/components/Icon.astro';
+import Words from '@/components/Words.astro';
+import {
+  websitePricing, financingTerms, defaultFinancingTerm, websiteRate,
+  hostingPlan, premiumPlan, euro, euroRate,
+} from '@/data/website-pricing';
 
-const maxMonths = 24;
-const defaultMonths = 12;
-// Empfehlung als Startwert – dasselbe Paket, das auch in den Karten markiert ist.
-const defaultPkg = websitePricing.find((p) => p.highlighted) ?? websitePricing[0];
-const defaultCare = carePlans.find((c) => c.id === (defaultPkg.careTiers[1] ?? defaultPkg.careTiers[0])) ?? carePlans[0];
+/** Nur Pakete mit festem Preis lassen sich in Raten aufteilen. */
+const packages = websitePricing.filter((p) => p.price !== null);
+const defaultPkg = packages.find((p) => p.highlighted) ?? packages[0];
+
+const minTerm = financingTerms[0];
+const maxTerm = financingTerms[financingTerms.length - 1];
+const step = financingTerms[1] - financingTerms[0];
+
+// Startzustand serverseitig – identisch zu dem, was das Skript spaeter rechnet.
+const startPrice = defaultPkg.price as number;
+const startRate = websiteRate(startPrice, defaultFinancingTerm);
+const startFill = ((defaultFinancingTerm - minTerm) / (maxTerm - minTerm)) * 100;
+const prefix = defaultPkg.priceFrom ? 'ab ' : '';
 ---
-<section class="ca" id="rechner" data-theme="light" data-bg="light" aria-labelledby="ca-title">
+<section class="fin wash" id="rechner" data-theme="light" data-bg="light" aria-labelledby="fin-title">
   <div class="container">
-    <div class="ca__head">
-      <p class="eyebrow">Kostenrechner</p>
-      <h2 class="ca__title" id="ca-title">
-        Was kostet deine Website <span class="hl">wirklich?</span>
-      </h2>
-      <p class="ca__lead">Erstellung und Betreuung durchrechnen – ohne Anfrage.</p>
+    <div class="fin__head">
+      <div>
+        <p class="eyebrow fin__label" data-reveal="fade">Ratenzahlung</p>
+        <h2 class="fin__title" id="fin-title">
+          <Words text="Deine Website" />
+          <span class="fin__title-em">monatlich bezahlen.</span>
+        </h2>
+      </div>
+      <p class="fin__lead" data-reveal style="--reveal-delay:140ms">
+        Paketpreis geteilt durch die Laufzeit – ohne Aufschlag. Danach gehört sie dir.
+      </p>
     </div>
 
-    <div class="card card--dark ca__card" data-calc
-         data-max={maxMonths}
-         data-default-months={defaultMonths}>
-      <div class="ca__controls">
-        <!-- Paketwahl -->
-        <fieldset class="ca__group">
-          <legend class="ca__legend">Paket</legend>
-          <div class="ca__seg">
-            {websitePricing.map((p) => (
-              <label class="ca__opt">
-                <input
-                  type="radio"
-                  name="calc-package"
-                  value={p.id}
-                  data-price={p.price ?? 0}
-                  data-from={p.priceFrom ? '1' : '0'}
-                  data-care={(p.careTiers[1] ?? p.careTiers[0] ?? 'none')}
-                  checked={p.id === defaultPkg.id}
-                />
-                <span class="ca__opt-box">
-                  <span class="ca__opt-name">{p.name.replace('LAMOR ', '').split(' ')[0]}</span>
-                  <span class="ca__opt-price">{p.priceFrom ? 'ab ' : ''}{euro(p.price ?? 0)}</span>
-                </span>
-              </label>
-            ))}
-          </div>
-        </fieldset>
+    <div
+      class="card card--dark fin__card"
+      data-calc
+      data-min={minTerm}
+      data-max={maxTerm}
+      data-hosting={hostingPlan.price}
+      data-reveal
+    >
+      <div class="fin__inputs">
+      <!-- Schritt 1: Paket -->
+      <fieldset class="fin__step">
+        <legend class="fin__legend"><span class="fin__num">1</span> Paket wählen</legend>
+        <div class="fin__pkgs">
+          {packages.map((p) => (
+            <label class="fin__pkg">
+              <input
+                type="radio"
+                name="fin-package"
+                value={p.id}
+                data-price={p.price}
+                data-from={p.priceFrom ? '1' : '0'}
+                data-name={p.name.replace('LAMOR ', '').split(' ')[0]}
+                checked={p.id === defaultPkg.id}
+              />
+              <span class="fin__pkg-box">
+                <span class="fin__pkg-name">{p.name.replace('LAMOR ', '').split(' ')[0]}</span>
+                <span class="fin__pkg-price">{p.priceFrom ? 'ab ' : ''}{euro(p.price as number)}</span>
+              </span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
 
-        <!-- Betreuung -->
-        <fieldset class="ca__group">
-          <legend class="ca__legend">Betreuung</legend>
-          <div class="ca__seg ca__seg--care">
-            {carePlans.map((c) => (
-              <label class="ca__opt" data-note={c.note}>
-                <input
-                  type="radio"
-                  name="calc-care"
-                  value={c.id}
-                  data-price={c.price}
-                  checked={c.id === defaultCare.id}
-                />
-                <span class="ca__opt-box">
-                  <span class="ca__opt-name">{c.name}</span>
-                  <span class="ca__opt-price">{c.price === 0 ? '0 €' : `${euro(c.price)} / Mon.`}</span>
-                </span>
-              </label>
-            ))}
-          </div>
-          <p class="ca__care-note" data-care-note>{defaultCare.note}</p>
-        </fieldset>
-
-        <!-- Laufzeit -->
-        <div class="ca__group">
-          <label class="ca__legend" for="calc-months">
-            Betreuung für <output class="ca__months" data-months-out for="calc-months">{defaultMonths}</output> Monate
-          </label>
-          <div class="ca__slider">
-            <input
-              type="range"
-              id="calc-months"
-              min="0"
-              max={maxMonths}
-              step="1"
-              value={defaultMonths}
-              data-months
-              aria-valuetext={`${defaultMonths} Monate`}
-              style={`--fill:${(defaultMonths / maxMonths) * 100}%`}
-            />
-            <div class="ca__ticks" aria-hidden="true">
-              <span>0</span><span>6</span><span>12</span><span>18</span><span>{maxMonths}</span>
-            </div>
+      <!-- Schritt 2: Laufzeit -->
+      <div class="fin__step">
+        <label class="fin__legend" for="fin-term">
+          <span class="fin__num">2</span> Ratenzahlung ·
+          <output class="fin__term" data-term-out for="fin-term">{defaultFinancingTerm}</output> Monate
+        </label>
+        <div class="fin__slider">
+          <input
+            type="range"
+            id="fin-term"
+            min={minTerm}
+            max={maxTerm}
+            step={step}
+            value={defaultFinancingTerm}
+            data-term
+            aria-valuetext={`${defaultFinancingTerm} Monate`}
+            style={`--fill:${startFill}%`}
+          />
+          <div class="fin__ticks" aria-hidden="true">
+            {financingTerms.map((t) => <span>{t}</span>)}
           </div>
         </div>
       </div>
+      </div>
 
       <!-- Ergebnis -->
-      <div class="ca__result card card--accent" role="status" aria-live="polite">
-        <p class="ca__result-label">Gesamt nach <span data-months-echo>{defaultMonths}</span> Monaten</p>
-        <p class="ca__total" data-total>–</p>
-        <p class="ca__avg" data-avg-wrap>
-          <span data-avg>–</span> <span class="ca__avg-note">Ø pro Monat</span>
+      <div class="fin__result card card--accent" role="status" aria-live="polite">
+        <p class="fin__result-pkg">
+          <span data-pkg-name>{defaultPkg.name.replace('LAMOR ', '').split(' ')[0]}</span> Website ·
+          <span data-pkg-price>{prefix}{euro(startPrice)}</span>
         </p>
-
-        <dl class="ca__rows">
-          <div class="ca__row">
-            <dt>Website-Erstellung</dt>
-            <dd data-once>–</dd>
-          </div>
-          <div class="ca__row">
-            <dt>Betreuung pro Monat</dt>
-            <dd data-monthly>–</dd>
-          </div>
-          <div class="ca__row ca__row--sum">
-            <dt>Betreuung über <span data-months-echo>{defaultMonths}</span> Monate</dt>
-            <dd data-care-total>–</dd>
-          </div>
-        </dl>
-
-        <p class="ca__hint" data-hint hidden></p>
-
-        <a href="#anfrage" class="btn ca__cta" data-magnetic>
-          <span>Projekt anfragen</span>
-          <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
-        </a>
-        <p class="ca__vat">Netto zzgl. USt. Richtwert, kein verbindliches Angebot.</p>
+        <p class="fin__rate">
+          <span data-rate>{prefix}{euroRate(startRate)}</span>
+          <span class="fin__rate-unit">/ Monat</span>
+        </p>
+        <p class="fin__rate-sub">
+          für <span data-term-echo>{defaultFinancingTerm}</span> Monate + Hosting {euro(hostingPlan.price)} / Monat
+        </p>
+        <p class="fin__paid">
+          <span class="rmark rmark--onred"><Icon name="check" /></span>
+          <span>Nach <span data-term-echo>{defaultFinancingTerm}</span> Monaten ist deine Website vollständig bezahlt.</span>
+        </p>
       </div>
+
+      <!-- Aufschluesselung: nichts wird zu einer Summe verschmolzen -->
+      <dl class="fin__rows">
+        <div class="fin__row">
+          <dt>Website einmalig</dt>
+          <dd data-once>{prefix}{euro(startPrice)}</dd>
+        </div>
+        <div class="fin__row">
+          <dt><span data-term-echo>{defaultFinancingTerm}</span>&nbsp;Monatsraten</dt>
+          <dd data-rate-row>{prefix}{euroRate(startRate)} / Monat</dd>
+        </div>
+        <div class="fin__row">
+          <dt>Hosting während der Laufzeit</dt>
+          <dd>{euro(hostingPlan.price)} / Monat</dd>
+        </div>
+        <div class="fin__row fin__row--sum">
+          <dt>Monatlich gesamt</dt>
+          <dd data-sum>{prefix}{euroRate(startRate + hostingPlan.price)} / Monat</dd>
+        </div>
+      </dl>
+
+      <!-- Zeitstrahl -->
+      <ol class="fin__time" role="list">
+        <li class="fin__stage">
+          <span class="fin__stage-label">Heute</span>
+          <span class="fin__stage-value">Projektstart</span>
+        </li>
+        <li class="fin__stage">
+          <span class="fin__stage-label">Ratenzahlung</span>
+          <span class="fin__stage-value"><span data-term-echo>{defaultFinancingTerm}</span> Monate</span>
+        </li>
+        <li class="fin__stage fin__stage--done">
+          <span class="fin__stage-label">Website bezahlt</span>
+          <span class="fin__stage-value">0 €</span>
+        </li>
+        <li class="fin__stage">
+          <span class="fin__stage-label">Danach</span>
+          <span class="fin__stage-value">Hosting oder Betreuung</span>
+        </li>
+      </ol>
+    </div>
+
+    <!-- Die zwei Wege nach der letzten Rate -->
+    <div class="fin__after" data-reveal>
+      <p class="fin__after-label">Ab Monat <span data-term-next>{defaultFinancingTerm + 1}</span> zahlst du nur noch</p>
+      <div class="fin__plans">
+        <article class="card card--light fin__plan">
+          <header class="fin__plan-head">
+            <span class="itile"><Icon name="cube" /></span>
+            <h3 class="fin__plan-name">Nur Hosting</h3>
+          </header>
+          <p class="fin__plan-price">{euro(hostingPlan.price)}<span class="fin__plan-unit">/ Monat</span></p>
+          <p class="fin__plan-note">{hostingPlan.note}</p>
+          <ul class="fin__plan-items" role="list">
+            {hostingPlan.includes.map((i) => (
+              <li class="fin__plan-item"><Icon name="check" class="fin__check" /><span>{i}</span></li>
+            ))}
+          </ul>
+        </article>
+
+        <article class="card card--dark fin__plan fin__plan--premium">
+          <header class="fin__plan-head">
+            <span class="itile"><Icon name="trend" /></span>
+            <h3 class="fin__plan-name">Premium Betreuung</h3>
+          </header>
+          <p class="fin__plan-price">{euro(premiumPlan.price)}<span class="fin__plan-unit">/ Monat</span></p>
+          <p class="fin__plan-note">{premiumPlan.note}</p>
+          <ul class="fin__plan-items" role="list">
+            {premiumPlan.includes.map((i) => (
+              <li class="fin__plan-item"><Icon name="check" class="fin__check" /><span>{i}</span></li>
+            ))}
+          </ul>
+        </article>
+      </div>
+    </div>
+
+    <div class="fin__foot">
+      <a href="#anfrage" class="btn fin__cta" data-magnetic>
+        <span>Projekt anfragen</span>
+        <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+      </a>
+      <p class="fin__vat">Netto zzgl. USt. Richtwert, kein verbindliches Angebot.</p>
     </div>
   </div>
 </section>
 
 <style>
-  .ca { padding-block: clamp(2.5rem, 6vw, 5rem); }
+  .fin { padding-block: clamp(2.75rem, 6vw, 5.5rem); }
 
-  .ca__head { display: grid; gap: var(--space-4); margin-bottom: clamp(1.5rem, 4vw, 2.5rem); }
-  .ca__title {
-    font-family: var(--font-display); font-weight: 900; font-stretch: 110%;
-    text-transform: uppercase;
-    font-size: clamp(1.6rem, 0.8rem + 3.4vw, 3.5rem);
-    line-height: 1; letter-spacing: -0.038em; max-width: 20ch;
+  .fin__head { display: grid; gap: var(--space-3); margin-bottom: clamp(1.5rem, 3.5vw, 2.5rem); }
+  .fin__label { color: var(--c-accent-text); }
+  .fin__title {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 112%;
+    font-size: clamp(1.9rem, 0.9rem + 4.2vw, 4.2rem);
+    line-height: 0.98; letter-spacing: -0.04em; max-width: 20ch; text-wrap: balance;
   }
-  .ca__lead { max-width: 52ch; color: var(--fg-muted); }
+  .fin__title-em { color: var(--c-accent); }
+  .fin__lead { color: var(--fg-muted); max-width: 42ch; font-size: clamp(0.95rem, 2.2vw, 1.2rem); line-height: 1.45; }
+  @media (min-width: 1024px) {
+    .fin__head { grid-template-columns: minmax(0, 1fr) minmax(0, 0.7fr); gap: var(--space-8); align-items: end; }
+  }
 
-  /* Dunkle Karte auf hellem Grund – liest sich als Werkzeug, nicht als Text. */
-  .ca__card {
+  /* ---------- Das Modul ---------- */
+  .fin__card {
     display: grid;
-    gap: clamp(1.5rem, 3.5vw, 2.5rem);
-    padding: clamp(1.25rem, 3vw, 2.25rem);
+    gap: clamp(1rem, 2.5vw, 1.75rem);
+    padding: clamp(1rem, 2.8vw, 2rem);
   }
-  @media (min-width: 900px) {
-    .ca__card { grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.85fr); align-items: start; gap: clamp(2rem, 4vw, 3.5rem); }
+  @media (min-width: 1000px) {
+    /* Links die Eingabe, rechts das Ergebnis – beides gleichzeitig im Blick. */
+    .fin__card {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 0.82fr);
+      align-items: start;
+      column-gap: clamp(1.5rem, 3.5vw, 3rem);
+    }
+    /* Links die Eingabe, rechts die Zahlen. */
+    .fin__inputs { grid-column: 1; grid-row: 1 / span 2; align-content: start; }
+    .fin__result { grid-column: 2; grid-row: 1; }
+    .fin__rows { grid-column: 2; grid-row: 2; align-self: start; }
+    .fin__time { grid-column: 1 / -1; }
   }
 
-  .ca__controls { display: grid; gap: clamp(1.25rem, 3vw, 2rem); align-content: start; }
-  .ca__group { border: 0; padding: 0; margin: 0; display: grid; gap: var(--space-3); min-width: 0; }
-  .ca__legend {
-    padding: 0;
+  .fin__inputs { display: grid; gap: clamp(1rem, 2.5vw, 1.75rem); align-content: start; min-width: 0; }
+  .fin__step { border: 0; padding: 0; margin: 0; min-width: 0; display: grid; gap: var(--space-3); align-content: start; }
+  .fin__legend {
+    display: flex; align-items: center; gap: 0.5em; padding: 0;
     font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
-    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--c-grey-dark);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--fg-muted);
   }
+  .fin__num {
+    display: grid; place-items: center; flex: none;
+    width: 1.45rem; aspect-ratio: 1; border-radius: 50%;
+    background: rgba(229, 67, 43, 0.16); border: 1px solid rgba(229, 67, 43, 0.35);
+    color: var(--c-accent-on-dark);
+    font-family: var(--font-display); font-weight: var(--fw-display); font-size: 0.7rem;
+  }
+  .fin__term { color: var(--c-accent-on-dark); font-weight: var(--fw-bold); font-variant-numeric: tabular-nums; }
 
-  /* ---------- Segmentierte Auswahl ---------- */
-  .ca__seg { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
-  @media (min-width: 620px) { .ca__seg { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-
-  .ca__opt { position: relative; display: block; min-width: 0; }
-  .ca__opt input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
-  .ca__opt-box {
-    display: grid; gap: 0.2rem; align-content: center;
-    min-height: 3.5rem;
-    padding: 0.7rem 0.8rem;
-    border: 1px solid var(--c-ink-3);
-    border-radius: 0.6rem;
-    background: var(--c-ink-2);
+  /* Paketwahl: 2x2 auf dem Telefon, vier nebeneinander ab Tablet. */
+  .fin__pkgs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
+  @media (min-width: 620px) { .fin__pkgs { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  .fin__pkg { position: relative; display: block; min-width: 0; }
+  .fin__pkg input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+  .fin__pkg-box {
+    display: grid; gap: 0.15rem; align-content: center;
+    min-height: 3.25rem;
+    padding: 0.6rem 0.7rem;
+    border-radius: calc(var(--radius-card) * 0.55);
+    border: 1px solid var(--card-dark-line);
+    background: var(--tile-dark-bg);
     transition: border-color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
   }
-  .ca__opt-name {
-    font-family: var(--font-display); font-weight: var(--fw-bold); font-stretch: 105%;
-    font-size: 0.82rem; text-transform: uppercase; letter-spacing: -0.01em;
-    overflow-wrap: anywhere;
+  .fin__pkg-name {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 105%;
+    text-transform: uppercase; font-size: clamp(0.72rem, 1.9vw, 0.88rem);
+    line-height: 1.05; letter-spacing: -0.02em;
   }
-  .ca__opt-price { font-size: 0.72rem; color: var(--c-grey-dark); font-variant-numeric: tabular-nums; }
-
-  .ca__opt input:checked + .ca__opt-box { border-color: var(--c-accent); background: color-mix(in srgb, var(--c-accent) 16%, var(--c-ink-2)); }
-  .ca__opt input:checked + .ca__opt-box .ca__opt-price { color: var(--c-paper); }
-  .ca__opt input:focus-visible + .ca__opt-box { outline: 2px solid var(--c-paper); outline-offset: 2px; }
-  @media (hover: hover) { .ca__opt:hover .ca__opt-box { border-color: var(--c-grey-dark); } }
-
-  .ca__care-note { font-size: var(--fs-small); color: var(--c-grey-dark); }
+  .fin__pkg-price { font-size: 0.72rem; color: var(--c-grey-dark); font-variant-numeric: tabular-nums; }
+  .fin__pkg input:checked + .fin__pkg-box {
+    border-color: var(--c-accent);
+    background: color-mix(in srgb, var(--c-accent) 18%, transparent);
+  }
+  .fin__pkg input:checked + .fin__pkg-box .fin__pkg-price { color: var(--c-paper); }
+  .fin__pkg input:focus-visible + .fin__pkg-box { outline: 2px solid var(--c-paper); outline-offset: 2px; }
+  @media (hover: hover) and (pointer: fine) {
+    .fin__pkg:hover .fin__pkg-box { border-color: var(--c-grey-dark); }
+  }
 
   /* ---------- Schieberegler ---------- */
-  .ca__months { font-family: var(--font-display); font-weight: var(--fw-display); color: var(--c-accent-on-dark); font-variant-numeric: tabular-nums; }
-
-  .ca__slider { display: grid; gap: 0.5rem; }
-  .ca__slider input[type='range'] {
+  .fin__slider { display: grid; gap: 0.35rem; }
+  .fin__slider input[type='range'] {
     -webkit-appearance: none; appearance: none;
     width: 100%; height: 2.75rem; margin: 0; background: transparent; cursor: pointer;
   }
-  /* Spur: gefuellter Teil kommt aus --fill, das JS mitschreibt. */
-  .ca__slider input[type='range']::-webkit-slider-runnable-track {
+  .fin__slider input[type='range']::-webkit-slider-runnable-track {
     height: 0.5rem; border-radius: var(--radius-pill);
-    background: linear-gradient(to right, var(--c-accent) 0 var(--fill, 50%), var(--c-ink-3) var(--fill, 50%) 100%);
+    background: linear-gradient(to right, var(--c-accent) 0 var(--fill, 50%), rgba(242, 237, 228, 0.16) var(--fill, 50%) 100%);
   }
-  .ca__slider input[type='range']::-moz-range-track {
+  .fin__slider input[type='range']::-moz-range-track {
     height: 0.5rem; border-radius: var(--radius-pill);
-    background: linear-gradient(to right, var(--c-accent) 0 var(--fill, 50%), var(--c-ink-3) var(--fill, 50%) 100%);
+    background: linear-gradient(to right, var(--c-accent) 0 var(--fill, 50%), rgba(242, 237, 228, 0.16) var(--fill, 50%) 100%);
   }
-  /* Griff: 2rem sichtbar, die Spurhoehe von 2.75rem gibt die Trefferflaeche. */
-  .ca__slider input[type='range']::-webkit-slider-thumb {
+  .fin__slider input[type='range']::-webkit-slider-thumb {
     -webkit-appearance: none; appearance: none;
     width: 2rem; height: 2rem; margin-top: -0.75rem;
     border-radius: 50%; border: 3px solid var(--c-ink);
     background: var(--c-paper);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(229, 67, 43, 0.35);
     transition: transform var(--dur-fast) var(--ease-out);
   }
-  .ca__slider input[type='range']::-moz-range-thumb {
+  .fin__slider input[type='range']::-moz-range-thumb {
     width: 2rem; height: 2rem;
     border-radius: 50%; border: 3px solid var(--c-ink);
     background: var(--c-paper);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
   }
-  .ca__slider input[type='range']:active::-webkit-slider-thumb { transform: scale(1.12); }
-  .ca__slider input[type='range']:focus-visible { outline: none; }
-  .ca__slider input[type='range']:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--c-accent-on-dark); outline-offset: 2px; }
-  .ca__slider input[type='range']:focus-visible::-moz-range-thumb { outline: 2px solid var(--c-accent-on-dark); outline-offset: 2px; }
+  .fin__slider input[type='range']:active::-webkit-slider-thumb { transform: scale(1.12); }
+  .fin__slider input[type='range']:focus-visible { outline: none; }
+  .fin__slider input[type='range']:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--c-accent-on-dark); outline-offset: 3px; }
+  .fin__slider input[type='range']:focus-visible::-moz-range-thumb { outline: 2px solid var(--c-accent-on-dark); outline-offset: 3px; }
   @media (prefers-reduced-motion: reduce) {
-    .ca__slider input[type='range']::-webkit-slider-thumb { transition: none; }
+    .fin__slider input[type='range']::-webkit-slider-thumb { transition: none; }
   }
-
-  .ca__ticks {
+  .fin__ticks {
     display: flex; justify-content: space-between;
-    font-size: 0.7rem; font-variant-numeric: tabular-nums; color: var(--c-grey-dark);
-    padding-inline: 0.25rem;
+    font-size: 0.7rem; color: var(--fg-muted); font-variant-numeric: tabular-nums;
+    padding-inline: 0.4rem;
   }
 
   /* ---------- Ergebnis ---------- */
-  /* Das Ergebnis ist die Aussage der Section – es bekommt die Akzentflaeche. */
-  .ca__result {
-    display: grid; gap: var(--space-2); align-content: start;
-    padding: clamp(1rem, 2.5vw, 1.5rem);
+  .fin__result {
+    display: grid; align-content: center; gap: 0.3rem;
+    padding: clamp(1rem, 2.6vw, 1.6rem);
   }
-  .ca__result-label {
+  .fin__result-pkg {
     font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
-    letter-spacing: var(--ls-wide); text-transform: uppercase; color: rgba(255, 255, 255, 0.82);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; color: rgba(255, 255, 255, 0.85);
   }
-  .ca__total {
+  .fin__rate {
+    display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.4rem;
     font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: 118%;
-    font-size: clamp(2.25rem, 1.2rem + 4.6vw, 4rem);
-    line-height: 0.95; letter-spacing: -0.045em;
-    font-variant-numeric: tabular-nums;
-    color: #fff;
-    overflow-wrap: break-word;
+    font-size: clamp(2rem, 1rem + 4.6vw, 3.6rem);
+    line-height: 0.95; letter-spacing: -0.05em;
+    font-variant-numeric: tabular-nums; color: #fff;
   }
-  .ca__avg { font-size: var(--fs-small); color: rgba(255, 255, 255, 0.85); font-variant-numeric: tabular-nums; }
-  .ca__avg span[data-avg] { color: #fff; font-weight: var(--fw-semi); }
-  .ca__avg-note { color: rgba(255, 255, 255, 0.72); font-weight: var(--fw-regular); }
+  .fin__rate-unit {
+    font-size: clamp(0.8rem, 2vw, 1.05rem); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.85);
+  }
+  .fin__rate-sub { font-size: var(--fs-small); color: rgba(255, 255, 255, 0.85); font-variant-numeric: tabular-nums; }
+  .fin__paid {
+    display: flex; align-items: center; gap: 0.55rem;
+    margin-top: var(--space-3); padding-top: var(--space-3);
+    border-top: 1px solid rgba(255, 255, 255, 0.28);
+    font-weight: var(--fw-semi); font-size: clamp(0.82rem, 2vw, 1rem); line-height: 1.25;
+  }
 
-  .ca__rows { display: grid; margin-top: var(--space-2); }
-  .ca__row {
+  /* ---------- Aufschluesselung ---------- */
+  .fin__rows { display: grid; align-content: start; }
+  .fin__row {
     display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
-    padding-block: 0.55rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.22);
+    padding-block: 0.5rem;
+    border-top: 1px solid var(--card-dark-line-soft);
     font-size: var(--fs-small);
   }
-  .ca__row dt { color: rgba(255, 255, 255, 0.78); }
-  .ca__row dd { margin: 0; font-weight: var(--fw-semi); font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .ca__row--sum dd { color: #fff; }
+  .fin__row dt { color: var(--c-grey-dark); }
+  .fin__row dd { margin: 0; font-weight: var(--fw-semi); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .fin__row--sum { border-top-color: var(--card-dark-line); }
+  .fin__row--sum dt { color: var(--c-paper); font-weight: var(--fw-semi); }
+  .fin__row--sum dd { color: var(--c-accent-on-dark); }
 
-  .ca__hint {
-    padding: 0.7rem 0.85rem; border-radius: 0.5rem;
-    background: color-mix(in srgb, var(--c-accent) 16%, transparent);
-    border: 1px solid color-mix(in srgb, var(--c-accent) 40%, transparent);
-    font-size: var(--fs-small); color: var(--c-paper);
+  /* ---------- Zeitstrahl ---------- */
+  .fin__time {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+    margin-top: var(--space-2);
+    border-top: 1px solid var(--card-dark-line);
+    padding-top: var(--space-4);
   }
+  @media (min-width: 700px) { .fin__time { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  .fin__stage {
+    position: relative; display: grid; gap: 0.1rem; align-content: start;
+    padding: 0.6rem 0.75rem 0.6rem 1.1rem;
+  }
+  /* Punkt auf der Linie – der erledigte Schritt ist der rote. */
+  .fin__stage::before {
+    content: ''; position: absolute; left: 0; top: 0.95rem;
+    width: 0.45rem; height: 0.45rem; border-radius: 50%;
+    background: var(--c-grey-dark); opacity: 0.5;
+  }
+  .fin__stage--done::before { background: var(--c-accent); opacity: 1; box-shadow: 0 0 0 3px rgba(229, 67, 43, 0.22); }
+  .fin__stage-label {
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--fg-muted);
+  }
+  .fin__stage-value { font-size: clamp(0.78rem, 1.9vw, 0.95rem); line-height: 1.25; font-weight: var(--fw-semi); }
+  .fin__stage--done .fin__stage-value { color: var(--c-accent-on-dark); }
 
-  .ca__cta { --btn-bg: #fff; --btn-fg: var(--c-ink); border-color: #fff; width: 100%; justify-content: space-between; margin-top: var(--space-2); --btn-bg: var(--c-paper); --btn-fg: var(--c-ink); border-color: var(--c-paper); }
-  .ca__vat { font-size: 0.72rem; color: rgba(255, 255, 255, 0.7); }
+  /* ---------- Die zwei Wege danach ---------- */
+  .fin__after { margin-top: clamp(1rem, 2.5vw, 1.75rem); }
+  .fin__after-label {
+    margin-bottom: var(--space-3);
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--fg-muted);
+  }
+  .fin__after-label span { color: var(--c-accent-text); font-variant-numeric: tabular-nums; }
+  .fin__plans {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(0.5rem, 1.6vw, 1.25rem);
+    align-items: stretch;
+  }
+  .fin__plan {
+    display: grid; align-content: start; gap: clamp(0.4rem, 1.2vw, 0.7rem);
+    padding: clamp(0.75rem, 2.2vw, 1.5rem);
+  }
+  .fin__plan-head { display: flex; align-items: center; gap: clamp(0.4rem, 1.2vw, 0.7rem); min-width: 0; }
+  .fin__plan-name {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 106%;
+    text-transform: uppercase; font-size: clamp(0.78rem, 2.1vw, 1.15rem);
+    line-height: 1.05; letter-spacing: -0.03em;
+    /* Normal umbrechen; nur im Extremfall trennen (html lang="de"). */
+    min-width: 0; overflow-wrap: normal; hyphens: auto;
+  }
+  /* Unter 400px bekommt der Name die volle Spaltenbreite – nebeneinander
+     mit der Kachel bliebe fuer "Premium Betreuung" zu wenig Platz. */
+  @media (max-width: 399px) {
+    .fin__plan-head { display: grid; justify-items: start; gap: 0.4rem; }
+  }
+  .fin__plan-price {
+    display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.3rem;
+    font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: 118%;
+    font-size: clamp(1.5rem, 0.9rem + 3vw, 2.6rem);
+    line-height: 0.95; letter-spacing: -0.05em; font-variant-numeric: tabular-nums;
+  }
+  .fin__plan--premium .fin__plan-price { color: var(--c-accent-on-dark); }
+  .fin__plan-unit {
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--card-muted);
+  }
+  .fin__plan-note {
+    font-size: clamp(0.72rem, 1.8vw, 0.9rem); line-height: 1.35; color: var(--card-muted);
+    padding-bottom: clamp(0.4rem, 1.2vw, 0.7rem);
+    border-bottom: 1px solid var(--card-line);
+  }
+  .fin__plan-items { display: grid; gap: clamp(0.25rem, 0.9vw, 0.45rem); }
+  .fin__plan-item {
+    display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.4rem; align-items: start;
+    font-size: clamp(0.74rem, 1.8vw, 0.92rem); line-height: 1.3;
+  }
+  .fin__check { width: 0.8rem; height: 0.8rem; margin-top: 0.25em; color: var(--c-accent); }
+  .fin__plan--premium .fin__check { color: var(--c-accent-on-dark); }
+
+  /* ---------- Abschluss ---------- */
+  .fin__foot {
+    display: grid; gap: var(--space-3);
+    margin-top: clamp(1rem, 2.5vw, 1.75rem);
+  }
+  @media (min-width: 620px) {
+    .fin__foot { grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: var(--space-5); }
+  }
+  .fin__cta { justify-self: start; }
+  .fin__vat { font-size: 0.72rem; color: var(--fg-muted); }
 </style>
 
 <script>
-  function initCalc() {
+  function initFinance() {
     const root = document.querySelector<HTMLElement>('[data-calc]');
     if (!root || (root as any).__init) return;
     (root as any).__init = true;
 
-    const months = root.querySelector<HTMLInputElement>('[data-months]')!;
-    const maxMonths = Number(root.dataset.max || 24);
-    const pkgs = Array.from(root.querySelectorAll<HTMLInputElement>('input[name="calc-package"]'));
-    const cares = Array.from(root.querySelectorAll<HTMLInputElement>('input[name="calc-care"]'));
+    const term = root.querySelector<HTMLInputElement>('[data-term]')!;
+    const pkgs = Array.from(root.querySelectorAll<HTMLInputElement>('input[name="fin-package"]'));
+    const minTerm = Number(root.dataset.min || 6);
+    const maxTerm = Number(root.dataset.max || 24);
+    // Der Hostingpreis kommt aus der Preisdatei, nicht aus diesem Skript.
+    const hosting = Number(root.dataset.hosting || 0);
 
     const out = {
+      rate: root.querySelector<HTMLElement>('[data-rate]')!,
+      rateRow: root.querySelector<HTMLElement>('[data-rate-row]')!,
       once: root.querySelector<HTMLElement>('[data-once]')!,
-      monthly: root.querySelector<HTMLElement>('[data-monthly]')!,
-      careTotal: root.querySelector<HTMLElement>('[data-care-total]')!,
-      total: root.querySelector<HTMLElement>('[data-total]')!,
-      avg: root.querySelector<HTMLElement>('[data-avg]')!,
-      avgWrap: root.querySelector<HTMLElement>('[data-avg-wrap]')!,
-      monthsOut: root.querySelector<HTMLElement>('[data-months-out]')!,
-      echoes: Array.from(root.querySelectorAll<HTMLElement>('[data-months-echo]')),
-      careNote: root.querySelector<HTMLElement>('[data-care-note]')!,
-      hint: root.querySelector<HTMLElement>('[data-hint]')!,
+      sum: root.querySelector<HTMLElement>('[data-sum]')!,
+      pkgName: root.querySelector<HTMLElement>('[data-pkg-name]')!,
+      pkgPrice: root.querySelector<HTMLElement>('[data-pkg-price]')!,
+      termOut: root.querySelector<HTMLElement>('[data-term-out]')!,
+      echoes: Array.from(document.querySelectorAll<HTMLElement>('[data-term-echo]')),
+      next: document.querySelector<HTMLElement>('[data-term-next]'),
     };
 
     const eur = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
-    const checked = (list: HTMLInputElement[]) => list.find((i) => i.checked) ?? list[0];
+    const eurRate = new Intl.NumberFormat('de-DE', {
+      style: 'currency', currency: 'EUR', minimumFractionDigits: 2, maximumFractionDigits: 2,
+    });
 
     function render() {
-      const pkg = checked(pkgs);
-      const care = checked(cares);
-      const m = Number(months.value);
-      // Alle Betraege stammen aus den data-Attributen, also aus der Preisdatei.
-      const once = Number(pkg.dataset.price || 0);
-      const perMonth = Number(care.dataset.price || 0);
-      const careSum = perMonth * m;
-      const total = once + careSum;
-      const from = pkg.dataset.from === '1';
-      const prefix = from ? 'ab ' : '';
+      const pkg = pkgs.find((p) => p.checked) ?? pkgs[0];
+      const price = Number(pkg.dataset.price || 0);
+      const months = Number(term.value);
+      const prefix = pkg.dataset.from === '1' ? 'ab ' : '';
 
-      out.once.textContent = prefix + eur.format(once);
-      out.monthly.textContent = perMonth === 0 ? '–' : eur.format(perMonth);
-      out.careTotal.textContent = eur.format(careSum);
-      out.total.textContent = prefix + eur.format(total);
+      // Die einzige Rechnung des Moduls: Preis geteilt durch Laufzeit.
+      const rate = price / months;
 
-      // Durchschnitt ergibt bei 0 Monaten keinen Sinn.
-      if (m > 0) {
-        out.avgWrap.hidden = false;
-        out.avg.textContent = prefix + eur.format(Math.round(total / m));
-      } else {
-        out.avgWrap.hidden = true;
-      }
+      out.pkgName.textContent = pkg.dataset.name || '';
+      out.pkgPrice.textContent = prefix + eur.format(price);
+      out.once.textContent = prefix + eur.format(price);
+      out.rate.textContent = prefix + eurRate.format(rate);
+      out.rateRow.textContent = `${prefix}${eurRate.format(rate)} / Monat`;
+      out.sum.textContent = `${prefix}${eurRate.format(rate + hosting)} / Monat`;
 
-      out.monthsOut.textContent = String(m);
-      out.echoes.forEach((e) => (e.textContent = String(m)));
-      months.setAttribute('aria-valuetext', m === 1 ? '1 Monat' : `${m} Monate`);
-      months.style.setProperty('--fill', `${(m / maxMonths) * 100}%`);
+      out.termOut.textContent = String(months);
+      out.echoes.forEach((e) => (e.textContent = String(months)));
+      if (out.next) out.next.textContent = String(months + 1);
 
-      if (perMonth === 0) {
-        out.hint.hidden = false;
-        out.hint.textContent = 'Ohne Betreuung zahlst du nur die Erstellung. Die Website gehört dir – Betreuung lässt sich jederzeit später dazubuchen.';
-      } else if (m === 0) {
-        out.hint.hidden = false;
-        out.hint.textContent = 'Bei 0 Monaten fällt nur die einmalige Erstellung an.';
-      } else {
-        out.hint.hidden = true;
-      }
+      term.setAttribute('aria-valuetext', `${months} Monate`);
+      term.style.setProperty('--fill', `${((months - minTerm) / (maxTerm - minTerm)) * 100}%`);
     }
 
-    // Paketwechsel schlaegt die dazu passende Betreuungsstufe vor.
-    pkgs.forEach((p) =>
-      p.addEventListener('change', () => {
-        const suggested = p.dataset.care;
-        const match = cares.find((c) => c.value === suggested);
-        if (match) match.checked = true;
-        syncCareNote();
-        render();
-      }),
-    );
-
-    function syncCareNote() {
-      const care = checked(cares);
-      const label = care.closest('.ca__opt');
-      const note = label?.getAttribute('data-note');
-      if (note) out.careNote.textContent = note;
-    }
-
-    cares.forEach((c) =>
-      c.addEventListener('change', () => {
-        syncCareNote();
-        render();
-      }),
-    );
-    months.addEventListener('input', render);
-
+    term.addEventListener('input', render);
+    pkgs.forEach((p) => p.addEventListener('change', render));
     render();
   }
-  document.addEventListener('astro:page-load', initCalc);
+
+  initFinance();
+  document.addEventListener('astro:page-load', initFinance);
 </script>

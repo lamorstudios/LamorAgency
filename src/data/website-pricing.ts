@@ -32,7 +32,7 @@ export interface MonthlyRange {
  * Wartung, Backups, Monitoring, kleinere Änderungen. Höhere Stufen ergänzen,
  * sie ersetzen nichts.
  */
-export type CareId = 'none' | 'basic' | 'business' | 'premium';
+export type CareId = 'none' | 'hosting' | 'business' | 'premium';
 
 export interface CarePlan {
   id: CareId;
@@ -52,25 +52,25 @@ export const carePlans: CarePlan[] = [
     includes: ['Website gehört dir', 'Jederzeit später dazubuchbar'],
   },
   {
-    id: 'basic',
-    name: 'Basic',
-    price: 39,
-    note: 'Die Seite bleibt online, aktuell und gesichert.',
-    includes: ['Hosting', 'Backups', 'Monitoring', 'Technische Wartung'],
+    id: 'hosting',
+    name: 'Hosting',
+    price: 29,
+    note: 'Die Seite bleibt online, gesichert und technisch betreut.',
+    includes: ['Hosting', 'SSL & Updates', 'Backups', 'Monitoring', 'Technische Wartung'],
   },
   {
     id: 'business',
     name: 'Business',
     price: 69,
     note: 'Dazu kleinere Änderungen, ohne dass du nachfragen musst.',
-    includes: ['Alles aus Basic', 'Kleinere Textänderungen', 'SSL & Updates', 'Ansprechpartner per Mail'],
+    includes: ['Alles aus Hosting', 'Kleinere Textänderungen', 'Inhaltspflege nach Absprache', 'Ansprechpartner per Mail'],
   },
   {
     id: 'premium',
     name: 'Premium',
     price: 119,
     note: 'Für Seiten, die laufend mitwachsen sollen.',
-    includes: ['Alles aus Business', 'Laufende Optimierung', 'Monatliche Inhaltspflege', 'Priorisierte Bearbeitung'],
+    includes: ['Alles aus Hosting', 'Kleinere Änderungen', 'Monatliche Inhaltspflege', 'Technische Verbesserungen', 'Laufende Optimierung'],
   },
 ];
 
@@ -117,7 +117,7 @@ const rawPackages: RawPackage[] = [
     label: 'Landing Page',
     price: 1490,
     priceFrom: true,
-    careTiers: ['basic', 'business'],
+    careTiers: ['hosting', 'business'],
     description: 'Eine starke Seite, die alles Wichtige zeigt und zur Anfrage führt.',
     for: ['Selbstständige', 'Restaurants', 'Lokale Unternehmen', 'Dienstleister', 'Einzelne Angebote', 'Kampagnen / Meta Ads'],
     features: [
@@ -147,7 +147,7 @@ const rawPackages: RawPackage[] = [
     label: 'Meistgewählt',
     price: 2490,
     priceFrom: true,
-    careTiers: ['basic', 'business', 'premium'],
+    careTiers: ['hosting', 'business', 'premium'],
     description: 'Der vollständige Auftritt für kleinere und mittlere Unternehmen.',
     for: ['Kleine und mittlere Unternehmen', 'Mehrere Leistungen', 'Lokale Sichtbarkeit'],
     features: [
@@ -335,6 +335,42 @@ export const monthlyLine = (m: MonthlyRange | null): string | null => {
 };
 
 export const euro = (n: number) => nf.format(n);
+
+/** Rate mit Nachkommastellen, z. B. "207,50 €" – Cent-Betraege muessen stimmen. */
+const nfRate = new Intl.NumberFormat('de-DE', {
+  style: 'currency', currency: 'EUR', minimumFractionDigits: 2, maximumFractionDigits: 2,
+});
+export const euroRate = (n: number) => nfRate.format(n);
+
+/**
+ * ============================================================================
+ * RATENZAHLUNG – die Website monatlich bezahlen
+ * ----------------------------------------------------------------------------
+ * Modell in einem Satz: Der Paketpreis wird auf die gewaehlte Laufzeit
+ * verteilt. Danach ist die Website bezahlt und es laeuft nur noch Hosting
+ * oder Betreuung weiter.
+ *
+ * WICHTIG fuer jede Darstellung:
+ *   - Die Rate ist der Paketpreis GETEILT durch die Laufzeit. Kein Aufschlag,
+ *     keine Zinsen, keine Gebuehr – deshalb rechnet der Rechner mit einer
+ *     einfachen Division und mit nichts sonst.
+ *   - Das Hosting laeuft DANEBEN und ist nicht Teil der Rate. Beides wird
+ *     getrennt ausgewiesen, nie zu einer Summe verschmolzen.
+ *   - Nach der letzten Rate ist der Website-Anteil 0 €. Er darf ab dann
+ *     nirgends mehr als laufende Kosten auftauchen.
+ * ============================================================================
+ */
+export const financingTerms = [6, 12, 18, 24] as const;
+export const defaultFinancingTerm = 12;
+
+/** Monatliche Website-Rate. Einzige Stelle, an der diese Formel steht. */
+export const websiteRate = (price: number, months: number) => price / months;
+
+/** Die technische Basis, die waehrend und nach der Ratenzahlung laeuft. */
+export const hostingPlan = getCarePlan('hosting');
+/** Der Weg fuer alle, die danach weiter betreut werden wollen. */
+export const premiumPlan = getCarePlan('premium');
+
 
 /**
  * Vergleich nach Kategorien: wie es üblicherweise läuft – und wie bei LAMOR.
