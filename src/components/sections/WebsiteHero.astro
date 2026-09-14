@@ -9,7 +9,10 @@
  */
 import Media from '@/components/Media.astro';
 import { site } from '@/data/site';
-import { websitePricing, websiteEntryPrice, euro } from '@/data/website-pricing';
+import {
+  websitePricing, websiteEntryPrice, euro, euroRate,
+  lowestRate, longestTerm, hostingPlan,
+} from '@/data/website-pricing';
 
 const pages = websitePricing.length;
 ---
@@ -20,12 +23,25 @@ const pages = websitePricing.length;
 
       <h1 class="wh__title" id="wh-title">
         Deine neue Website.<br />
-        <span class="wh__price">Ab {euro(websiteEntryPrice)} netto.</span>
+        <span class="wh__price">
+          <span class="wh__price-value">Ab {euroRate(lowestRate)}</span>
+          <span class="wh__price-unit">/ Monat</span>
+        </span>
       </h1>
 
+      <!-- Der Gesamtpreis steht direkt an der Rate, nicht irgendwo darunter. -->
+      <p class="wh__basis">
+        <span class="wh__basis-main">
+          Onepage {euro(websiteEntryPrice)} netto, aufgeteilt auf {longestTerm} Raten
+        </span>
+        <span class="wh__basis-flag">0 % Aufschlag</span>
+      </p>
+      <p class="wh__basis wh__basis--soft">
+        Hosting optional ab {euro(hostingPlan.price)} / Monat – nicht Teil der Rate
+      </p>
+
       <p class="wh__lead">
-        Individuell entwickelt, vollständig responsive und auf Anfragen ausgerichtet –
-        keine Vorlage von der Stange.
+        Individuell entwickelt, vollständig responsive und auf Anfragen ausgerichtet.
       </p>
 
       <ul class="chips wh__chips" role="list">
@@ -37,7 +53,7 @@ const pages = websitePricing.length;
 
       <div class="wh__actions">
         <a href="#anfrage" class="btn wh__cta" data-magnetic>
-          <span>Kostenlose Website-Beratung</span>
+          <span>Website anfragen</span>
           <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
         </a>
         <a href="#pakete" class="wh__ghost">
@@ -83,7 +99,31 @@ const pages = websitePricing.length;
     .wh__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: clamp(2.5rem, 5vw, 4.5rem); }
   }
 
-  .wh__price { color: var(--c-accent-on-dark); }
+  /* Die Rate traegt die Headline, die Einheit bleibt kleiner – sonst reicht
+     die Spaltenbreite nicht und "/ Monat" laeuft ins Bild. */
+  .wh__price { display: block; color: var(--c-accent-on-dark); }
+  .wh__price-value { white-space: nowrap; }
+  .wh__price-unit {
+    font-size: 0.42em; font-stretch: var(--wd-tight); letter-spacing: var(--ls-wide);
+    white-space: nowrap; margin-left: 0.15em;
+  }
+
+  /* Preisbasis: Rate ohne Gesamtpreis waere irrefuehrend – beides steht
+     zusammen, und das Hosting ist ausdruecklich als optional markiert. */
+  .wh__basis {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem;
+    margin-top: var(--space-3);
+    font-size: var(--fs-small); line-height: 1.4; color: var(--fg-muted);
+  }
+  .wh__basis--soft { margin-top: 0.35rem; font-size: 0.82rem; }
+  .wh__basis-main { color: var(--c-paper); }
+  .wh__basis-flag {
+    padding: 0.35em 0.7em; border-radius: var(--radius-pill);
+    background: rgba(229, 67, 43, 0.16); border: 1px solid rgba(229, 67, 43, 0.35);
+    color: var(--c-accent-on-dark); white-space: nowrap;
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase;
+  }
   .wh__title {
     margin-top: var(--space-4);
     font-family: var(--font-display);

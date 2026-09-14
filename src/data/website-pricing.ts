@@ -444,6 +444,15 @@ export const defaultFinancingTerm = 12;
 /** Monatliche Website-Rate. Einzige Stelle, an der diese Formel steht. */
 export const websiteRate = (price: number, months: number) => price / months;
 
+/** Laengste waehlbare Laufzeit – ergibt die niedrigste Rate. */
+export const longestTerm = financingTerms[financingTerms.length - 1];
+
+/**
+ * Niedrigstmoegliche Website-Rate: guenstigstes Paket auf die laengste
+ * Laufzeit. Abgeleitet, kein eigener Preis – aendert sich automatisch mit.
+ */
+export const lowestRate = websiteRate(websiteEntryPrice, longestTerm);
+
 /** Die technische Basis, die waehrend und nach der Ratenzahlung laeuft. */
 export const hostingPlan = getCarePlan('hosting');
 /** Der Weg fuer alle, die danach weiter betreut werden wollen. */

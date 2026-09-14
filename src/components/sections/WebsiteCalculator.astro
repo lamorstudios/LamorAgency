@@ -53,7 +53,7 @@ const prefix = defaultPkg.priceFrom ? 'ab ' : '';
         </h2>
       </div>
       <p class="fin__lead" data-reveal style="--reveal-delay:140ms">
-        Paketpreis geteilt durch die Laufzeit – ohne Aufschlag. Danach gehört sie dir.
+        Paketpreis geteilt durch die Laufzeit – 0 % Aufschlag. Danach gehört sie dir.
       </p>
     </div>
 
@@ -126,7 +126,7 @@ const prefix = defaultPkg.priceFrom ? 'ab ' : '';
           <span class="fin__rate-unit">/ Monat</span>
         </p>
         <p class="fin__rate-sub">
-          für <span data-term-echo>{defaultFinancingTerm}</span> Monate + Hosting {euro(hostingPlan.price)} / Monat
+          für <span data-term-echo>{defaultFinancingTerm}</span> Monate · Hosting optional {euro(hostingPlan.price)} / Monat
         </p>
         <p class="fin__paid">
           <span class="rmark rmark--onred"><Icon name="check" /></span>
@@ -145,11 +145,11 @@ const prefix = defaultPkg.priceFrom ? 'ab ' : '';
           <dd data-rate-row>{prefix}{euroRate(startRate)} / Monat</dd>
         </div>
         <div class="fin__row">
-          <dt>Hosting während der Laufzeit</dt>
+          <dt>Hosting <span class="fin__opt">optional</span></dt>
           <dd>{euro(hostingPlan.price)} / Monat</dd>
         </div>
         <div class="fin__row fin__row--sum">
-          <dt>Monatlich gesamt</dt>
+          <dt>Monatlich mit Hosting</dt>
           <dd data-sum>{prefix}{euroRate(startRate + hostingPlan.price)} / Monat</dd>
         </div>
       </dl>
@@ -384,6 +384,13 @@ const prefix = defaultPkg.priceFrom ? 'ab ' : '';
   .fin__row--sum { border-top-color: var(--card-dark-line); }
   .fin__row--sum dt { color: var(--c-paper); font-weight: var(--fw-semi); }
   .fin__row--sum dd { color: var(--c-accent-on-dark); }
+  /* Hosting ist keine Pflichtposition – das muss in der Zeile stehen. */
+  .fin__opt {
+    margin-left: 0.4em; padding: 0.2em 0.5em; border-radius: var(--radius-pill);
+    border: 1px solid var(--card-dark-line); color: var(--fg-muted);
+    font-size: 0.62rem; font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase;
+  }
 
   /* ---------- Zeitstrahl ---------- */
   .fin__time {
