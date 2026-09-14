@@ -52,7 +52,7 @@ User-agent: ZoominfoBot
 Disallow: /
 
 # ---------------------------------------------------------------------------
-# KI-Crawler: bewusst NICHT geblockt, damit LAMOR in KI-Antworten auftauchen
+# KI-Crawler: bewusst NICHT geblockt, damit LAMOR AGENCY in KI-Antworten auftauchen
 # kann. Wenn das nicht gewuenscht ist, die folgenden Zeilen einkommentieren:
 # User-agent: GPTBot
 # Disallow: /
