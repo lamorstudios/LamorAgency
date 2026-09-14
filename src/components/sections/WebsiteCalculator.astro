@@ -78,11 +78,11 @@ const prefix = defaultPkg.priceFrom ? 'ab ' : '';
                 value={p.id}
                 data-price={p.price}
                 data-from={p.priceFrom ? '1' : '0'}
-                data-name={p.name.replace('LAMOR ', '').split(' ')[0]}
+                data-name={p.name.split(' ')[0]}
                 checked={p.id === defaultPkg.id}
               />
               <span class="fin__pkg-box">
-                <span class="fin__pkg-name">{p.name.replace('LAMOR ', '').split(' ')[0]}</span>
+                <span class="fin__pkg-name">{p.name.split(' ')[0]}</span>
                 <span class="fin__pkg-price">{p.priceFrom ? 'ab ' : ''}{euro(p.price as number)}</span>
               </span>
             </label>
@@ -118,7 +118,7 @@ const prefix = defaultPkg.priceFrom ? 'ab ' : '';
       <!-- Ergebnis -->
       <div class="fin__result card card--accent" role="status" aria-live="polite">
         <p class="fin__result-pkg">
-          <span data-pkg-name>{defaultPkg.name.replace('LAMOR ', '').split(' ')[0]}</span> Website ·
+          <span data-pkg-name>{defaultPkg.name.split(' ')[0]}</span> Website ·
           <span data-pkg-price>{prefix}{euro(startPrice)}</span>
         </p>
         <p class="fin__rate">

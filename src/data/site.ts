@@ -5,7 +5,8 @@
  */
 export const site = {
   name: 'LAMOR AGENCY',
-  shortName: 'LAMOR',
+  /** Wortmarke in Header, Footer und Intro. Offizielle Schreibweise. */
+  shortName: 'LAMOR AGENCY',
   legalName: 'LAMOR AGENCY', // TODO_VERIFY: Rechtsform lt. bestehendem Impressum
   url: 'https://www.lamoragency.de',
 

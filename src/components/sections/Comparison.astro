@@ -136,9 +136,14 @@ const figures = stats.slice(0, 3);
   }
   .cmp__panel-title {
     font-family: var(--font-display); font-weight: 900; font-stretch: 108%;
-    font-size: clamp(0.88rem, 2.6vw, 1.5rem);
+    font-size: clamp(0.82rem, 2.5vw, 1.5rem);
     line-height: 1.05; letter-spacing: -0.03em;
-    text-wrap: balance;
+    text-wrap: balance; min-width: 0; hyphens: auto;
+  }
+  /* Unter 400px bekommt "Mit LAMOR AGENCY" die volle Spaltenbreite –
+     neben der Marke bliebe sonst zu wenig Platz. */
+  @media (max-width: 399px) {
+    .cmp__panel-head { display: grid; justify-items: start; gap: 0.4rem; }
   }
   .rmark--quiet { background: rgba(11, 10, 9, 0.08); color: var(--c-grey); }
   .rmark--onred { background: rgba(255, 255, 255, 0.22); color: #fff; }

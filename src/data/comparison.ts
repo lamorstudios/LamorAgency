@@ -72,11 +72,11 @@ export interface StructureRow {
 }
 
 export const structure = {
-  eyebrow: 'Warum LAMOR',
+  eyebrow: 'Warum LAMOR AGENCY',
   headline: 'Ein Studio statt',
   headlineAccent: 'fünf Schnittstellen.',
   usualLabel: 'Einzeln organisiert',
-  lamorLabel: 'Bei LAMOR',
+  lamorLabel: 'Bei LAMOR AGENCY',
   rows: [
     { topic: 'Ansprache', usual: 'Mehrere Ansprechpartner', value: '1', lamor: 'Ansprechpartner' },
     { topic: 'Briefing', usual: 'Briefing je Gewerk', value: '1', lamor: 'Briefing für alles' },

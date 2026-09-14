@@ -12,7 +12,7 @@ export interface FaqItem {
 
 export const faqs: FaqItem[] = [
   {
-    q: 'Was kostet eine Zusammenarbeit mit LAMOR?',
+    q: 'Was kostet eine Zusammenarbeit mit LAMOR AGENCY?',
     a: 'Unsere Pakete starten bei {{PREIS_START}} – dazu kommt ein einmaliger Projektstart. Was genau sinnvoll ist, hängt vom Umfang ab: eine Landingpage ist etwas anderes als ein laufendes Content-System. Im Erstgespräch sagen wir dir konkret, was dein Projekt kostet, bevor irgendetwas beauftragt wird.',
     schema: true,
   },
@@ -32,7 +32,7 @@ export const faqs: FaqItem[] = [
     schema: true,
   },
   {
-    q: 'Kann LAMOR Models für meine Kampagne organisieren?',
+    q: 'Kann LAMOR AGENCY Models für meine Kampagne organisieren?',
     a: 'Ja. Wir haben einen eigenen Models- und Talent-Bereich. Du brauchst keine zweite Agentur: Casting, Booking und Produktion laufen über uns – für Commercials, Social Content, UGC, Musikvideos, Fashion, Fitness, Beauty und Lifestyle.',
     schema: true,
   },
@@ -66,7 +66,7 @@ export const faqs: FaqItem[] = [
  */
 export const websiteFaqs: FaqItem[] = [
   {
-    q: 'Was kostet eine Website bei LAMOR?',
+    q: 'Was kostet eine Website bei LAMOR AGENCY?',
     a: 'Websites starten bei {{WEB_PREIS}} einmalig. Was dein Projekt konkret kostet, hängt vom Umfang ab – eine Onepage ist etwas anderes als ein Auftritt mit zehn Seiten. Nach einem kurzen Gespräch bekommst du einen festen Preis, bevor du dich entscheidest.',
     schema: true,
   },

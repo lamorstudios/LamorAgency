@@ -113,7 +113,7 @@ type RawPackage = Omit<WebsitePackage, 'monthlyPrice'>;
 const rawPackages: RawPackage[] = [
   {
     id: 'onepage',
-    name: 'LAMOR ONEPAGE',
+    name: 'ONEPAGE',
     label: 'Landing Page',
     price: 1490,
     priceFrom: true,
@@ -143,7 +143,7 @@ const rawPackages: RawPackage[] = [
   },
   {
     id: 'business',
-    name: 'LAMOR BUSINESS',
+    name: 'BUSINESS',
     label: 'Meistgewählt',
     price: 2490,
     priceFrom: true,
@@ -174,7 +174,7 @@ const rawPackages: RawPackage[] = [
   },
   {
     id: 'premium',
-    name: 'LAMOR PREMIUM',
+    name: 'PREMIUM',
     label: 'Markenauftritt',
     price: 3990,
     priceFrom: true,

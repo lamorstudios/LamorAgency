@@ -19,7 +19,7 @@ export const team: Member[] = [
   {
     name: 'Nick Mielke',
     role: 'Founder & Creative Director',
-    bio: 'Gründer von LAMOR. Führt Konzept, Look und Produktion – von der ersten Idee bis zum finalen Frame.',
+    bio: 'Gründer von LAMOR AGENCY. Führt Konzept, Look und Produktion – von der ersten Idee bis zum finalen Frame.',
     lead: true,
   },
   {

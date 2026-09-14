@@ -50,7 +50,7 @@ export const priceNote = 'Alle Preise netto zzgl. gesetzlicher Umsatzsteuer.';
 export const packages: Package[] = [
   {
     id: 'start',
-    name: 'LAMOR START',
+    name: 'START',
     label: 'Grundauftritt',
     for: 'Für Unternehmen, die einen hochwertigen digitalen Grundauftritt brauchen.',
     monthly: { amount: 495, from: true, per: 'Monat' },
@@ -68,7 +68,7 @@ export const packages: Package[] = [
   },
   {
     id: 'growth',
-    name: 'LAMOR GROWTH',
+    name: 'GROWTH',
     label: 'Meistgewählt',
     for: 'Für Marken, die Website, Content und Auftritt zusammen denken wollen.',
     monthly: { amount: 790, from: true, per: 'Monat' },

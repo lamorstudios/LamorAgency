@@ -111,7 +111,10 @@ const isActive = (href: string) => (norm(href) === '/' ? path === '/' : path.sta
   .header__wordmark {
     font-family: var(--font-display); font-weight: var(--fw-display);
     font-stretch: var(--wd-mega); letter-spacing: var(--ls-tight);
-    font-size: 1.4rem; text-transform: uppercase;
+    /* "LAMOR AGENCY" muss einzeilig bleiben – ein Umbruch verdoppelt die
+       Kopfhoehe. Die Groesse laeuft daher mit der Breite mit. */
+    font-size: clamp(0.95rem, 0.62rem + 1.6vw, 1.4rem); text-transform: uppercase;
+    white-space: nowrap;
   }
   .header__wordmark sup { font-size: 0.5em; vertical-align: top; margin-left: 0.1em; font-weight: var(--fw-regular); }
 

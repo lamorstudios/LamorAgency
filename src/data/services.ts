@@ -113,7 +113,7 @@ export const services: Service[] = [
     slug: 'models-talents',
     title: 'Models & Talents',
     label: 'Models & Talents',
-    short: 'Gesichter direkt über LAMOR gebucht.',
+    short: 'Gesichter direkt über LAMOR AGENCY gebucht.',
     items: [
       'Commercials',
       'Social Content',
