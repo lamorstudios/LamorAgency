@@ -8,10 +8,10 @@
  * Die Paare stehen in derselben Reihenfolge in src/data/website-pricing.ts.
  */
 import Words from '@/components/Words.astro';
-import Button from '@/components/Button.astro';
+import Icon from '@/components/Icon.astro';
 import { websiteProblems, websiteSolutions, websiteEntryPrice, euro } from '@/data/website-pricing';
 ---
-<section class="wpr" data-theme="light" data-bg="light" aria-labelledby="wpr-title">
+<section class="wpr wash" data-theme="light" data-bg="light" aria-labelledby="wpr-title">
   <div class="container">
     <div class="wpr__head">
       <p class="eyebrow wpr__label" data-reveal="fade">Ausgangslage</p>
@@ -21,48 +21,51 @@ import { websiteProblems, websiteSolutions, websiteEntryPrice, euro } from '@/da
       </h2>
     </div>
 
-    <div class="wpr__pair">
-      <!-- Ist-Zustand: bewusst flach, ohne eigene Flaeche. -->
-      <div class="wpr__side wpr__side--before">
-        <p class="wpr__side-label">Aktueller Stand</p>
+    <div class="wpr__pair" data-reveal>
+      <!-- Ist-Zustand: zurueckhaltend -->
+      <article class="card card--light wpr__side wpr__side--before">
+        <header class="wpr__side-head">
+          <span class="rmark rmark--bad"><Icon name="minus" /></span>
+          <h3 class="wpr__side-title">Aktueller Stand</h3>
+        </header>
         <ul class="wpr__list" role="list">
           {websiteProblems.map((p) => (
             <li class="wpr__item">
-              <span class="wpr__mark wpr__mark--bad" aria-hidden="true">
-                <svg viewBox="0 0 16 16" fill="none"><path d="M4 8H12" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"/></svg>
-              </span>
+              <span class="wpr__mark" aria-hidden="true"><Icon name="close" /></span>
               <span class="wpr__text">{p}</span>
             </li>
           ))}
         </ul>
-        <p class="wpr__lead">
-          Das ist kein Schönheitsproblem. Eine Seite, die langsam lädt, auf dem Handy
-          nicht funktioniert und keinen klaren Weg zur Anfrage hat, arbeitet jeden Tag
-          gegen dich – ohne dass du es in einer Statistik siehst.
-        </p>
-      </div>
+      </article>
 
-      <!-- Soll-Zustand: angehobene dunkle Tafel als Gegenstueck. -->
-      <div class="wpr__side wpr__side--after">
-        <p class="wpr__side-label">Mit LAMOR</p>
+      <span class="vs wpr__vs" aria-hidden="true">vs.</span>
+
+      <!-- Soll-Zustand: die Antwort -->
+      <article class="card card--dark wpr__side wpr__side--after">
+        <header class="wpr__side-head">
+          <span class="rmark rmark--good"><Icon name="check" /></span>
+          <h3 class="wpr__side-title">Mit LAMOR</h3>
+        </header>
         <ul class="wpr__list" role="list">
-          {websiteSolutions.map((s) => (
+          {websiteSolutions.map((sol) => (
             <li class="wpr__item">
-              <span class="wpr__mark wpr__mark--good" aria-hidden="true">
-                <svg viewBox="0 0 16 16" fill="none"><path d="M3.5 8.5L6.5 11.5L12.5 4.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="square"/></svg>
-              </span>
-              <span class="wpr__text">{s}</span>
+              <span class="wpr__mark wpr__mark--good" aria-hidden="true"><Icon name="check" /></span>
+              <span class="wpr__text">{sol}</span>
             </li>
           ))}
         </ul>
-        <div class="wpr__foot">
-          <p class="wpr__outro">Aus einer alten Seite wird ein digitaler Markenauftritt.</p>
-          <div class="wpr__cta">
-            <Button href="#pakete" label={`Pakete ab ${euro(websiteEntryPrice)}`} />
-          </div>
-        </div>
-      </div>
+      </article>
     </div>
+
+    <div class="wpr__foot" data-reveal>
+      <p class="wpr__outro">Aus einer alten Seite wird ein digitaler Markenauftritt.</p>
+      <a class="wpr__cta" href="#pakete">
+        <span class="wpr__cta-price">ab {euro(websiteEntryPrice)}</span>
+        <span class="wpr__cta-label">Pakete ansehen</span>
+        <Icon name="arrow" class="wpr__cta-icon" />
+      </a>
+    </div>
+
   </div>
 </section>
 
@@ -78,71 +81,94 @@ import { websiteProblems, websiteSolutions, websiteEntryPrice, euro } from '@/da
     line-height: 0.95; letter-spacing: -0.045em;
   }
   .wpr__title-em { display: block; color: var(--c-accent-text); text-transform: none; letter-spacing: -0.02em; }
-  /* Der Absatz steht unter der Ist-Liste, nicht im Kopf – so traegt die linke
-     Haelfte bis zur Unterkante der Tafel gegenueber. */
-  .wpr__lead {
-    color: var(--fg-muted); max-width: 46ch;
-    font-size: var(--fs-small); line-height: 1.6;
-    margin-top: var(--space-5); padding-top: var(--space-5);
-    border-top: 1px solid var(--line);
-  }
 
-  /* ---------- Die zwei Haelften ---------- */
-  .wpr__pair { display: grid; gap: var(--space-5); }
-  @media (min-width: 900px) {
-    .wpr__pair { grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr); gap: clamp(1.5rem, 3vw, 3rem); align-items: start; }
+  /* ---------- Die zwei Haelften ----------
+     Der Vergleich bleibt auch auf dem Telefon nebeneinander. */
+  .wpr__pair {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(0.5rem, 1.6vw, 2.25rem);
+    align-items: stretch;
+    position: relative;
   }
+  .wpr__side { padding: clamp(0.75rem, 2.2vw, 1.6rem); }
 
-  .wpr__side-label {
-    font-size: var(--fs-eyebrow); letter-spacing: var(--ls-wide); text-transform: uppercase;
-    font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
-    padding-bottom: var(--space-3); margin-bottom: var(--space-3);
-    border-bottom: 1px solid var(--line);
+  /* Beide Spalten teilen sich dieselben Zeilen, damit jedes Paar auf einer
+     Hoehe steht. Ohne Subgrid-Unterstuetzung bleibt die Darstellung gueltig,
+     nur die Zeilen sitzen dann nicht exakt aufeinander. */
+  @supports (grid-template-rows: subgrid) {
+    .wpr__pair { grid-template-rows: auto repeat(8, auto); }
+    .wpr__side { grid-row: 1 / -1; display: grid; grid-template-rows: subgrid; align-content: start; }
+    .wpr__list { grid-row: 2 / -1; display: grid; grid-template-rows: subgrid; }
+    .wpr__item { align-content: center; }
+  }
+  .wpr__vs { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 3; }
+
+  .wpr__side-head {
+    display: flex; align-items: center; gap: clamp(0.45rem, 1.4vw, 0.8rem);
+    padding-bottom: clamp(0.5rem, 1.4vw, 0.9rem);
+    border-bottom: 1px solid var(--card-line);
+    margin-bottom: clamp(0.3rem, 1vw, 0.5rem);
+  }
+  .wpr__side-title {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 108%;
+    font-size: clamp(0.88rem, 2.4vw, 1.4rem); line-height: 1.05; letter-spacing: -0.03em;
   }
 
   .wpr__list { display: grid; }
   .wpr__item {
     display: grid; grid-template-columns: auto minmax(0, 1fr);
-    gap: var(--space-3); align-items: center;
-    padding-block: clamp(0.55rem, 1.3vw, 0.85rem);
+    gap: clamp(0.35rem, 1.2vw, 0.6rem); align-items: start;
+    padding-block: clamp(0.45rem, 1.3vw, 0.7rem);
   }
-  .wpr__item + .wpr__item { border-top: 1px solid var(--line); }
-  .wpr__mark { width: 1.1rem; height: 1.1rem; flex: none; }
-  .wpr__mark svg { width: 100%; height: 100%; }
-  .wpr__text { font-size: var(--fs-small); line-height: 1.4; }
-
-  /* Ist-Zustand */
-  .wpr__side--before .wpr__side-label { color: var(--fg-muted); }
-  .wpr__side--before .wpr__mark { color: var(--fg-muted); opacity: 0.55; }
-  .wpr__side--before .wpr__text { color: var(--fg-muted); text-decoration: line-through; text-decoration-thickness: 1px; text-decoration-color: color-mix(in srgb, currentColor 45%, transparent); }
-
-  /* Soll-Zustand: eigene Flaeche, leicht angehoben. */
-  .wpr__side--after {
-    background: var(--c-ink); color: var(--c-paper);
-    border-radius: clamp(0.8rem, 2vw, 1.2rem);
-    padding: clamp(1.25rem, 2.8vw, 2rem);
+  .wpr__item + .wpr__item { border-top: 1px solid var(--card-line); }
+  .wpr__mark { width: 0.9rem; height: 0.9rem; margin-top: 0.2em; color: var(--card-muted); opacity: 0.6; }
+  .wpr__mark--good { color: var(--c-accent-on-dark); opacity: 1; }
+  .wpr__text { font-size: clamp(0.76rem, 1.9vw, 0.98rem); line-height: 1.3; }
+  .wpr__side--before .wpr__text {
+    color: var(--c-grey);
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+    text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
   }
-  .wpr__side--after .wpr__side-label { color: var(--c-accent-on-dark); border-bottom-color: rgba(242, 237, 228, 0.16); }
-  .wpr__side--after .wpr__item + .wpr__item { border-top-color: rgba(242, 237, 228, 0.12); }
-  .wpr__side--after .wpr__mark { color: var(--c-accent-on-dark); }
   .wpr__side--after .wpr__text { font-weight: var(--fw-semi); }
-  @media (min-width: 900px) {
-    /* Der Versatz nach oben erzeugt den Sprung zwischen den Haelften. */
-    .wpr__side--after { margin-top: -1.75rem; }
-    .wpr__side--before { padding-top: 0.35rem; }
-  }
 
+  /* ---------- Abschluss ---------- */
   .wpr__foot {
-    margin-top: var(--space-5); padding-top: var(--space-5);
-    border-top: 1px solid rgba(242, 237, 228, 0.16);
-    display: grid; gap: var(--space-4);
-  }
-  .wpr__outro {
-    font-family: var(--font-display); font-weight: 900; font-stretch: 112%;
-    text-transform: uppercase; font-size: clamp(1.05rem, 0.85rem + 0.9vw, 1.6rem);
-    line-height: 1.05; letter-spacing: -0.025em; max-width: 22ch;
+    display: grid; gap: var(--space-3);
+    margin-top: clamp(0.75rem, 2vw, 1.25rem);
+    padding: clamp(0.85rem, 2.2vw, 1.4rem);
+    border-radius: calc(var(--radius-card) * 0.7);
+    background: rgba(11, 10, 9, 0.04);
+    border: 1px solid var(--card-light-line-soft);
   }
   @media (min-width: 620px) {
     .wpr__foot { grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--space-5); }
+  }
+  .wpr__outro {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 108%;
+    text-transform: uppercase; font-size: clamp(0.95rem, 2.4vw, 1.5rem);
+    line-height: 1.05; letter-spacing: -0.03em; max-width: 24ch;
+  }
+  .wpr__cta {
+    display: inline-grid; grid-template-columns: auto auto auto; align-items: center;
+    gap: 0.6rem; justify-self: start;
+    padding: 0.7rem 1.1rem; border-radius: var(--radius-pill);
+    background: var(--card-accent-bg); color: #fff;
+    box-shadow: var(--card-accent-shadow); text-decoration: none;
+  }
+  .wpr__cta-price {
+    font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: 112%;
+    font-size: clamp(1.05rem, 2.6vw, 1.5rem); line-height: 1; letter-spacing: -0.035em;
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+  .wpr__cta-label {
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; white-space: nowrap;
+  }
+  .wpr__cta-icon { width: 1.1em; height: 1.1em; }
+  @media (hover: hover) and (pointer: fine) {
+    .wpr__cta { transition: transform var(--dur-base) var(--ease-out); }
+    .wpr__cta:hover { transform: translateY(-2px); }
   }
 </style>

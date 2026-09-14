@@ -22,18 +22,32 @@ import Testimonials from '@/components/sections/Testimonials.astro';
 import Faq from '@/components/sections/Faq.astro';
 import Media from '@/components/Media.astro';
 import Words from '@/components/Words.astro';
+import Icon from '@/components/Icon.astro';
 import { site } from '@/data/site';
 import { websiteFaqs } from '@/data/faq';
 import { websiteEntryPrice, websiteEntryMonthly, euro, websitePricing } from '@/data/website-pricing';
 import { breadcrumb, faqPage, websiteServiceSchema } from '@/lib/schema';
 
-const benefits = [
-  { title: 'Individuell statt Baukasten', text: 'Kein Template. Layout, Typografie und Bildsprache entstehen für deine Marke.' },
-  { title: 'Mobile zuerst gebaut', text: 'Die meisten Besucher kommen vom Handy. Genau dort wird zuerst getestet, nicht zuletzt.' },
-  { title: 'Auf Anfragen ausgelegt', text: 'Klare Nutzerführung, sichtbare Kontaktwege, Formular und WhatsApp direkt erreichbar.' },
-  { title: 'Schnell geladen', text: 'Optimierte Bilder, sauberer Code, kurze Ladezeiten – auch im Mobilfunknetz.' },
-  { title: 'Rechtlich sauber', text: 'Impressum, Datenschutz und DSGVO-Basics sind eingebunden, nicht nachträglich angeflickt.' },
-  { title: 'Content auf Wunsch inklusive', text: 'Fotos und Videos produzieren wir selbst – du musst nichts dazukaufen.' },
+/**
+ * Leistungsumfang als Matrix statt als sechs Karten mit Absatz.
+ * Drei Gruppen, je drei bis vier Stichpunkte – in drei Sekunden erfassbar.
+ */
+const scope = [
+  {
+    group: 'Website',
+    icon: 'cube',
+    items: ['Individuelles Design', 'Mobile zuerst gebaut', 'Responsive Umsetzung', 'Kurze Ladezeiten'],
+  },
+  {
+    group: 'Sichtbarkeit',
+    icon: 'trend',
+    items: ['SEO-Grundlagen', 'Saubere technische Struktur', 'Auf Anfragen ausgelegt', 'Sichtbare Kontaktwege'],
+  },
+  {
+    group: 'Absicherung',
+    icon: 'heart',
+    items: ['Impressum & Datenschutz', 'DSGVO-Basics eingebunden', 'Hosting & Updates optional', 'Content auf Wunsch inklusive'],
+  },
 ];
 
 const examples = [
@@ -57,7 +71,7 @@ const description = `Webdesign aus ${site.address.city}: individuelle Websites a
   <WebsiteHero />
   <WebsiteValue />
   <WebsiteCalculator />
-  <Clients label="Vertrauen uns" title="Marken, für die wir bereits gearbeitet haben." compact />
+  <Clients label="Vertrauen uns" title="Marken, für die wir gearbeitet haben." compact />
   <WebsiteProblem />
 
   <!-- Website-Beispiele -->
@@ -65,7 +79,7 @@ const description = `Webdesign aus ${site.address.city}: individuelle Websites a
     <div class="container">
       <div class="wx__head">
         <p class="t-label wx__label" data-reveal="fade">Beispiele</p>
-        <h2 class="t-say wx__title" id="wx-title"><Words text="So sehen unsere Websites aus." /></h2>
+        <h2 class="t-sec wx__title" id="wx-title"><Words text="So sehen unsere Websites aus." /></h2>
       </div>
       <ul class="wx__grid swipe" role="list">
         {examples.map((ex, i) => (
@@ -87,19 +101,28 @@ const description = `Webdesign aus ${site.address.city}: individuelle Websites a
     </div>
   </section>
 
-  <!-- Vorteile -->
-  <section class="wv section" data-theme="light" data-bg="light" aria-labelledby="wv-title">
+  <!-- Leistungsumfang -->
+  <section class="wv wash" data-theme="light" data-bg="light" aria-labelledby="wv-title">
     <div class="container">
       <div class="wv__head">
-        <p class="t-label wv__label" data-reveal="fade">Vorteile</p>
-        <h2 class="t-say wv__title" id="wv-title"><Words text="Was du dafür bekommst." /></h2>
+        <p class="eyebrow wv__label" data-reveal="fade">Leistungsumfang</p>
+        <h2 class="t-sec wv__title" id="wv-title"><Words text="Was drin ist." /></h2>
       </div>
       <ul class="wv__grid" role="list">
-        {benefits.map((b, i) => (
-          <li class="wv__card" data-reveal style={`--reveal-delay:${i * 70}ms`}>
-            <span class="wv__num t-label">{String(i + 1).padStart(2, '0')}</span>
-            <h3 class="t-h4 wv__card-title">{b.title}</h3>
-            <p class="t-small t-muted">{b.text}</p>
+        {scope.map((g) => (
+          <li class="card card--light wv__card" data-reveal>
+            <div class="wv__card-head">
+              <span class="itile"><Icon name={g.icon} /></span>
+              <h3 class="wv__card-title">{g.group}</h3>
+            </div>
+            <ul class="wv__items" role="list">
+              {g.items.map((i) => (
+                <li class="wv__item">
+                  <Icon name="check" class="wv__check" />
+                  <span>{i}</span>
+                </li>
+              ))}
+            </ul>
           </li>
         ))}
       </ul>
@@ -175,22 +198,45 @@ const description = `Webdesign aus ${site.address.city}: individuelle Websites a
   .wx__note { margin-top: var(--space-6); max-width: 56ch; }
 
   /* Vorteile */
-  .wv__head { display: grid; gap: var(--space-3); margin-bottom: var(--space-7); }
-  .wv__label { color: var(--c-accent); }
+  .wv { padding-block: clamp(2.75rem, 6vw, 5.5rem); }
+  .wv__head { display: grid; gap: var(--space-3); margin-bottom: clamp(1.5rem, 3.5vw, 2.5rem); }
+  .wv__label { color: var(--c-accent-text); }
   .wv__title { max-width: 18ch; }
-  .wv__grid { display: grid; gap: var(--space-5); }
-  @media (min-width: 620px) { .wv__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  @media (min-width: 1024px) { .wv__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-  .wv__card {
-    display: grid; gap: 0.4rem; align-content: start;
-    padding: clamp(1.25rem, 2.5vw, 1.75rem);
-    border: 1px solid var(--line);
-    background: var(--bg);
-    transition: border-color var(--dur-base) var(--ease-out);
+
+  /* Drei Gruppen nebeneinander – auf dem Telefon zwei, damit der Umfang
+     als Block lesbar bleibt statt als lange Liste. */
+  .wv__grid {
+    display: grid; gap: clamp(0.5rem, 1.5vw, 1.25rem);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  @media (hover: hover) { .wv__card:hover { border-color: var(--fg); } }
-  .wv__num { color: var(--c-accent); }
-  .wv__card-title { margin-top: var(--space-2); }
+  .wv__card:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  @media (min-width: 900px) {
+    .wv__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .wv__card:last-child:nth-child(odd) { grid-column: auto; }
+  }
+  .wv__card {
+    display: grid; gap: clamp(0.5rem, 1.4vw, 0.85rem); align-content: start;
+    padding: clamp(0.85rem, 2.2vw, 1.5rem);
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) { .wv__card:hover { transform: translateY(-3px); } }
+  .wv__card-head {
+    display: flex; align-items: center; gap: clamp(0.4rem, 1.2vw, 0.7rem);
+    padding-bottom: clamp(0.4rem, 1.2vw, 0.7rem);
+    border-bottom: 1px solid var(--card-line);
+  }
+  .wv__card-title {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 108%;
+    text-transform: uppercase; font-size: clamp(0.82rem, 2.2vw, 1.15rem);
+    line-height: 1.05; letter-spacing: -0.03em;
+  }
+  .wv__items { display: grid; gap: clamp(0.3rem, 1vw, 0.5rem); }
+  .wv__item {
+    display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.45rem;
+    align-items: start;
+    font-size: clamp(0.76rem, 1.9vw, 0.95rem); line-height: 1.3;
+  }
+  .wv__check { width: 0.85rem; height: 0.85rem; margin-top: 0.2em; color: var(--c-accent); }
 
   /* Finaler CTA */
   .wf__inner { display: grid; gap: var(--space-5); }

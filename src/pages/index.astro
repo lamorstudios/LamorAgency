@@ -1,7 +1,7 @@
 ---
 /**
  * Startseite – die Dramaturgie:
- * Hero → Showreel → Vertrauen (Kunden + Zahlen) → Problem/Lösung → Leistungen
+ * Hero → Showreel → Vertrauen (Kunden) → Problem/Lösung (inkl. Zahlen) → Leistungen
  * → Webdesign → Arbeiten → Prozess → Models → Branchen → Zahlen → Stimmen
  * → Preise → FAQ → Kontakt.
  *
@@ -19,7 +19,6 @@ import SelectedWork from '@/components/home/SelectedWork.astro';
 import Process from '@/components/sections/Process.astro';
 import ModelsTeaser from '@/components/sections/ModelsTeaser.astro';
 import Industries from '@/components/sections/Industries.astro';
-import Stats from '@/components/sections/Stats.astro';
 import Testimonials from '@/components/sections/Testimonials.astro';
 import Pricing from '@/components/sections/Pricing.astro';
 import Faq from '@/components/sections/Faq.astro';
@@ -35,7 +34,7 @@ import { offerCatalog } from '@/lib/schema';
 >
   <Hero />
   <Showreel />
-  <Clients />
+  <Clients figures={false} />
   <Comparison />
   <Services />
   <WebsiteTeaser />
@@ -43,7 +42,6 @@ import { offerCatalog } from '@/lib/schema';
   <Process />
   <ModelsTeaser />
   <Industries />
-  <Stats />
   <Testimonials />
   <Pricing compact />
   <Faq />

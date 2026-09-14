@@ -635,28 +635,37 @@ a:hover .media--hover > img, a:hover .media--hover > picture img, a:hover .media
 }
 
 /* Sticky-CTA – nur dort einsetzen, wo eine Seite auf eine Anfrage hinarbeitet. */
+/* Schwebende Leiste statt Vollbalken: sie verdeckt weniger und wirkt
+   wie ein Element der Seite, nicht wie eine Browserleiste. */
 .sticky-cta {
   position: fixed;
-  left: 0; right: 0; bottom: 0;
+  left: 0; right: 0;
+  bottom: calc(0.6rem + env(safe-area-inset-bottom));
   z-index: var(--z-nav);
   display: flex;
-  gap: 0.5rem;
-  padding: 0.6rem var(--gutter) calc(0.6rem + env(safe-area-inset-bottom));
-  background: color-mix(in srgb, var(--c-ink) 88%, transparent);
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
-  border-top: 1px solid var(--c-ink-3);
-  transform: translateY(110%);
+  gap: 0.4rem;
+  padding-inline: var(--gutter);
+  transform: translateY(calc(100% + 1.5rem));
   transition: transform var(--dur-base) var(--ease-out);
 }
 .sticky-cta.is-on { transform: none; }
-.sticky-cta__main { flex: 1; justify-content: center; min-height: 3rem; }
+.sticky-cta__main {
+  flex: 1; justify-content: center;
+  min-height: 2.85rem; padding-block: 0.6rem;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 10px 30px -10px rgba(11, 10, 9, 0.55);
+}
 .sticky-cta__alt {
   flex: none; display: grid; place-items: center;
-  width: 3rem; height: 3rem; border-radius: 50%;
-  border: 1px solid var(--c-ink-3); color: var(--c-paper);
+  width: 2.85rem; height: 2.85rem; border-radius: 50%;
+  color: var(--c-paper);
+  background: color-mix(in srgb, var(--c-ink) 86%, transparent);
+  border: 1px solid rgba(242, 237, 228, 0.18);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 10px 30px -10px rgba(11, 10, 9, 0.55);
 }
-.sticky-cta__alt svg { width: 1.25rem; height: 1.25rem; }
+.sticky-cta__alt svg { width: 1.2rem; height: 1.2rem; }
 @media (min-width: 900px) { .sticky-cta { display: none; } }
 @media (prefers-reduced-motion: reduce) { .sticky-cta { transition: none; } }
 
@@ -806,3 +815,204 @@ a:hover .media--hover > img, a:hover .media--hover > picture img, a:hover .media
 .hide-mobile { display: none; }
 @media (min-width: 768px) { .hide-mobile { display: revert; } .hide-desktop { display: none; } }
 @media (min-width: 900px) { .hide-desktop-lg { display: none; } }
+
+/* ==========================================================================
+   FLAECHEN-SYSTEM (Cards, Kacheln, Pills, Kennzahlen, Waschungen)
+
+   Die Regel aus dem Mockup: eine helle Flaeche ist zurueckhaltend, eine dunkle
+   Flaeche ist die Antwort. Tiefe entsteht aus Verlauf + Haarlinie + sehr
+   weichem Schatten, nicht aus Rahmen. Alle Werte kommen aus tokens.css.
+   ========================================================================== */
+
+/* Basisgroesse fuer alle Icons – ohne das dehnt Flex sie auf Containerhoehe. */
+.icon { width: 1em; height: 1em; flex: none; display: block; }
+
+.card {
+  position: relative;
+  border-radius: var(--radius-card);
+  isolation: isolate;
+}
+
+/* Zurueckhaltende Flaeche: der Ist-Zustand, das Nebenstehende. */
+.card--light {
+  background: var(--card-light-bg);
+  border: 1px solid var(--card-light-line);
+  box-shadow: var(--card-light-shadow);
+  color: var(--c-ink);
+  --card-line: var(--card-light-line-soft);
+  --card-muted: var(--c-grey);
+  --card-tile: var(--tile-light-bg);
+  --card-tile-line: var(--card-light-line);
+}
+
+/* Die Antwort: dunkel, mit rotem Schein und innerem Lichtsaum oben. */
+.card--dark {
+  background: var(--card-dark-bg);
+  border: 1px solid var(--card-dark-line);
+  box-shadow: var(--card-dark-shadow), var(--card-dark-glow);
+  color: var(--c-paper);
+  --card-line: var(--card-dark-line-soft);
+  --card-muted: var(--c-grey-dark);
+  --card-tile: var(--tile-dark-bg);
+  --card-tile-line: var(--card-dark-line);
+}
+/* Innerer Lichtsaum – gibt der Kante Materialitaet statt eines harten Rahmens. */
+.card--dark::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(120% 80% at 50% -20%, rgba(255, 255, 255, 0.07), transparent 60%);
+  z-index: -1;
+}
+
+.card--accent {
+  background: var(--card-accent-bg);
+  border: 1px solid var(--card-accent-line);
+  box-shadow: var(--card-accent-shadow);
+  color: #fff;
+  --card-line: rgba(255, 255, 255, 0.24);
+  --card-muted: rgba(255, 255, 255, 0.82);
+  --card-tile: rgba(255, 255, 255, 0.16);
+  --card-tile-line: rgba(255, 255, 255, 0.28);
+}
+
+.card__pad { padding: clamp(1rem, 2.4vw, 1.75rem); }
+
+/* ---------- Icon-Kachel: quadratisch, ruhig, immer gleich gross ---------- */
+.itile {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: clamp(1.9rem, 4.6vw, 2.5rem);
+  aspect-ratio: 1;
+  border-radius: var(--radius-tile);
+  background: var(--card-tile, var(--tile-light-bg));
+  border: 1px solid var(--card-tile-line, var(--line));
+  color: currentColor;
+}
+.itile svg { width: 52%; height: 52%; }
+.itile--bad { color: var(--card-muted, var(--fg-muted)); }
+.itile--good { color: var(--c-accent-on-dark); }
+
+/* Runde Marke im Kopf einer Vergleichs-Card */
+.rmark {
+  display: grid; place-items: center; flex: none;
+  width: clamp(1.6rem, 4vw, 2.2rem); aspect-ratio: 1; border-radius: 50%;
+}
+.rmark svg { width: 55%; height: 55%; }
+.rmark--bad { border: 1.5px solid var(--c-accent); color: var(--c-accent); }
+.rmark--good { background: var(--c-accent); color: #fff; box-shadow: 0 0 0 4px rgba(229, 67, 43, 0.16); }
+
+/* ---------- Status-Pill (Konsistent / Effizient / …) ---------- */
+.spill {
+  display: inline-flex; align-items: center;
+  padding: 0.4em 0.75em;
+  border-radius: var(--radius-pill);
+  font-size: clamp(0.6rem, 1.4vw, 0.7rem);
+  font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+  letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap;
+  background: rgba(229, 67, 43, 0.14);
+  border: 1px solid rgba(229, 67, 43, 0.28);
+  color: var(--c-accent-on-dark);
+}
+.spill--quiet {
+  background: rgba(11, 10, 9, 0.05);
+  border-color: var(--card-light-line);
+  color: var(--c-grey);
+}
+
+/* ---------- Schwebendes VS.-Badge zwischen zwei Panels ---------- */
+.vs {
+  display: grid; place-items: center;
+  width: clamp(2.2rem, 7vw, 3.4rem); aspect-ratio: 1;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #ffffff, #f2ede4);
+  border: 1px solid var(--card-light-line);
+  box-shadow: 0 2px 4px rgba(11, 10, 9, 0.06), 0 14px 30px -12px rgba(11, 10, 9, 0.28);
+  color: var(--c-ink);
+  font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: var(--wd-tight);
+  font-size: clamp(0.62rem, 1.7vw, 0.82rem); letter-spacing: 0.06em; text-transform: uppercase;
+}
+
+/* ---------- Kennzahlen-Streifen ---------- */
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+@media (min-width: 760px) { .metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.metric {
+  display: grid; align-content: start; gap: 0.1rem;
+  padding: clamp(0.9rem, 2.4vw, 1.6rem) clamp(0.9rem, 2.2vw, 1.5rem);
+  position: relative;
+}
+/* Trennlinien als Innenlinien statt als Rahmen um jede Zelle. */
+.metric + .metric::before {
+  content: ''; position: absolute; inset: 12% auto 12% 0; width: 1px;
+  background: var(--card-line, var(--line));
+}
+@media (max-width: 759px) {
+  .metric:nth-child(odd)::before { display: none; }
+  .metric:nth-child(n + 3)::after {
+    content: ''; position: absolute; inset: 0 6% auto 6%; height: 1px;
+    background: var(--card-line, var(--line));
+  }
+}
+.metric__value {
+  font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: 118%;
+  font-size: clamp(1.6rem, 1rem + 3.2vw, 3.2rem);
+  line-height: 0.92; letter-spacing: -0.05em;
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.metric__label {
+  margin-top: 0.4rem;
+  font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+  letter-spacing: var(--ls-wide); text-transform: uppercase;
+}
+.metric__note { font-size: clamp(0.72rem, 1.8vw, 0.85rem); line-height: 1.4; color: var(--card-muted, var(--fg-muted)); }
+
+/* ---------- Licht-Waschung hinter einer Section ---------- */
+.wash { position: relative; isolation: isolate; }
+.wash::before {
+  content: '';
+  position: absolute; inset: 0;
+  pointer-events: none; z-index: -1;
+  background:
+    radial-gradient(70% 55% at 85% 0%, var(--wash-red), transparent 70%),
+    radial-gradient(60% 50% at 0% 100%, rgba(11, 10, 9, 0.05), transparent 70%);
+}
+[data-theme='dark'].wash::before,
+[data-theme='dark'] .wash::before {
+  background:
+    radial-gradient(70% 55% at 85% 0%, var(--wash-red-dark), transparent 70%),
+    radial-gradient(55% 45% at 5% 95%, rgba(242, 237, 228, 0.05), transparent 70%);
+}
+
+/* Zeile in einer Vergleichs-Card: Kachel · Text · Pill */
+.crow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(0.5rem, 1.6vw, 0.85rem);
+  padding-block: clamp(0.55rem, 1.5vw, 0.9rem);
+}
+.crow + .crow { border-top: 1px solid var(--card-line, var(--line)); }
+.crow__text { font-size: clamp(0.82rem, 2.1vw, 1.02rem); line-height: 1.3; }
+.crow__pill { grid-column: 2; justify-self: start; }
+@media (min-width: 1024px) {
+  .crow { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .crow__pill { grid-column: 3; justify-self: end; }
+}
+
+/* Einheitliche Section-Ueberschrift: schwere Displayschrift statt Fliesstext.
+   Ersetzt das frueher editoriale .t-say in den Sections. */
+.t-sec {
+  font-family: var(--font-display); font-weight: 900; font-stretch: 112%;
+  font-size: clamp(1.9rem, 0.9rem + 4.2vw, 4.2rem);
+  line-height: 0.98; letter-spacing: -0.04em;
+  text-wrap: balance;
+}

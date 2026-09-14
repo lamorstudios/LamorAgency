@@ -25,7 +25,7 @@ export const services: Service[] = [
     slug: 'video-production',
     title: 'Videoproduktion',
     label: 'Video Production',
-    short: 'Von der ersten Idee bis zum finalen Frame – Bewegtbild, das für Plattform, Marke und Wirkung gebaut ist.',
+    short: 'Vom Konzept bis zum finalen Frame.',
     items: [
       'Social Media Videos',
       'Commercials / Werbespots',
@@ -44,7 +44,7 @@ export const services: Service[] = [
     slug: 'photography',
     title: 'Fotografie',
     label: 'Photography',
-    short: 'Bilder, die deine Marke tragen – sauber ausgeleuchtet, klar gestaltet, sofort einsetzbar.',
+    short: 'Bilder, die sofort einsetzbar sind.',
     items: [
       'Produktfotografie',
       'Brand Shootings',
@@ -61,7 +61,7 @@ export const services: Service[] = [
     slug: 'social-media',
     title: 'Social Media',
     label: 'Social Media',
-    short: 'Content, Strategie und Kanalführung aus einer Hand – damit aus Reichweite Wiedererkennung wird.',
+    short: 'Content, Strategie und Kanal in einer Hand.',
     items: [
       'Content Creation',
       'Content Strategie',
@@ -78,7 +78,7 @@ export const services: Service[] = [
     slug: 'web-design',
     title: 'Webdesign',
     label: 'Web Design',
-    short: 'Websites, die nicht nur gut aussehen, sondern Anfragen bringen. Schnell, sauber, auf jedem Gerät.',
+    short: 'Websites, die Anfragen bringen.',
     items: [
       'Individuelle Websites',
       'Landingpages',
@@ -95,7 +95,7 @@ export const services: Service[] = [
     slug: 'branding',
     title: 'Branding & Design',
     label: 'Branding & Design',
-    short: 'Die visuelle Identität, an der man dich erkennt – bevor dein Name fällt.',
+    short: 'Erkennbar, bevor dein Name fällt.',
     items: [
       'Logo Design',
       'Corporate Identity',
@@ -113,7 +113,7 @@ export const services: Service[] = [
     slug: 'models-talents',
     title: 'Models & Talents',
     label: 'Models & Talents',
-    short: 'Gesichter für deine Kampagne – direkt über LAMOR gebucht, ohne zweite Agentur dazwischen.',
+    short: 'Gesichter direkt über LAMOR gebucht.',
     items: [
       'Commercials',
       'Social Content',

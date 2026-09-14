@@ -101,10 +101,40 @@
   --grid-cols: 12;
   --grid-gap: clamp(0.75rem, 0.5rem + 1.25vw, 2rem);
 
+  /* ---------- Tiefe: Flaechen, Verlaeufe, Glows
+     Das Flache war das Problem. Jede Ebene bekommt hier ihren Verlauf,
+     ihre Linie und ihren Schein – Components greifen nur auf die Tokens zu,
+     damit Hell und Dunkel ueberall gleich klingen. */
+  --card-light-bg: linear-gradient(168deg, #fcfaf6 0%, #f4efe7 52%, #ece5d9 100%);
+  --card-light-line: rgba(11, 10, 9, 0.10);
+  --card-light-line-soft: rgba(11, 10, 9, 0.06);
+  --card-light-shadow: 0 1px 2px rgba(11, 10, 9, 0.04), 0 18px 44px -22px rgba(11, 10, 9, 0.18);
+
+  --card-dark-bg: linear-gradient(162deg, #1c1815 0%, #100d0b 48%, #17120f 100%);
+  --card-dark-line: rgba(242, 237, 228, 0.13);
+  --card-dark-line-soft: rgba(242, 237, 228, 0.08);
+  --card-dark-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 30px 70px -30px rgba(0, 0, 0, 0.9);
+  /* Der rote Schein bleibt bewusst weit unter Neon: er umreisst die Flaeche nur. */
+  --card-dark-glow: 0 0 0 1px rgba(229, 67, 43, 0.10), 0 28px 70px -34px rgba(229, 67, 43, 0.45);
+
+  --card-accent-bg: linear-gradient(100deg, #f04f33 0%, #e5432b 42%, #b8321e 100%);
+  --card-accent-line: rgba(255, 255, 255, 0.22);
+  --card-accent-shadow: 0 18px 44px -22px rgba(229, 67, 43, 0.7);
+
+  /* Flaechen fuer Icon-Kacheln und Pills, jeweils hell/dunkel */
+  --tile-light-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(11, 10, 9, 0.035));
+  --tile-dark-bg: linear-gradient(180deg, rgba(242, 237, 228, 0.09), rgba(242, 237, 228, 0.02));
+
+  /* Sehr weite Licht-Waschungen fuer Section-Hintergruende */
+  --wash-red: rgba(229, 67, 43, 0.18);
+  --wash-red-dark: rgba(229, 67, 43, 0.2);
+
   /* ---------- Border / Radius */
   --radius-0: 0;
   --radius-1: 2px;
   --radius-pill: 999px;
+  --radius-card: clamp(1rem, 2.2vw, 1.5rem);
+  --radius-tile: clamp(0.6rem, 1.2vw, 0.85rem);
   --border: 1px solid var(--line);
 
   /* ---------- Motion */

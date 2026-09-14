@@ -30,13 +30,10 @@ const defaultCare = carePlans.find((c) => c.id === (defaultPkg.careTiers[1] ?? d
       <h2 class="ca__title" id="ca-title">
         Was kostet deine Website <span class="hl">wirklich?</span>
       </h2>
-      <p class="ca__lead">
-        Einmalige Erstellung und optionale Betreuung transparent durchrechnen –
-        ohne Anfrage, ohne E-Mail-Adresse.
-      </p>
+      <p class="ca__lead">Erstellung und Betreuung durchrechnen – ohne Anfrage.</p>
     </div>
 
-    <div class="ca__card" data-calc
+    <div class="card card--dark ca__card" data-calc
          data-max={maxMonths}
          data-default-months={defaultMonths}>
       <div class="ca__controls">
@@ -112,11 +109,11 @@ const defaultCare = carePlans.find((c) => c.id === (defaultPkg.careTiers[1] ?? d
       </div>
 
       <!-- Ergebnis -->
-      <div class="ca__result" role="status" aria-live="polite">
+      <div class="ca__result card card--accent" role="status" aria-live="polite">
         <p class="ca__result-label">Gesamt nach <span data-months-echo>{defaultMonths}</span> Monaten</p>
         <p class="ca__total" data-total>–</p>
         <p class="ca__avg" data-avg-wrap>
-          <span data-avg>–</span> <span class="ca__avg-note">rechnerisch pro Monat über die Laufzeit</span>
+          <span data-avg>–</span> <span class="ca__avg-note">Ø pro Monat</span>
         </p>
 
         <dl class="ca__rows">
@@ -140,7 +137,7 @@ const defaultCare = carePlans.find((c) => c.id === (defaultPkg.careTiers[1] ?? d
           <span>Projekt anfragen</span>
           <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
         </a>
-        <p class="ca__vat">Alle Beträge netto zzgl. USt. Richtwert – der verbindliche Preis kommt aus dem Angebot.</p>
+        <p class="ca__vat">Netto zzgl. USt. Richtwert, kein verbindliches Angebot.</p>
       </div>
     </div>
   </div>
@@ -163,10 +160,6 @@ const defaultCare = carePlans.find((c) => c.id === (defaultPkg.careTiers[1] ?? d
     display: grid;
     gap: clamp(1.5rem, 3.5vw, 2.5rem);
     padding: clamp(1.25rem, 3vw, 2.25rem);
-    border-radius: clamp(0.9rem, 2.2vw, 1.5rem);
-    background: var(--c-ink);
-    color: var(--c-paper);
-    box-shadow: 0 24px 60px -30px rgba(11, 10, 9, 0.55);
   }
   @media (min-width: 900px) {
     .ca__card { grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.85fr); align-items: start; gap: clamp(2rem, 4vw, 3.5rem); }
@@ -256,39 +249,37 @@ const defaultCare = carePlans.find((c) => c.id === (defaultPkg.careTiers[1] ?? d
   }
 
   /* ---------- Ergebnis ---------- */
+  /* Das Ergebnis ist die Aussage der Section – es bekommt die Akzentflaeche. */
   .ca__result {
-    display: grid; gap: var(--space-3); align-content: start;
+    display: grid; gap: var(--space-2); align-content: start;
     padding: clamp(1rem, 2.5vw, 1.5rem);
-    border: 1px solid var(--c-ink-3);
-    border-radius: clamp(0.6rem, 1.6vw, 1rem);
-    background: var(--c-ink-2);
   }
   .ca__result-label {
     font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
-    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--c-grey-dark);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; color: rgba(255, 255, 255, 0.82);
   }
   .ca__total {
     font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: 118%;
     font-size: clamp(2.25rem, 1.2rem + 4.6vw, 4rem);
     line-height: 0.95; letter-spacing: -0.045em;
     font-variant-numeric: tabular-nums;
-    color: var(--c-paper);
+    color: #fff;
     overflow-wrap: break-word;
   }
-  .ca__avg { font-size: var(--fs-small); color: var(--c-grey-dark); font-variant-numeric: tabular-nums; }
-  .ca__avg span[data-avg] { color: var(--c-accent-on-dark); font-weight: var(--fw-semi); }
-  .ca__avg-note { color: var(--c-grey-dark); font-weight: var(--fw-regular); }
+  .ca__avg { font-size: var(--fs-small); color: rgba(255, 255, 255, 0.85); font-variant-numeric: tabular-nums; }
+  .ca__avg span[data-avg] { color: #fff; font-weight: var(--fw-semi); }
+  .ca__avg-note { color: rgba(255, 255, 255, 0.72); font-weight: var(--fw-regular); }
 
   .ca__rows { display: grid; margin-top: var(--space-2); }
   .ca__row {
     display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
-    padding-block: 0.65rem;
-    border-top: 1px solid var(--c-ink-3);
+    padding-block: 0.55rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.22);
     font-size: var(--fs-small);
   }
-  .ca__row dt { color: var(--c-grey-dark); }
+  .ca__row dt { color: rgba(255, 255, 255, 0.78); }
   .ca__row dd { margin: 0; font-weight: var(--fw-semi); font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .ca__row--sum dd { color: var(--c-accent-on-dark); }
+  .ca__row--sum dd { color: #fff; }
 
   .ca__hint {
     padding: 0.7rem 0.85rem; border-radius: 0.5rem;
@@ -297,8 +288,8 @@ const defaultCare = carePlans.find((c) => c.id === (defaultPkg.careTiers[1] ?? d
     font-size: var(--fs-small); color: var(--c-paper);
   }
 
-  .ca__cta { width: 100%; justify-content: space-between; margin-top: var(--space-2); --btn-bg: var(--c-paper); --btn-fg: var(--c-ink); border-color: var(--c-paper); }
-  .ca__vat { font-size: 0.72rem; color: var(--c-grey-dark); }
+  .ca__cta { --btn-bg: #fff; --btn-fg: var(--c-ink); border-color: #fff; width: 100%; justify-content: space-between; margin-top: var(--space-2); --btn-bg: var(--c-paper); --btn-fg: var(--c-ink); border-color: var(--c-paper); }
+  .ca__vat { font-size: 0.72rem; color: rgba(255, 255, 255, 0.7); }
 </style>
 
 <script>

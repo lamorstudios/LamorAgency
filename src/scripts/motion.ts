@@ -86,15 +86,19 @@ function reveal() {
  */
 function safetyNet() {
   if (reduced()) return;
-  const inViewport = (el: HTMLElement) => {
-    // Fuer Elemente in einer Leiste zaehlt, ob die Leiste sichtbar ist.
-    const r = (railHost(el) ?? el).getBoundingClientRect();
-    return r.top < innerHeight * 1.1 && r.bottom > 0;
-  };
+  /**
+   * "Erreicht" statt "sichtbar": Alles, dessen Oberkante bereits im Bild war
+   * oder darueber liegt, muss sichtbar sein. Wer daran vorbeigescrollt ist,
+   * darf beim Zurueckscrollen keine leere Flaeche vorfinden – genau das
+   * passierte, wenn ein Abschnitt zwischen zwei Frames uebersprungen wurde.
+   * Fuer Elemente in einer Leiste zaehlt die Position der Leiste.
+   */
+  const reached = (el: HTMLElement) =>
+    (railHost(el) ?? el).getBoundingClientRect().top < innerHeight * 1.1;
   const sweep = (all: boolean) => {
     document.querySelectorAll<HTMLElement>(REVEAL_SELECTOR).forEach((el) => {
       if (el.classList.contains('is-inview')) return;
-      if (all || inViewport(el)) el.classList.add('is-inview');
+      if (all || reached(el)) el.classList.add('is-inview');
     });
   };
   const t1 = setTimeout(() => sweep(false), 1400);

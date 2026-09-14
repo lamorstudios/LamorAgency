@@ -15,12 +15,14 @@ import { Picture } from 'astro:assets';
 import { clients } from '@/data/clients';
 import { stats } from '@/data/stats';
 
-interface Props { title?: string; label?: string; theme?: 'dark' | 'light'; compact?: boolean }
+interface Props { title?: string; label?: string; theme?: 'dark' | 'light'; compact?: boolean; figures?: boolean }
 const {
-  title = 'Marken, die schon mit uns gearbeitet haben.',
-  label = 'Selected Clients',
+  title = 'Marken, für die wir gearbeitet haben.',
+  label = 'Vertrauen uns',
   theme = 'light',
   compact = false,
+  /** Die Kennzahlen stehen auf der Startseite schon im Problem/Lösung-Block. */
+  figures: showFigures = true,
 } = Astro.props;
 
 const logos = import.meta.glob<{ default: ImageMetadata }>('/src/assets/brand/clients/*.{svg,png,jpg,webp,avif}');
@@ -33,15 +35,16 @@ const [lead, ...rest] = stats.slice(0, 4);
 ---
 <section class="tr" data-theme={theme} data-bg={theme} aria-labelledby="clients-title">
   <div class="container">
-    <div class="tr__panel">
+    <div class="card card--light tr__panel">
       <!-- Anspruch + groesste Zahl -->
       <div class="tr__claim">
         <p class="eyebrow tr__label">{label}</p>
         <h2 class="tr__title" id="clients-title">{title}</h2>
         <p class="tr__note">
-          Von lokalen Unternehmen bis Major Label – <strong>{resolved.length}</strong> Marken im Auszug.
+          Von lokalen Unternehmen bis Major Label.
         </p>
 
+        {showFigures && (
         <div class="tr__lead">
           <span class="tr__lead-value">
             {lead.prefix ?? ''}<span data-count={lead.value} data-grouped={lead.grouped ? '' : undefined}>{lead.grouped ? new Intl.NumberFormat('de-DE').format(lead.value) : lead.value}</span>{lead.suffix ?? ''}
@@ -49,6 +52,7 @@ const [lead, ...rest] = stats.slice(0, 4);
           <span class="tr__lead-label">{lead.label}</span>
           {lead.note && <span class="tr__lead-note">{lead.note}</span>}
         </div>
+        )}
       </div>
 
       <!-- Markenraster -->
@@ -66,6 +70,7 @@ const [lead, ...rest] = stats.slice(0, 4);
       </ul>
 
       <!-- Kennzahlenstreifen ueber die volle Breite der Tafel -->
+      {showFigures && (
       <ul class="tr__figures" role="list">
         {rest.map((s) => (
           <li class="tr__fig">
@@ -77,6 +82,7 @@ const [lead, ...rest] = stats.slice(0, 4);
           </li>
         ))}
       </ul>
+      )}
     </div>
   </div>
 </section>
@@ -85,12 +91,7 @@ const [lead, ...rest] = stats.slice(0, 4);
   .tr { padding-block: clamp(2.5rem, 6vw, 5rem); }
 
   /* Eine Tafel: die Haarlinien im Inneren halten alles zusammen. */
-  .tr__panel {
-    display: grid;
-    border: 1px solid var(--line);
-    border-radius: clamp(0.7rem, 1.8vw, 1.1rem);
-    overflow: hidden;
-  }
+  .tr__panel { display: grid; overflow: hidden; }
   @media (min-width: 1000px) {
     .tr__panel { grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr); }
     .tr__figures { grid-column: 1 / -1; }
@@ -116,7 +117,7 @@ const [lead, ...rest] = stats.slice(0, 4);
   .tr__lead {
     display: grid; gap: 0.2rem; align-content: end;
     margin-top: var(--space-5); padding-top: var(--space-5);
-    border-top: 1px solid var(--line);
+    border-top: 1px solid var(--card-light-line-soft);
   }
   .tr__lead-value {
     font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: 118%;
@@ -136,30 +137,30 @@ const [lead, ...rest] = stats.slice(0, 4);
   }
 
   /* ---------- Markenraster ---------- */
+  /* Drei Spalten ab dem kleinsten Display – fuenfzehn Marken in fuenf Zeilen
+     statt in acht. Haarlinien liegen als Innenschatten in der Zelle, damit
+     eine unbesetzte Rasterzelle nicht wie eine Linie aussieht. */
   .tr__grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1px;
-    background: var(--line);
-    border-top: 1px solid var(--line);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0;
+    border-top: 1px solid var(--card-light-line-soft);
   }
   /* Die letzte Zeile darf keine Luecke lassen – sonst steht dort die
      Linienfarbe als leeres Feld. Die Restkachel fuellt die Zeile auf. */
-  .tr__cell:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  .tr__cell:last-child:nth-child(3n + 1) { grid-column: span 3; }
+  .tr__cell:last-child:nth-child(3n + 2) { grid-column: span 2; }
   @media (min-width: 620px) {
-    .tr__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .tr__cell:last-child:nth-child(odd) { grid-column: auto; }
-    .tr__cell:last-child:nth-child(3n + 1) { grid-column: span 3; }
-    .tr__cell:last-child:nth-child(3n + 2) { grid-column: span 2; }
   }
   @media (min-width: 1000px) {
-    .tr__grid { border-top: 0; border-left: 1px solid var(--line); }
+    .tr__grid { border-top: 0; border-left: 1px solid var(--card-light-line-soft); }
   }
   .tr__cell {
     display: grid; place-items: center; align-content: center; gap: 0.3rem;
-    padding: clamp(0.9rem, 2.2vw, 1.5rem) 0.75rem;
-    background: var(--bg);
-    min-height: clamp(4.5rem, 10vw, 6.25rem);
+    padding: clamp(0.7rem, 2vw, 1.5rem) 0.5rem;
+    background: transparent;
+    box-shadow: inset -1px -1px 0 0 var(--card-light-line-soft);
+    min-height: clamp(3.5rem, 9vw, 6.25rem);
     text-align: center;
     transition: background var(--dur-base) var(--ease-out);
   }
@@ -171,7 +172,7 @@ const [lead, ...rest] = stats.slice(0, 4);
   .tr__name {
     font-family: var(--font-display); font-weight: 800; font-stretch: 105%;
     text-transform: uppercase;
-    font-size: clamp(0.8rem, 0.62rem + 0.8vw, 1.15rem);
+    font-size: clamp(0.68rem, 0.55rem + 0.8vw, 1.15rem);
     line-height: 1.05; letter-spacing: -0.025em;
     transition: color var(--dur-base) var(--ease-out);
   }
@@ -184,10 +185,9 @@ const [lead, ...rest] = stats.slice(0, 4);
   /* ---------- Kennzahlenstreifen ---------- */
   .tr__figures {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
-    gap: 1px;
-    background: var(--line);
-    border-top: 1px solid var(--line);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+    border-top: 1px solid var(--card-light-line-soft);
   }
   .tr__fig {
     display: grid; gap: 0.15rem; align-content: start;
@@ -207,4 +207,5 @@ const [lead, ...rest] = stats.slice(0, 4);
     letter-spacing: var(--ls-wide); text-transform: uppercase; margin-top: 0.3rem;
   }
   .tr__fig-note { font-size: var(--fs-small); color: var(--fg-muted); max-width: 26ch; }
+  @media (min-width: 760px) { .tr__figures { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 </style>

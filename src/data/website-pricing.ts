@@ -257,7 +257,7 @@ export const websiteBundles: Bundle[] = [
     name: 'WEBSITE + BRANDING',
     headline: 'Noch kein Markenauftritt? Dann bauen wir beides zusammen.',
     description:
-      'Wenn Logo, Farben und Typografie noch fehlen, entsteht die Website nicht im luftleeren Raum – sondern zusammen mit der Marke.',
+      'Website und Marke entstehen zusammen, nicht nacheinander.',
     price: 3490,
     priceFrom: true,
     priceNote: 'Umfang wird individuell kalkuliert',
@@ -269,7 +269,7 @@ export const websiteBundles: Bundle[] = [
     name: 'WEBSITE + CONTENT PRODUCTION',
     headline: 'Deine Website. Deine Bilder. Deine Videos. Aus einer Hand.',
     description:
-      'Die meisten Websites scheitern nicht am Design, sondern am fehlenden Material. Wir bauen nicht nur die Seite – wir produzieren auch, was darauf zu sehen ist.',
+      'Wir bauen die Seite und produzieren, was darauf zu sehen ist.',
     price: null,
     priceFrom: false,
     priceNote: 'Individuell kalkuliert – abhängig von Drehtagen und Umfang',
@@ -280,12 +280,12 @@ export const websiteBundles: Bundle[] = [
 
 /** Der Ablauf eines Website-Projekts. */
 export const websiteProcess = [
-  { index: '01', title: 'Strategie', text: 'Wir verstehen dein Unternehmen, deine Ziele und deine Zielgruppe.' },
-  { index: '02', title: 'Konzept', text: 'Struktur und Nutzerführung: Was steht wo und wohin führt es.' },
-  { index: '03', title: 'Design', text: 'Ein individuelles visuelles Konzept – kein Template von der Stange.' },
-  { index: '04', title: 'Entwicklung', text: 'Responsive Umsetzung, sauber gebaut und schnell auf jedem Gerät.' },
-  { index: '05', title: 'Launch', text: 'Testing, SEO-Basics und Veröffentlichung – inklusive technischer Einrichtung.' },
-  { index: '06', title: 'Betreuung', text: 'Optional: Updates, Hosting, Monitoring und laufende Optimierung.', optional: true },
+  { index: '01', title: 'Strategie', text: 'Ziele und Zielgruppe' },
+  { index: '02', title: 'Konzept', text: 'Struktur und Nutzerführung' },
+  { index: '03', title: 'Design', text: 'Individuell, kein Template' },
+  { index: '04', title: 'Entwicklung', text: 'Responsive und schnell' },
+  { index: '05', title: 'Launch', text: 'Testing, SEO-Basis, live' },
+  { index: '06', title: 'Betreuung', text: 'Updates, Hosting, Monitoring', optional: true },
 ];
 
 /** Typische Probleme bestehender Websites – die Problem-Section der Landingpage. */
@@ -346,40 +346,20 @@ export const euro = (n: number) => nf.format(n);
  */
 export interface ComparisonRow {
   category: string;
-  /** Wie es üblicherweise aufgeteilt ist – rein strukturell. */
+  /** Wie es üblicherweise aufgeteilt ist – rein strukturell, nie wertend. */
   others: string;
-  /** Was bei LAMOR dazugehört. */
-  lamor: string[];
-  /** Einschränkung, wo sie sachlich nötig ist. */
-  note?: string;
+  /** Was bei LAMOR dazugehört – eine Zeile, kein Absatz. */
+  lamor: string;
+  /** Der Gewinn in zwei Wörtern. Steht als Pill in der dunklen Spalte. */
+  gain: string;
+  /** Icon-Name aus components/Icon.astro */
+  icon: string;
 }
 
 export const websiteComparison: ComparisonRow[] = [
-  {
-    category: 'Website',
-    others: 'Design und Umsetzung separat beauftragt',
-    lamor: ['Konzept, Design und Umsetzung', 'Klar definierter Paketpreis'],
-  },
-  {
-    category: 'Content',
-    others: 'Foto und Video extra beauftragt und koordiniert',
-    lamor: ['Fotos und Videos aus dem eigenen Haus', 'Am selben Drehtag geplant'],
-  },
-  {
-    category: 'Branding',
-    others: 'Grafik und Identity getrennt vergeben',
-    lamor: ['Logo, Farben, Typografie', 'Passend zur Website entwickelt'],
-  },
-  {
-    category: 'Betreuung',
-    others: 'Eigener Vertrag, eigener Ansprechpartner',
-    lamor: ['Änderungen und Pflege', 'Ein fester Ansprechpartner'],
-    note: 'Umfang je nach Betreuungsstufe',
-  },
-  {
-    category: 'Hosting & Wartung',
-    others: 'Technik liegt bei dir oder beim nächsten Dienstleister',
-    lamor: ['Hosting, Backups, Monitoring', 'Updates ohne Nachfragen'],
-    note: 'Optional ab 39 € / Monat',
-  },
+  { category: 'Website', icon: 'cube', others: 'Separat beauftragt', lamor: 'Konzept, Design, Umsetzung', gain: 'Ein Paketpreis' },
+  { category: 'Design', icon: 'image', others: 'Separate Abstimmung', lamor: 'Von Anfang an integriert', gain: 'Ein Look' },
+  { category: 'Content', icon: 'bolt', others: 'Weiterer Partner nötig', lamor: 'Foto & Video aus dem Haus', gain: 'Ein Drehtag' },
+  { category: 'Branding', icon: 'heart', others: 'Separates Gewerk', lamor: 'Logo, Farben, Typografie', gain: 'Ein System' },
+  { category: 'Hosting & Wartung', icon: 'trend', others: 'Je nach Modell extra', lamor: 'Hosting, Backups, Updates', gain: 'Optional betreut' },
 ];

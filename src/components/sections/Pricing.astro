@@ -14,10 +14,9 @@ const { compact = false } = Astro.props;
   <div class="container">
     <div class="pr__head">
       <p class="t-label pr__label" data-reveal="fade">Modelle</p>
-      <h2 class="t-say pr__title" id="pr-title"><Words text="Klare Modelle statt Angebots-Dschungel." /></h2>
+      <h2 class="t-sec pr__title" id="pr-title"><Words text="Klare Modelle statt Angebots-Dschungel." /></h2>
       <p class="t-lead t-muted pr__lead" data-reveal style="--reveal-delay:140ms">
-        Ein monatlicher Betrag für die laufende Arbeit, ein einmaliger Projektstart
-        für den Aufbau. Du weißt vorher, woran du bist.
+        Monatlicher Betrag für die laufende Arbeit, einmaliger Projektstart für den Aufbau.
       </p>
       <p class="swipe-hint pr__hint" aria-hidden="true">Wischen für alle Modelle</p>
     </div>
@@ -25,7 +24,7 @@ const { compact = false } = Astro.props;
     <ul class="pr__grid swipe" role="list">
       {packages.map((p, i) => (
         <li
-          class={`pr__card ${p.featured ? 'pr__card--featured' : ''}`}
+          class={`card pr__card ${p.featured ? 'card--dark pr__card--featured' : 'card--light'}`}
           data-reveal
           style={`--reveal-delay:${i * 110}ms`}
         >
@@ -66,7 +65,7 @@ const { compact = false } = Astro.props;
     <p class="pr__note t-small t-muted" data-reveal="fade">{priceNote}</p>
 
     <div class="pr__foot" data-reveal>
-      <p class="t-h3 pr__foot-title">Noch nicht sicher, welches Modell passt?</p>
+      <p class="pr__foot-title">Noch nicht sicher, welches Modell passt?</p>
       <div class="pr__foot-actions">
         <a href="/contact/" class="btn" data-magnetic>
           <span>Kostenloses Erstgespräch</span>
@@ -103,29 +102,20 @@ const { compact = false } = Astro.props;
   }
 
   .pr__card {
-    position: relative;
     display: grid;
     gap: clamp(1.1rem, 2.5vw, 2rem);
-    padding: clamp(1.4rem, 3vw, 2.25rem);
-    border: 1px solid var(--line);
-    border-radius: clamp(0.7rem, 1.8vw, 1.1rem);
-    background: var(--c-paper);
-    transition: border-color var(--dur-base) var(--ease-out);
+    padding: clamp(1.25rem, 3vw, 2.25rem);
+    transition: transform var(--dur-base) var(--ease-out);
   }
   @media (hover: hover) and (pointer: fine) {
-    .pr__card:hover { border-color: var(--fg); }
+    .pr__card:hover { transform: translateY(-3px); }
   }
   @media (min-width: 900px) {
     .pr__card { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: clamp(1.75rem, 4vw, 3.5rem); }
   }
 
   /* Hauptempfehlung: dunkle Flaeche, damit die Wahl sofort lesbar ist. */
-  .pr__card--featured {
-    background: var(--c-ink);
-    color: var(--c-paper);
-    border-color: var(--c-ink);
-  }
-  .pr__card--featured .pr__feature { border-color: var(--c-ink-3); }
+  .pr__card--featured .pr__feature { border-color: var(--card-dark-line-soft); }
   .pr__card--featured .pr__for,
   .pr__card--featured .pr__card-label,
   .pr__card--featured .t-muted { color: var(--c-grey-dark); }
@@ -141,6 +131,7 @@ const { compact = false } = Astro.props;
     color: #fff;
     border-radius: var(--radius-pill);
     white-space: nowrap;
+    z-index: 2;
   }
 
   /* Linke Haelfte: die Zahl. */
@@ -177,7 +168,7 @@ const { compact = false } = Astro.props;
   @media (min-width: 620px) {
     .pr__features { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--space-5); }
   }
-  .pr__feature { display: flex; align-items: flex-start; gap: 0.7em; padding-block: 0.5rem; border-top: 1px solid var(--line); font-size: var(--fs-small); }
+  .pr__feature { display: flex; align-items: flex-start; gap: 0.7em; padding-block: 0.5rem; border-top: 1px solid var(--card-light-line-soft); font-size: var(--fs-small); }
   .pr__check { width: 0.85rem; height: 0.85rem; margin-top: 0.3em; flex-shrink: 0; color: var(--c-accent); }
 
   .pr__note { margin-top: var(--space-5); }
@@ -189,7 +180,12 @@ const { compact = false } = Astro.props;
     padding-top: var(--space-7);
     border-top: 1px solid var(--line);
   }
-  .pr__foot-title { max-width: 20ch; }
+  .pr__foot-title {
+    max-width: 20ch;
+    font-family: var(--font-display); font-weight: 900; font-stretch: 108%;
+    font-size: clamp(1.25rem, 1rem + 1.4vw, 2rem);
+    line-height: 1.02; letter-spacing: -0.035em; text-transform: uppercase;
+  }
   .pr__foot-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-5); }
   @media (min-width: 900px) {
     .pr__foot { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }

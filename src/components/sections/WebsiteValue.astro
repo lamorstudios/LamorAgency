@@ -1,282 +1,228 @@
 ---
 /**
- * "Alles aus einer Hand" – eine zusammenhängende Vergleichs-Komposition.
+ * "Einzeln organisiert – bei LAMOR aus einer Hand" als Vergleichsmatrix.
  *
- * Der entscheidende visuelle Griff: Die LAMOR-Spalte ist EINE durchgehende
- * Akzentfläche über alle Kategorien hinweg, nicht fünf einzelne Karten.
- * Links bleibt bewusst zurückhaltend (keine Fläche, gedämpfte Schrift),
- * rechts trägt Fläche, Haken und Kontrast. Das Auge liest in einem Zug
- * "das alles gehört zusammen" statt "hier sind fünf Vergleiche".
+ * Eine Komposition, keine fuenf Sections: links die Kategorie, in der Mitte der
+ * uebliche Weg (zurueckhaltend), rechts eine durchgehende dunkle Spalte mit
+ * rotem Schein – das ist die Antwort. Auch auf dem Telefon bleiben beide
+ * Spalten nebeneinander; gekuerzt wird der Text, nicht der Vergleich.
  *
- * REGEL: keine erfundenen Marktpreise, keine Wertung über Dritte. Links steht
- * ausschliesslich, wie die Beauftragung üblicherweise AUFGETEILT ist.
+ * REGEL: Die mittlere Spalte beschreibt nur die Struktur des ueblichen Weges.
+ * Keine Preise, keine Wertung ueber Dritte.
  */
-import Media from '@/components/Media.astro';
-import { websiteComparison, websiteEntryPrice, euro } from '@/data/website-pricing';
+import Icon from '@/components/Icon.astro';
+import Words from '@/components/Words.astro';
+import { websiteComparison, websiteEntryPrice, euro, carePlans } from '@/data/website-pricing';
 
-const assurances = [
-  'Transparente Preise ab Erstgespräch',
-  'Klare Projektphasen',
-  'Ein persönlicher Ansprechpartner',
-  'Responsive immer inklusive',
-  'Keine versteckten Pflicht-Retainer',
-  'Betreuung bleibt optional',
-];
+const careFrom = Math.min(...carePlans.filter((c) => c.price > 0).map((c) => c.price));
 ---
-<section class="one" data-theme="dark" data-bg="dark" aria-labelledby="one-title">
+<section class="one wash" data-theme="light" data-bg="light" aria-labelledby="one-title">
   <div class="container">
-    <header class="one__head">
-      <p class="eyebrow">Der Unterschied</p>
-      <h2 class="one__title" id="one-title">
-        <span class="one__title-a">Woanders sind es fünf Aufträge.</span>
-        <span class="one__title-b">Bei LAMOR ist es einer.</span>
-      </h2>
-      <p class="one__lead">
-        Gute Freelancer und Agenturen gibt es viele. Der Aufwand entsteht nicht
-        durch sie, sondern durch die Aufteilung: fünf Briefings, fünf Zeitpläne,
-        fünf Bildsprachen – bevor überhaupt etwas online geht.
-      </p>
-    </header>
-
-    <div class="one__wrap">
-      <span class="one__glow" aria-hidden="true"></span>
-      <span class="one__stamp">Alles aus einer Hand</span>
-
-      <div class="one__matrix" role="table" aria-label="Vergleich: übliche Aufteilung und LAMOR AGENCY">
-        <span class="one__col-a" role="columnheader">Üblicherweise</span>
-        <span class="one__col-b" role="columnheader">LAMOR Agency</span>
-
-        {websiteComparison.map((row) => (
-          <>
-            <p class="one__cat" role="rowheader">{row.category}</p>
-
-            <div class="one__a" role="cell">
-              <span class="one__mini">Üblicherweise</span>
-              <p class="one__a-text">
-                <span class="one__dash" aria-hidden="true"></span>
-                {row.others}
-              </p>
-            </div>
-
-            <div class="one__b" role="cell">
-              <span class="one__mini one__mini--on">LAMOR</span>
-              <ul class="one__list" role="list">
-                {row.lamor.map((item) => (
-                  <li class="one__item">
-                    <span class="one__check" aria-hidden="true"></span>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-              {row.note && <p class="one__note">{row.note}</p>}
-            </div>
-          </>
-        ))}
+    <div class="one__head">
+      <div>
+        <p class="eyebrow one__label" data-reveal="fade">Der Unterschied</p>
+        <h2 class="one__title" id="one-title">
+          <Words text="Einzeln organisiert." />
+          <span class="one__title-em">Bei LAMOR aus einer Hand.</span>
+        </h2>
       </div>
+      <p class="one__lead" data-reveal style="--reveal-delay:140ms">
+        Fünf Gewerke, ein Projekt – und ein Ansprechpartner dafür.
+      </p>
     </div>
 
-    <!-- Abbinder: Zusagen und der Einstiegspreis, ohne neue Kartenreihe -->
-    <div class="one__foot">
-      <div class="one__foot-copy">
-        <p class="one__foot-label t-label">Worauf du dich verlassen kannst</p>
-        <ul class="chips" role="list">
-          {assurances.map((a) => <li class="chip">{a}</li>)}
-        </ul>
+    <div class="card card--light one__matrix" data-reveal>
+      <!-- Kopfzeile der Matrix -->
+      <div class="one__row one__row--head" aria-hidden="true">
+        <span class="one__cat one__cat--head">Leistung</span>
+        <span class="one__col-label">Einzeln organisiert</span>
+        <span class="one__col-label one__col-label--good">Bei LAMOR</span>
       </div>
-      <a href="#anfrage" class="one__foot-cta">
-        <span class="one__foot-price">ab {euro(websiteEntryPrice)}</span>
-        <span class="one__foot-sub">Website anfragen</span>
-        <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"/></svg>
-      </a>
+
+      {websiteComparison.map((row) => (
+        <div class="one__row">
+          <span class="one__cat">
+            <span class="itile"><Icon name={row.icon} /></span>
+            <span class="one__cat-name">{row.category}</span>
+          </span>
+          <span class="one__others">
+            <span class="one__x" aria-hidden="true"><Icon name="close" /></span>
+            {row.others}
+          </span>
+          <span class="one__lamor">
+            <span class="one__check" aria-hidden="true"><Icon name="check" /></span>
+            <span class="one__lamor-text">{row.lamor}</span>
+            <span class="spill one__gain">{row.gain}</span>
+          </span>
+        </div>
+      ))}
+
+      <!-- Abschluss: der Preis-Einstieg statt eines Absatzes -->
+      <div class="one__foot">
+        <p class="one__foot-note">Betreuung optional ab {euro(careFrom)} / Monat</p>
+        <a class="one__cta" href="#pakete">
+          <span class="one__cta-price">ab {euro(websiteEntryPrice)}</span>
+          <span class="one__cta-label">Pakete ansehen</span>
+          <Icon name="arrow" class="one__cta-icon" />
+        </a>
+      </div>
     </div>
   </div>
 </section>
 
 <style>
-  .one { padding-block: clamp(2.5rem, 6vw, 5rem); overflow: clip; }
+  .one { padding-block: clamp(2.75rem, 6vw, 5.5rem); }
 
-  /* ---------- Kopf ---------- */
-  .one__head { display: grid; gap: var(--space-4); margin-bottom: clamp(2rem, 5vw, 3.5rem); }
+  .one__head { display: grid; gap: var(--space-3); margin-bottom: clamp(1.5rem, 3.5vw, 2.5rem); }
+  .one__label { color: var(--c-accent-text); }
   .one__title {
-    font-family: var(--font-display);
-    font-weight: 900;
-    font-stretch: 110%;
-    text-transform: uppercase;
-    font-size: clamp(1.7rem, 0.7rem + 3.9vw, 4rem);
-    line-height: 0.98;
-    letter-spacing: -0.04em;
+    font-family: var(--font-display); font-weight: 900; font-stretch: 112%;
+    font-size: clamp(1.9rem, 0.9rem + 4.2vw, 4.2rem);
+    line-height: 0.98; letter-spacing: -0.04em; max-width: 22ch; text-wrap: balance;
+  }
+  .one__title-em { color: var(--c-accent); }
+  .one__lead { color: var(--fg-muted); max-width: 42ch; font-size: clamp(0.95rem, 2.2vw, 1.2rem); line-height: 1.45; }
+  @media (min-width: 1024px) {
+    .one__head { grid-template-columns: minmax(0, 1fr) minmax(0, 0.7fr); gap: var(--space-8); align-items: end; }
+  }
+
+  /* ---------- Die Matrix ----------
+     Drei Spalten ab Tablet; darunter bleibt der Vergleich zweispaltig und die
+     Kategorie sitzt als Zeile darueber. */
+  .one__matrix { padding: clamp(0.6rem, 1.8vw, 1.25rem); overflow: hidden; }
+
+  .one__row {
     display: grid;
-    max-width: 20ch;
-  }
-  /* Erste Zeile zurueckgenommen, zweite traegt den Akzent – die Aussage
-     steht im Kontrast der beiden Zeilen, nicht in einem Ausrufezeichen. */
-  .one__title-a { color: var(--c-grey-dark); }
-  .one__title-b { color: var(--c-accent-on-dark); }
-  .one__lead { max-width: 56ch; color: var(--fg-muted); }
-
-  /* ---------- Matrix ---------- */
-  .one__wrap { position: relative; padding-top: 0.9rem; }
-
-  /* Sehr zurueckhaltender Schein hinter der Akzentspalte – gibt Tiefe,
-     ohne in Neon zu kippen. */
-  .one__glow {
-    position: absolute;
-    inset: -10% -6% -10% 40%;
-    background: radial-gradient(60% 50% at 70% 50%, color-mix(in srgb, var(--c-accent) 22%, transparent), transparent 70%);
-    filter: blur(40px);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .one__stamp {
-    position: absolute;
-    z-index: 3;
-    top: 0;
-    right: clamp(0.75rem, 3vw, 2rem);
-    display: inline-flex;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas: 'cat cat' 'others lamor';
+    gap: 0.35rem clamp(0.4rem, 1.4vw, 1rem);
     align-items: center;
-    padding: 0.5em 1em;
-    border-radius: var(--radius-pill);
-    background: var(--c-accent);
-    color: #fff;
-    font-size: var(--fs-eyebrow);
-    font-weight: var(--fw-semi);
-    font-stretch: var(--wd-tight);
-    letter-spacing: var(--ls-wide);
-    text-transform: uppercase;
-    /* Sitzt bewusst halb auf der Oberkante der Akzentflaeche. */
-    transform: translateY(-50%);
-    box-shadow: 0 6px 18px -6px rgba(0, 0, 0, 0.6);
-  }
-
-  .one__matrix {
+    padding: clamp(0.5rem, 1.4vw, 0.85rem) clamp(0.35rem, 1vw, 0.75rem);
     position: relative;
-    z-index: 1;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    border: 1px solid var(--line);
-    border-radius: clamp(0.7rem, 1.8vw, 1.1rem);
-    overflow: hidden;
-    background: color-mix(in srgb, var(--c-ink-2) 70%, transparent);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
   }
+  .one__row + .one__row { border-top: 1px solid var(--card-light-line-soft); }
 
-  .one__col-a, .one__col-b { display: none; }
+  .one__cat { grid-area: cat; display: flex; align-items: center; gap: 0.5rem; min-width: 0; }
+  .one__cat-name {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 108%;
+    font-size: clamp(0.82rem, 2.2vw, 1.1rem); line-height: 1.05;
+    letter-spacing: -0.025em; text-transform: uppercase;
+  }
+  .one__others {
+    grid-area: others; display: flex; align-items: center; gap: 0.4rem;
+    font-size: clamp(0.74rem, 1.9vw, 0.95rem); line-height: 1.25; color: var(--c-grey);
+  }
+  .one__x { display: grid; place-items: center; flex: none; width: 0.95rem; height: 0.95rem; color: var(--c-grey); opacity: 0.6; }
 
-  .one__cat {
-    grid-column: 1 / -1;
-    padding: 0.65rem clamp(0.8rem, 2.2vw, 1.3rem);
-    background: var(--c-ink);
-    border-top: 1px solid var(--line);
-    font-family: var(--font-display);
-    font-size: var(--fs-eyebrow);
-    font-weight: var(--fw-bold);
-    font-stretch: var(--wd-tight);
-    letter-spacing: var(--ls-wider);
-    text-transform: uppercase;
+  /* Die LAMOR-Spalte laeuft als EINE dunkle Flaeche durch alle Zeilen. */
+  .one__lamor {
+    grid-area: lamor; display: flex; align-items: center; flex-wrap: wrap;
+    gap: 0.3rem 0.45rem; min-width: 0;
+    font-size: clamp(0.76rem, 1.9vw, 0.98rem); line-height: 1.25;
+    font-weight: var(--fw-semi);
+    padding: clamp(0.4rem, 1.2vw, 0.7rem) clamp(0.5rem, 1.4vw, 0.9rem);
+    background: var(--card-dark-bg);
+    border: 1px solid var(--card-dark-line);
+    border-radius: calc(var(--radius-card) * 0.5);
     color: var(--c-paper);
   }
-  .one__cat:first-of-type { border-top: 0; }
+  .one__check { display: grid; place-items: center; flex: none; width: 1rem; height: 1rem; color: var(--c-accent-on-dark); }
+  .one__lamor-text { min-width: 0; }
+  .one__gain { display: none; }
 
-  .one__a, .one__b {
-    display: grid;
-    align-content: start;
-    gap: 0.4rem;
-    padding: clamp(0.75rem, 2.2vw, 1.2rem) clamp(0.7rem, 2vw, 1.3rem);
-    min-width: 0;
-  }
-  /* Die rechte Spalte ist durchgehend eingefaerbt – dadurch liest sie sich
-     als EINE Flaeche und nicht als Reihe einzelner Karten. */
-  .one__b { background: color-mix(in srgb, var(--c-accent) 13%, transparent); }
-  .one__a { border-right: 1px solid var(--line); }
+  /* Auf dem Telefon sind Kreuz und Haken selbsterklaerend – die Kopfzeile
+     kostet dort nur Hoehe. */
+  .one__row--head { display: none; }
+  @media (min-width: 760px) { .one__row--head { display: grid; padding-block: 0.35rem 0; } }
 
-  .one__mini {
-    font-size: 0.66rem; font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
-    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--fg-muted);
-  }
-  .one__mini--on { color: var(--c-accent-on-dark); }
-
-  .one__a-text {
-    display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.5em; align-items: baseline;
-    font-size: var(--fs-small); color: var(--fg-muted); overflow-wrap: break-word;
-  }
-  .one__dash { width: 0.75rem; height: 1px; background: currentColor; opacity: 0.6; align-self: start; margin-top: 0.62em; }
-
-  .one__list { display: grid; gap: 0.35rem; }
-  .one__item { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.55em; align-items: baseline; font-size: var(--fs-small); }
-  .one__check {
-    width: 0.9rem; height: 0.9rem; border-radius: 50%; align-self: start; margin-top: 0.15em; flex: none;
-    background: var(--c-accent) no-repeat center / 0.52rem
-      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none'><path d='M2 6.5L4.8 9L10 3' stroke='white' stroke-width='2.2' stroke-linecap='square'/></svg>");
-  }
-  .one__note { font-size: 0.72rem; color: var(--c-accent-on-dark); }
-
-  @media (min-width: 900px) {
-    /* Kategorie links, beide Spalten daneben – die Akzentflaeche laeuft
-       jetzt ununterbrochen von oben nach unten durch. */
-    .one__matrix { grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.15fr) minmax(0, 1.15fr); }
-    .one__col-a, .one__col-b {
-      display: block;
-      padding: 0.7rem 1.3rem;
-      font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
-      letter-spacing: var(--ls-wider); text-transform: uppercase;
-      border-bottom: 1px solid var(--line);
+  /* Unter 760px: Haken links, Text rechts – kein Umbruch unter das Icon. */
+  @media (max-width: 759px) {
+    .one__lamor {
+      display: grid; grid-template-columns: auto minmax(0, 1fr);
+      align-items: start; gap: 0.4rem;
     }
-    .one__col-a { grid-column: 2; color: var(--fg-muted); }
-    .one__col-b { grid-column: 3; color: var(--c-accent-on-dark); background: color-mix(in srgb, var(--c-accent) 13%, transparent); }
-    .one__cat {
-      grid-column: 1;
-      display: grid; align-content: center;
-      background: transparent;
-      border-right: 1px solid var(--line);
-      font-size: 0.8rem;
-      letter-spacing: var(--ls-wide);
-    }
-    .one__mini { display: none; }
-    .one__a, .one__b { border-top: 1px solid var(--line); }
-    .one__cat + .one__a { border-top: 1px solid var(--line); }
+    .one__check { margin-top: 0.1rem; }
   }
-
-  /* ---------- Abbinder ---------- */
-  .one__foot {
-    display: grid;
-    gap: var(--space-5);
-    margin-top: clamp(2rem, 5vw, 3.5rem);
-    padding-top: clamp(1.5rem, 3.5vw, 2.5rem);
-    border-top: 1px solid var(--line);
-    align-items: center;
-  }
-  .one__foot-label { color: var(--fg-muted); margin-bottom: var(--space-3); }
-
-  .one__foot-cta {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 0.75rem;
-    padding: clamp(0.9rem, 2vw, 1.25rem) clamp(1.1rem, 2.5vw, 1.6rem);
-    border: 1px solid var(--c-accent);
-    border-radius: clamp(0.6rem, 1.6vw, 1rem);
-    background: color-mix(in srgb, var(--c-accent) 12%, transparent);
-    transition: background var(--dur-base) var(--ease-out);
-  }
-  .one__foot-cta:hover { background: color-mix(in srgb, var(--c-accent) 22%, transparent); }
-  .one__foot-price {
-    grid-column: 1;
-    font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: 118%;
-    font-size: clamp(1.5rem, 1rem + 1.8vw, 2.25rem); line-height: 1;
-    letter-spacing: var(--ls-tight); font-variant-numeric: tabular-nums;
-    color: var(--c-paper);
-  }
-  .one__foot-sub {
-    grid-column: 2;
+  .one__cat--head, .one__col-label {
     font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
-    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--c-accent-on-dark);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--c-grey);
   }
-  .one__foot-cta svg { grid-column: 3; width: 1.1rem; height: 1.1rem; color: var(--c-accent-on-dark); transition: transform var(--dur-base) var(--ease-out); }
-  .one__foot-cta:hover svg { transform: translate(0.25em, -0.25em); }
+  .one__col-label--good { color: var(--c-accent-text); }
+  .one__row--head .one__cat--head { grid-area: cat; }
+  .one__row--head .one__col-label:nth-of-type(1) { grid-area: others; }
+  .one__row--head .one__col-label--good { grid-area: lamor; padding-left: clamp(0.5rem, 1.4vw, 0.9rem); }
 
-  @media (min-width: 900px) {
-    .one__foot { grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-7); }
+  /* Ab Tablet: echte drei Spalten, die dunkle Flaeche wird durchgehend. */
+  @media (min-width: 760px) {
+    .one__row {
+      grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr) minmax(0, 1.25fr);
+      grid-template-areas: 'cat others lamor';
+      gap: clamp(0.5rem, 1.6vw, 1.25rem);
+      padding-block: 0;
+    }
+    .one__row + .one__row { border-top: 0; }
+    .one__cat, .one__others { padding-block: clamp(0.7rem, 1.6vw, 1rem); }
+    .one__row + .one__row .one__cat,
+    .one__row + .one__row .one__others { border-top: 1px solid var(--card-light-line-soft); }
+    .one__lamor {
+      border-radius: 0; border-inline: 0; border-block: 0;
+      padding-block: clamp(0.7rem, 1.6vw, 1rem);
+      align-self: stretch;
+    }
+    .one__row + .one__row .one__lamor { border-top: 1px solid var(--card-dark-line-soft); }
+    /* Erste und letzte Zelle runden die durchgehende Spalte ab. */
+    .one__row:last-of-type .one__lamor { border-radius: 0 0 calc(var(--radius-card) * 0.5) calc(var(--radius-card) * 0.5); }
+    /* Der Kopf rundet oben ab, die Zeilen darunter stossen eckig an –
+       sonst entsteht eine sichtbare Stufe in der durchgehenden Spalte. */
+    .one__row--head { padding-bottom: 0; }
+    .one__row--head .one__col-label--good {
+      background: var(--card-dark-bg);
+      color: var(--c-accent-on-dark);
+      padding: 0.75rem clamp(0.5rem, 1.4vw, 0.9rem) 0.5rem;
+      border-radius: calc(var(--radius-card) * 0.5) calc(var(--radius-card) * 0.5) 0 0;
+      align-self: stretch;
+    }
+    .one__row--head .one__lamor { padding: 0; }
+  }
+  @media (min-width: 1100px) {
+    .one__gain { display: inline-flex; margin-left: auto; }
+  }
+
+  /* ---------- Abschluss ---------- */
+  .one__foot {
+    display: grid; gap: var(--space-3);
+    margin-top: clamp(0.6rem, 1.6vw, 1rem);
+    padding: clamp(0.75rem, 2vw, 1.25rem);
+    border-radius: calc(var(--radius-card) * 0.6);
+    background: rgba(11, 10, 9, 0.04);
+    border: 1px solid var(--card-light-line-soft);
+  }
+  @media (min-width: 620px) {
+    .one__foot { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+  }
+  .one__foot-note { font-size: var(--fs-small); color: var(--c-grey); }
+  .one__cta {
+    display: inline-grid; grid-template-columns: auto auto auto; align-items: center;
+    gap: 0.3rem 0.6rem; justify-self: start;
+    padding: 0.7rem 1.1rem; border-radius: var(--radius-pill);
+    background: var(--card-accent-bg); color: #fff;
+    box-shadow: var(--card-accent-shadow);
+    text-decoration: none;
+  }
+  .one__cta-price {
+    grid-row: 1; grid-column: 1;
+    font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: 112%;
+    font-size: clamp(1.05rem, 2.6vw, 1.5rem); line-height: 1; letter-spacing: -0.035em;
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+  .one__cta-label {
+    grid-row: 1; grid-column: 2;
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; white-space: nowrap;
+  }
+  .one__cta-icon { grid-row: 1; grid-column: 3; width: 1.1em; height: 1.1em; }
+  @media (hover: hover) and (pointer: fine) {
+    .one__cta { transition: transform var(--dur-base) var(--ease-out); }
+    .one__cta:hover { transform: translateY(-2px); }
   }
 </style>

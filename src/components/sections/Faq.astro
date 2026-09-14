@@ -37,7 +37,7 @@ const items = resolveFaqTokens(given ?? faqs);
   <div class="container faq__inner">
     <div class="faq__head">
       <p class="t-label faq__label" data-reveal="fade">{label}</p>
-      <h2 class="t-say faq__title" id={`${id}-title`}><Words text={heading} /></h2>
+      <h2 class="t-sec faq__title" id={`${id}-title`}><Words text={heading} /></h2>
       <p class="t-body t-muted faq__lead" data-reveal style="--reveal-delay:140ms">{lead}</p>
       <div class="faq__head-cta" data-reveal="fade" style="--reveal-delay:220ms">
         <ArrowLink href="/contact/" label="Frage stellen" />
