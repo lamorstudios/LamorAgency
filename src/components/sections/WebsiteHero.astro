@@ -1,30 +1,26 @@
 ---
 /**
- * Hero der Website-Landingpage – für bezahlten Traffic gebaut.
+ * Hero der Website-Landingpage – bewusst kurz.
  *
- * Reihenfolge nach Einwänden: Was ist das (Eyebrow) → Was kostet es
- * (Headline mit Preis) → Was bekomme ich (Chips) → Was tue ich jetzt (CTA)
- * → Wie läuft es (Schritte) → Wie sieht es aus (Mockup).
- *
- * Die Trennung einmalig / monatlich steht direkt im ersten Viewport, weil
- * genau dort sonst das Missverständnis entsteht.
+ * Er beantwortet nur: Was ist das, was kostet es ab, was bekomme ich, was tue
+ * ich jetzt. Preisaufteilung, Ablauf und Leistungsumfang stehen unmittelbar
+ * darunter in den Paketkarten, im Rechner und in der Leistungsmatrix – im Hero
+ * waeren sie doppelt und wuerden die Pakete nach unten druecken.
  */
 import Media from '@/components/Media.astro';
 import { site } from '@/data/site';
-import {
-  websitePricing, websiteEntryPrice, websiteEntryMonthly, euro, websiteProcess,
-} from '@/data/website-pricing';
+import { websitePricing, websiteEntryPrice, euro } from '@/data/website-pricing';
 
 const pages = websitePricing.length;
 ---
-<section class="wh" data-theme="light" data-bg="light" aria-labelledby="wh-title">
+<section class="wh wash" data-theme="dark" data-bg="dark" aria-labelledby="wh-title">
   <div class="container wh__grid">
     <div class="wh__copy">
       <p class="eyebrow">Website erstellen lassen · {site.address.city}</p>
 
       <h1 class="wh__title" id="wh-title">
         Deine neue Website.<br />
-        <span class="hl">Ab {euro(websiteEntryPrice)} netto.</span>
+        <span class="wh__price">Ab {euro(websiteEntryPrice)} netto.</span>
       </h1>
 
       <p class="wh__lead">
@@ -38,20 +34,6 @@ const pages = websitePricing.length;
         <li class="chip">SEO-Grundoptimierung</li>
         <li class="chip">Persönlicher Ansprechpartner</li>
       </ul>
-
-      <!-- Der Punkt, an dem sonst Verwirrung entsteht: getrennt dargestellt. -->
-      <div class="split wh__split">
-        <div class="split__col split__col--lead">
-          <span class="split__label">Website-Erstellung</span>
-          <span class="split__value">ab {euro(websiteEntryPrice)}</span>
-          <span class="split__note">einmalig · das Projekt gehört danach dir</span>
-        </div>
-        <div class="split__col">
-          <span class="split__label">Betreuung</span>
-          <span class="split__value">ab {euro(websiteEntryMonthly)}</span>
-          <span class="split__note">optional pro Monat · jederzeit dazubuchbar</span>
-        </div>
-      </div>
 
       <div class="wh__actions">
         <a href="#anfrage" class="btn wh__cta" data-magnetic>
@@ -82,26 +64,16 @@ const pages = websitePricing.length;
         <span class="mock__tag mock__tag--br">Desktop &amp; Mobile</span>
       </div>
 
-      <!-- Ablauf kompakt: nimmt dem Erstkontakt die Unsicherheit. -->
-      <div class="wh__steps">
-        <p class="wh__steps-label t-label">So läuft es ab</p>
-        <ol class="steps" role="list">
-          {websiteProcess.map((s) => (
-            <li class="steps__item">
-              <span class="steps__n" aria-hidden="true">{s.index}</span>
-              <span>{s.title}{s.optional ? ' (optional)' : ''}</span>
-            </li>
-          ))}
-        </ol>
-      </div>
     </div>
   </div>
 </section>
 
 <style>
   .wh {
-    background: var(--c-paper);
-    color: var(--c-ink);
+    /* Farben aus dem Theme, nicht fest verdrahtet – sonst laufen Chips und
+       Buttons ins Leere, sobald die Section dunkel wird. */
+    background: var(--bg);
+    color: var(--fg);
     padding-top: calc(var(--header-h) + clamp(1.5rem, 5vh, 3rem));
     padding-bottom: clamp(2.5rem, 6vw, 4.5rem);
     overflow: clip;
@@ -111,6 +83,7 @@ const pages = websitePricing.length;
     .wh__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: clamp(2.5rem, 5vw, 4.5rem); }
   }
 
+  .wh__price { color: var(--c-accent-on-dark); }
   .wh__title {
     margin-top: var(--space-4);
     font-family: var(--font-display);
@@ -122,7 +95,7 @@ const pages = websitePricing.length;
     letter-spacing: -0.038em;
     margin-left: -0.03em;
   }
-  .wh__lead { margin-top: var(--space-4); max-width: 46ch; color: var(--c-grey); font-size: var(--fs-body); line-height: 1.55; }
+  .wh__lead { margin-top: var(--space-4); max-width: 46ch; color: var(--fg-muted); font-size: var(--fs-body); line-height: 1.55; }
 
   .wh__chips { margin-top: var(--space-5); }
   .wh__split { margin-top: var(--space-5); background: var(--bg); }
@@ -136,7 +109,7 @@ const pages = websitePricing.length;
     border-bottom: 1px solid currentColor; padding-bottom: 0.25em;
   }
   .wh__ghost svg { width: 1em; height: 1em; transition: transform var(--dur-base) var(--ease-out); }
-  .wh__ghost:hover { color: var(--c-accent-text); }
+  .wh__ghost:hover { color: var(--c-accent-on-dark); }
   .wh__ghost:hover svg { transform: translateY(0.25em); }
 
   .wh__vat { margin-top: var(--space-4); font-size: var(--fs-small); color: var(--fg-muted); }

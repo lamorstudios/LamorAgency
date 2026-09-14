@@ -1,0 +1,276 @@
+---
+/**
+ * Leistungsuebersicht + "bei anderen oft extra" – zwei Tabellen nebeneinander.
+ *
+ * Die linke Matrix haengt am Rechner: Welches Paket dort gewaehlt ist, wird
+ * hier hervorgehoben. So entsteht die Kette PREIS -> RATE -> LEISTUNGEN.
+ * Ohne JavaScript ist das Empfehlungspaket markiert, also immer ein gueltiger
+ * Zustand.
+ *
+ * Inhalte kommen aus src/data/website-pricing.ts. Ein Haken steht nur dort,
+ * wo die Leistung in der Paketliste tatsaechlich zugesagt ist.
+ */
+import Icon from '@/components/Icon.astro';
+import Words from '@/components/Words.astro';
+import {
+  websitePricing, websiteMatrix, matrixIncludes, inclusiveComparison,
+  packageOrder, euro,
+} from '@/data/website-pricing';
+
+const defaultPkg = websitePricing.find((p) => p.highlighted) ?? websitePricing[0];
+/** Kurzname fuer die Spaltenkoepfe – "CUSTOM DIGITAL EXPERIENCE" sprengt sonst die Spalte. */
+const shortName = (name: string) => name.split(' ')[0];
+---
+<section class="mx" data-theme="light" data-bg="light" aria-labelledby="mx-title">
+  <div class="container">
+    <div class="mx__cols">
+      <!-- Leistungsuebersicht -->
+      <div class="card card--light mx__panel" data-matrix data-active={defaultPkg.id}>
+        <header class="mx__head">
+          <h2 class="mx__title" id="mx-title"><Words text="Leistungsübersicht" /></h2>
+          <p class="mx__sub">Was in welchem Paket enthalten ist.</p>
+          <p class="mx__hint">Zeigt das im Rechner gewählte Paket. Oben umschalten, um zu vergleichen.</p>
+        </header>
+
+        <div class="mx__scroll">
+          <table class="mx__table">
+            <caption class="visually-hidden">Leistungen je Website-Paket</caption>
+            <thead>
+              <tr>
+                <th scope="col" class="mx__th mx__th--row">Leistung</th>
+                {websitePricing.map((p) => (
+                  <th scope="col" class={`mx__th mx__th--pkg ${p.id === defaultPkg.id ? 'is-active' : ''}`} data-col={p.id}>
+                    <span class="mx__th-name">{shortName(p.name)}</span>
+                    <span class="mx__th-price">ab {euro(p.price as number)}</span>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {websiteMatrix.map((row) => (
+                <tr>
+                  <th scope="row" class="mx__row">
+                    <span class="mx__row-icon" aria-hidden="true"><Icon name={row.icon} /></span>
+                    <span>{row.label}</span>
+                  </th>
+                  {packageOrder.map((id) => (
+                    <td class={`mx__cell ${id === defaultPkg.id ? 'is-active' : ''}`} data-col={id}>
+                      {matrixIncludes(row, id)
+                        ? <span class="mx__yes" title="enthalten"><Icon name="check" /><span class="visually-hidden">enthalten</span></span>
+                        : <span class="mx__no" aria-hidden="true">–</span>}
+                      {!matrixIncludes(row, id) && <span class="visually-hidden">nicht enthalten</span>}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Was andernorts extra berechnet wird -->
+      <div class="card card--dark mx__panel mx__panel--dark">
+        <header class="mx__head">
+          <h2 class="mx__title mx__title--dark">
+            Bei anderen oft extra.<br /><span class="mx__title-em">Bei LAMOR AGENCY inklusive.</span>
+          </h2>
+          <p class="mx__sub mx__sub--dark">In jedem Paket enthalten – ohne Nachverhandlung.</p>
+        </header>
+
+        <div class="mx__legend" aria-hidden="true">
+          <span>Üblicherweise</span>
+          <span class="mx__legend-us">LAMOR AGENCY</span>
+        </div>
+
+        <ul class="mx__list" role="list">
+          {inclusiveComparison.map((row) => (
+            <li class="mx__item">
+              <span class="mx__item-label">
+                <span class="mx__row-icon" aria-hidden="true"><Icon name={row.icon} /></span>
+                <span>{row.label}</span>
+              </span>
+              <span class="mx__usual">{row.usual}</span>
+              <span class="mx__incl"><Icon name="check" class="mx__incl-icon" />inklusive</span>
+            </li>
+          ))}
+        </ul>
+
+        <p class="mx__claim">
+          <span class="rmark rmark--onred"><Icon name="check" /></span>
+          <span>Bei LAMOR AGENCY weißt du vorher, was enthalten ist.</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  /**
+   * Die Matrix folgt der Paketwahl im Rechner. Faellt das Skript aus, bleibt
+   * das serverseitig markierte Empfehlungspaket hervorgehoben.
+   */
+  function initMatrix() {
+    const matrix = document.querySelector<HTMLElement>('[data-matrix]');
+    if (!matrix || (matrix as any).__init) return;
+    const radios = Array.from(document.querySelectorAll<HTMLInputElement>('input[name="fin-package"]'));
+    if (!radios.length) return;
+    (matrix as any).__init = true;
+
+    const apply = () => {
+      const id = (radios.find((r) => r.checked) ?? radios[0]).value;
+      matrix.dataset.active = id;
+      matrix.querySelectorAll<HTMLElement>('[data-col]').forEach((cell) => {
+        cell.classList.toggle('is-active', cell.dataset.col === id);
+      });
+    };
+    radios.forEach((r) => r.addEventListener('change', apply));
+    apply();
+  }
+  initMatrix();
+  document.addEventListener('astro:page-load', initMatrix);
+</script>
+
+<style>
+  .mx { padding-block: clamp(2rem, 5vw, 4rem); }
+
+  .mx__cols { display: grid; gap: clamp(0.75rem, 2vw, 1.5rem); align-items: stretch; }
+  @media (min-width: 1100px) {
+    /* Beide Vergleiche nebeneinander – der Zusammenhang ist der Punkt. */
+    .mx__cols { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); }
+  }
+
+  .mx__panel { padding: clamp(0.85rem, 2.2vw, 1.6rem); min-width: 0; }
+  /* Beide Tafeln gleich hoch: die rechte schliesst mit der Aussage ab. */
+  .mx__panel--dark { display: grid; grid-template-rows: auto auto 1fr auto; height: 100%; }
+  .mx__head { margin-bottom: clamp(0.75rem, 2vw, 1.25rem); }
+  .mx__title {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 108%;
+    font-size: clamp(1.05rem, 0.85rem + 1.5vw, 1.9rem);
+    line-height: 1.02; letter-spacing: -0.035em; text-transform: uppercase;
+  }
+  .mx__title-em { color: var(--c-accent-on-dark); }
+  .mx__sub { margin-top: 0.3rem; font-size: var(--fs-small); color: var(--c-grey); }
+  /* Der Hinweis gilt nur dort, wo die Tabelle auf eine Spalte reduziert ist. */
+  .mx__hint { display: none; margin-top: 0.3rem; font-size: 0.78rem; color: var(--c-accent-text); }
+  @media (max-width: 699px) { .mx__hint { display: block; } }
+  .mx__sub--dark { color: var(--c-grey-dark); }
+
+  /* ---------- Tabelle ---------- */
+  .mx__scroll { overflow-x: auto; margin-inline: calc(-1 * clamp(0.85rem, 2.2vw, 1.6rem)); padding-inline: clamp(0.85rem, 2.2vw, 1.6rem); }
+  .mx__table { width: 100%; border-collapse: collapse; }
+
+  .mx__th {
+    position: sticky; top: 0;
+    padding: 0.35rem 0.3rem 0.6rem;
+    text-align: center; vertical-align: bottom;
+    background: transparent;
+  }
+  .mx__th--row { text-align: left; width: 45%; }
+  .mx__th--row, .mx__th-price {
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--c-grey);
+  }
+  .mx__th-name {
+    display: block;
+    font-family: var(--font-display); font-weight: 900; font-stretch: 104%;
+    font-size: clamp(0.6rem, 1.6vw, 0.82rem); letter-spacing: -0.01em; text-transform: uppercase;
+  }
+  .mx__th-price { display: block; font-size: clamp(0.54rem, 1.4vw, 0.68rem); margin-top: 0.1rem; }
+
+  .mx__row {
+    display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.4rem; align-items: center;
+    text-align: left; font-weight: var(--fw-regular);
+    padding: 0.45rem 0.5rem 0.45rem 0;
+    font-size: clamp(0.7rem, 1.7vw, 0.88rem); line-height: 1.25;
+    border-top: 1px solid var(--card-light-line-soft);
+  }
+  .mx__row-icon { display: grid; place-items: center; width: 1rem; height: 1rem; flex: none; color: var(--c-grey); font-size: 1rem; }
+  .mx__cell {
+    text-align: center; vertical-align: middle;
+    padding: 0.45rem 0.2rem;
+    border-top: 1px solid var(--card-light-line-soft);
+  }
+  .mx__yes {
+    display: inline-grid; place-items: center;
+    width: clamp(1.15rem, 2.6vw, 1.45rem); aspect-ratio: 1; border-radius: 50%;
+    background: var(--c-accent); color: #fff;
+    font-size: clamp(0.7rem, 1.7vw, 0.85rem);
+  }
+  .mx__no { color: var(--c-grey); opacity: 0.45; }
+
+  /* Auf dem Telefon waeren vier Spalten nur noch Wortsalat: dort steht genau
+     das Paket, das im Rechner gewaehlt ist. Ohne JavaScript ist das die
+     Empfehlung – also immer eine gueltige Spalte. */
+  @media (max-width: 699px) {
+    .mx__th--pkg:not(.is-active), .mx__cell:not(.is-active) { display: none; }
+    .mx__th--row { width: auto; }
+    .mx__th--pkg.is-active { min-width: 5.5rem; }
+  }
+
+  /* Die Spalte des gewaehlten Pakets wird durchgehend hinterlegt. */
+  .mx__th--pkg.is-active, .mx__cell.is-active {
+    background: color-mix(in srgb, var(--c-accent) 9%, transparent);
+  }
+  .mx__th--pkg.is-active { border-radius: calc(var(--radius-card) * 0.4) calc(var(--radius-card) * 0.4) 0 0; }
+  .mx__th--pkg.is-active .mx__th-name { color: var(--c-accent-text); }
+  .mx__table tr:last-child .mx__cell.is-active { border-radius: 0 0 calc(var(--radius-card) * 0.4) calc(var(--radius-card) * 0.4); }
+
+  /* ---------- Rechte Tafel ---------- */
+  .mx__legend {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.5rem; padding-bottom: 0.4rem;
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--c-grey-dark);
+  }
+  .mx__legend > :first-child { grid-column: 1; justify-self: end; }
+  .mx__legend-us { color: var(--c-accent-on-dark); }
+  @media (max-width: 599px) { .mx__legend { display: none; } }
+
+  .mx__list { display: grid; }
+  .mx__item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: 'label label' 'usual incl';
+    gap: 0.25rem 0.6rem; align-items: center;
+    padding-block: 0.5rem;
+    border-top: 1px solid var(--card-dark-line-soft);
+  }
+  .mx__item-label {
+    grid-area: label;
+    display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.4rem; align-items: center;
+    font-size: clamp(0.74rem, 1.8vw, 0.92rem); line-height: 1.25; font-weight: var(--fw-semi);
+  }
+  .mx__item-label .mx__row-icon { color: var(--c-grey-dark); }
+  .mx__usual {
+    grid-area: usual;
+    font-size: clamp(0.66rem, 1.6vw, 0.8rem); color: var(--c-grey-dark);
+  }
+  .mx__incl {
+    grid-area: incl;
+    display: inline-flex; align-items: center; gap: 0.3rem; white-space: nowrap;
+    padding: 0.3em 0.6em; border-radius: var(--radius-pill);
+    background: rgba(229, 67, 43, 0.14); border: 1px solid rgba(229, 67, 43, 0.28);
+    color: var(--c-accent-on-dark);
+    font-size: clamp(0.6rem, 1.5vw, 0.72rem); font-weight: var(--fw-semi);
+    font-stretch: var(--wd-tight); letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .mx__incl-icon { width: 0.8em; height: 0.8em; }
+
+  .mx__claim {
+    display: flex; align-items: center; gap: 0.6rem;
+    margin-top: clamp(0.75rem, 2vw, 1.25rem);
+    padding: clamp(0.65rem, 1.8vw, 1rem) clamp(0.75rem, 2vw, 1.1rem);
+    border-radius: calc(var(--radius-card) * 0.6);
+    background: var(--card-accent-bg); border: 1px solid var(--card-accent-line);
+    color: #fff; font-weight: var(--fw-semi);
+    font-size: clamp(0.78rem, 1.9vw, 1rem); line-height: 1.25;
+  }
+  /* Ab Tablet steht das Paar nebeneinander statt untereinander. */
+  @media (min-width: 600px) {
+    .mx__item {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 0.7fr) auto;
+      grid-template-areas: 'label usual incl';
+    }
+    .mx__usual { text-align: right; }
+  }
+</style>

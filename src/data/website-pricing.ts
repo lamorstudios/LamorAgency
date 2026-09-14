@@ -312,6 +312,84 @@ export const websiteSolutions = [
   'Technisch sauber umgesetzt',
 ];
 
+/**
+ * ============================================================================
+ * LEISTUNGSMATRIX – was in welchem Paket steckt
+ * ----------------------------------------------------------------------------
+ * REGEL 1: Jede Zeile ist aus den `features`-Listen der Pakete oben abgeleitet.
+ *          Hinter jeder Zeile steht, worauf sie sich stützt. Es wird NICHTS
+ *          zugesagt, was dort nicht steht.
+ * REGEL 2: `from` nennt die UNTERSTE Stufe, ab der eine Zeile enthalten ist.
+ *          Höhere Pakete enthalten den Umfang der niedrigeren – so sind die
+ *          Pakete aufgebaut (BUSINESS ist gegenüber ONEPAGE "der vollständige
+ *          Auftritt", PREMIUM mehr, CUSTOM am meisten). Deshalb listet CUSTOM
+ *          oben nur, was über PREMIUM hinausgeht.
+ *
+ * Bewusst NICHT in der Matrix, weil in keinem Paket zugesagt:
+ *   - GEO / KI-Sichtbarkeit
+ *   - Cookie-/Consent-Tool (es gibt nur die DSGVO-Basisintegration)
+ *   - Hosting, Wartung, laufende Betreuung → das sind die Betreuungsstufen
+ *     (carePlans), kein Bestandteil der einmaligen Erstellung.
+ * ============================================================================
+ */
+export const packageOrder = ['onepage', 'business', 'premium', 'custom'] as const;
+export type PackageId = (typeof packageOrder)[number];
+
+export interface MatrixRow {
+  label: string;
+  /** Unterste Stufe, ab der die Zeile enthalten ist. */
+  from: PackageId;
+  icon: string;
+}
+
+export const websiteMatrix: MatrixRow[] = [
+  // ab ONEPAGE – steht so in der Onepage-Featureliste
+  { label: 'Individuelles Webdesign', from: 'onepage', icon: 'image' },
+  { label: 'Responsive für alle Geräte', from: 'onepage', icon: 'cube' },
+  { label: 'Anfrageformular & WhatsApp-CTA', from: 'onepage', icon: 'bolt' },
+  { label: 'SEO-Grundoptimierung', from: 'onepage', icon: 'trend' },
+  { label: 'Performance-Optimierung', from: 'onepage', icon: 'bolt' },
+  { label: 'Rechtstexte & DSGVO-Basis eingebunden', from: 'onepage', icon: 'heart' },
+  { label: 'Deployment & technische Einrichtung', from: 'onepage', icon: 'cube' },
+  // ab BUSINESS – Onepage ist eine Seite, alles Weitere kommt hier dazu
+  { label: 'Mehrseitige Website', from: 'business', icon: 'image' },
+  { label: 'Google Maps & Local SEO', from: 'business', icon: 'trend' },
+  { label: 'Analytics / Tracking vorbereitet', from: 'business', icon: 'bars' },
+  // ab PREMIUM
+  { label: 'Creative-Direction-Konzept', from: 'premium', icon: 'heart' },
+  { label: 'Motion Design & Scroll-Animationen', from: 'premium', icon: 'bolt' },
+  { label: 'Blog- / Referenz-System', from: 'premium', icon: 'image' },
+  // ab CUSTOM
+  { label: 'Individuelle Funktionen & Buchungssysteme', from: 'custom', icon: 'cube' },
+];
+
+/** Ist die Zeile in diesem Paket enthalten? */
+export const matrixIncludes = (row: MatrixRow, pkg: PackageId) =>
+  packageOrder.indexOf(pkg) >= packageOrder.indexOf(row.from);
+
+/**
+ * "Bei anderen oft extra – bei LAMOR AGENCY inklusive"
+ *
+ * REGEL: Links steht ausschliesslich, wie ein Angebot ueblicherweise
+ * ZUGESCHNITTEN ist – nie ein Preis, nie eine Wertung ueber Dritte. Rechts
+ * steht nur, was in JEDEM Paket enthalten ist (Zeilen mit from: 'onepage').
+ */
+export interface InclusiveRow {
+  label: string;
+  usual: string;
+  icon: string;
+}
+
+export const inclusiveComparison: InclusiveRow[] = [
+  { label: 'Individuelles Design', usual: 'je nach Angebot', icon: 'image' },
+  { label: 'Responsive Umsetzung', usual: 'je nach Angebot', icon: 'cube' },
+  { label: 'SEO-Grundoptimierung', usual: 'häufig Zusatzleistung', icon: 'trend' },
+  { label: 'Performance-Optimierung', usual: 'je nach Anbieter', icon: 'bolt' },
+  { label: 'Rechtstexte technisch eingebunden', usual: 'oft separat', icon: 'heart' },
+  { label: 'Deployment & Einrichtung', usual: 'je nach Anbieter separat', icon: 'cube' },
+  { label: 'Fester Ansprechpartner', usual: 'abhängig vom Anbieter', icon: 'head' },
+];
+
 /** Günstigster Einstiegspreis – für Teaser, Hero und Meta-Beschreibung. */
 export const websiteEntryPrice = Math.min(
   ...websitePricing.filter((p) => p.price !== null).map((p) => p.price as number),

@@ -15,40 +15,19 @@ import WebsiteValue from '@/components/sections/WebsiteValue.astro';
 import WebsiteCalculator from '@/components/sections/WebsiteCalculator.astro';
 import StickyCta from '@/components/StickyCta.astro';
 import WebsiteProcess from '@/components/sections/WebsiteProcess.astro';
-import WebsitePricing from '@/components/sections/WebsitePricing.astro';
+import WebsitePackages from '@/components/sections/WebsitePackages.astro';
+import WebsiteMatrix from '@/components/sections/WebsiteMatrix.astro';
+import WebsiteBundles from '@/components/sections/WebsiteBundles.astro';
 import WebsiteContentUsp from '@/components/sections/WebsiteContentUsp.astro';
 import WebsiteLeadForm from '@/components/sections/WebsiteLeadForm.astro';
 import Testimonials from '@/components/sections/Testimonials.astro';
 import Faq from '@/components/sections/Faq.astro';
 import Media from '@/components/Media.astro';
 import Words from '@/components/Words.astro';
-import Icon from '@/components/Icon.astro';
 import { site } from '@/data/site';
 import { websiteFaqs } from '@/data/faq';
 import { websiteEntryPrice, websiteEntryMonthly, euro, websitePricing } from '@/data/website-pricing';
 import { breadcrumb, faqPage, websiteServiceSchema } from '@/lib/schema';
-
-/**
- * Leistungsumfang als Matrix statt als sechs Karten mit Absatz.
- * Drei Gruppen, je drei bis vier Stichpunkte – in drei Sekunden erfassbar.
- */
-const scope = [
-  {
-    group: 'Website',
-    icon: 'cube',
-    items: ['Individuelles Design', 'Mobile zuerst gebaut', 'Responsive Umsetzung', 'Kurze Ladezeiten'],
-  },
-  {
-    group: 'Sichtbarkeit',
-    icon: 'trend',
-    items: ['SEO-Grundlagen', 'Saubere technische Struktur', 'Auf Anfragen ausgelegt', 'Sichtbare Kontaktwege'],
-  },
-  {
-    group: 'Absicherung',
-    icon: 'heart',
-    items: ['Impressum & Datenschutz', 'DSGVO-Basics eingebunden', 'Hosting & Updates optional', 'Content auf Wunsch inklusive'],
-  },
-];
 
 const examples = [
   { label: '[WEBDESIGN] Beispiel Gastronomie', alt: 'Website-Beispiel Gastronomie', ratio: 'portrait' as const, caption: 'Gastronomie · Onepage' },
@@ -69,8 +48,9 @@ const description = `Webdesign aus ${site.address.city}: individuelle Websites a
   ]}
 >
   <WebsiteHero />
-  <WebsiteValue />
+  <WebsitePackages />
   <WebsiteCalculator />
+  <WebsiteMatrix />
   <Clients label="Vertrauen uns" title="Marken, für die wir gearbeitet haben." compact />
   <WebsiteProblem />
 
@@ -101,36 +81,9 @@ const description = `Webdesign aus ${site.address.city}: individuelle Websites a
     </div>
   </section>
 
-  <!-- Leistungsumfang -->
-  <section class="wv wash" data-theme="light" data-bg="light" aria-labelledby="wv-title">
-    <div class="container">
-      <div class="wv__head">
-        <p class="eyebrow wv__label" data-reveal="fade">Leistungsumfang</p>
-        <h2 class="t-sec wv__title" id="wv-title"><Words text="Was drin ist." /></h2>
-      </div>
-      <ul class="wv__grid" role="list">
-        {scope.map((g) => (
-          <li class="card card--light wv__card" data-reveal>
-            <div class="wv__card-head">
-              <span class="itile"><Icon name={g.icon} /></span>
-              <h3 class="wv__card-title">{g.group}</h3>
-            </div>
-            <ul class="wv__items" role="list">
-              {g.items.map((i) => (
-                <li class="wv__item">
-                  <Icon name="check" class="wv__check" />
-                  <span>{i}</span>
-                </li>
-              ))}
-            </ul>
-          </li>
-        ))}
-      </ul>
-    </div>
-  </section>
-
+  <WebsiteValue />
   <WebsiteProcess />
-  <WebsitePricing />
+  <WebsiteBundles />
   <WebsiteContentUsp />
   <Testimonials />
 
@@ -145,15 +98,17 @@ const description = `Webdesign aus ${site.address.city}: individuelle Websites a
   <WebsiteLeadForm />
 
   <!-- Finaler CTA -->
-  <section class="wf section" data-theme="dark" data-bg="dark" aria-labelledby="wf-title">
+  <section class="wf wash" data-theme="dark" data-bg="dark" aria-labelledby="wf-title">
     <div class="container wf__inner">
-      <h2 class="t-hero wf__title" id="wf-title">
-        <Words lines={['Bereit für eine', 'Website, die wirkt?']} />
-      </h2>
-      <p class="t-lead wf__lead" data-reveal style="--reveal-delay:200ms">
-        {websitePricing.length} Pakete, ein klarer Preis, ein Ansprechpartner.
-        Schreib uns – die Einschätzung kostet nichts.
-      </p>
+      <div class="wf__copy">
+        <h2 class="wf__title" id="wf-title">
+          <Words lines={['Bereit für eine', 'Website, die wirkt?']} />
+        </h2>
+        <p class="wf__lead" data-reveal style="--reveal-delay:200ms">
+          {websitePricing.length} Pakete, ein klarer Preis, ein Ansprechpartner.
+          Die Einschätzung kostet nichts.
+        </p>
+      </div>
       <div class="wf__actions" data-reveal style="--reveal-delay:280ms">
         <a href="#anfrage" class="btn" data-magnetic>
           <span>Website anfragen</span>
@@ -198,50 +153,25 @@ const description = `Webdesign aus ${site.address.city}: individuelle Websites a
   .wx__note { margin-top: var(--space-6); max-width: 56ch; }
 
   /* Vorteile */
-  .wv { padding-block: clamp(2.75rem, 6vw, 5.5rem); }
-  .wv__head { display: grid; gap: var(--space-3); margin-bottom: clamp(1.5rem, 3.5vw, 2.5rem); }
-  .wv__label { color: var(--c-accent-text); }
-  .wv__title { max-width: 18ch; }
-
-  /* Drei Gruppen nebeneinander – auf dem Telefon zwei, damit der Umfang
-     als Block lesbar bleibt statt als lange Liste. */
-  .wv__grid {
-    display: grid; gap: clamp(0.5rem, 1.5vw, 1.25rem);
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .wv__card:last-child:nth-child(odd) { grid-column: 1 / -1; }
-  @media (min-width: 900px) {
-    .wv__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .wv__card:last-child:nth-child(odd) { grid-column: auto; }
-  }
-  .wv__card {
-    display: grid; gap: clamp(0.5rem, 1.4vw, 0.85rem); align-content: start;
-    padding: clamp(0.85rem, 2.2vw, 1.5rem);
-    transition: transform var(--dur-base) var(--ease-out);
-  }
-  @media (hover: hover) and (pointer: fine) { .wv__card:hover { transform: translateY(-3px); } }
-  .wv__card-head {
-    display: flex; align-items: center; gap: clamp(0.4rem, 1.2vw, 0.7rem);
-    padding-bottom: clamp(0.4rem, 1.2vw, 0.7rem);
-    border-bottom: 1px solid var(--card-line);
-  }
-  .wv__card-title {
-    font-family: var(--font-display); font-weight: 900; font-stretch: 108%;
-    text-transform: uppercase; font-size: clamp(0.82rem, 2.2vw, 1.15rem);
-    line-height: 1.05; letter-spacing: -0.03em;
-  }
-  .wv__items { display: grid; gap: clamp(0.3rem, 1vw, 0.5rem); }
-  .wv__item {
-    display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.45rem;
-    align-items: start;
-    font-size: clamp(0.76rem, 1.9vw, 0.95rem); line-height: 1.3;
-  }
-  .wv__check { width: 0.85rem; height: 0.85rem; margin-top: 0.2em; color: var(--c-accent); }
-
   /* Finaler CTA */
   .wf__inner { display: grid; gap: var(--space-5); }
-  .wf__title { max-width: 14ch; }
-  .wf__lead { max-width: 44ch; color: var(--c-grey-dark); }
-  .wf__actions { display: flex; flex-wrap: wrap; gap: var(--space-4); margin-top: var(--space-3); }
-  .wf__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6em 1em; margin-top: var(--space-4); }
+  /* Kompakter Abschluss: Aussage links, Handlung rechts – die Riesen-Headline
+     hat fuer vier Woerter einen ganzen Bildschirm gebraucht. */
+  .wf { padding-block: clamp(2.5rem, 6vw, 4.5rem); }
+  .wf__inner { display: grid; gap: clamp(1.25rem, 3vw, 2rem); }
+  @media (min-width: 900px) {
+    .wf__inner { grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: var(--space-8); }
+    .wf__copy { grid-column: 1; }
+    .wf__actions { grid-column: 2; }
+    .wf__meta { grid-column: 1 / -1; }
+  }
+  .wf__title {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 112%;
+    font-size: clamp(1.9rem, 0.9rem + 4.2vw, 4.2rem);
+    line-height: 0.98; letter-spacing: -0.04em; text-transform: uppercase;
+    max-width: 16ch;
+  }
+  .wf__lead { margin-top: var(--space-3); max-width: 44ch; color: var(--c-grey-dark); font-size: var(--fs-small); line-height: 1.55; }
+  .wf__actions { display: flex; flex-wrap: wrap; gap: var(--space-4); }
+  .wf__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6em 1em; margin-top: var(--space-2); }
 </style>
