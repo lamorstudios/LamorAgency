@@ -376,8 +376,8 @@ export const matrixIncludes = (row: MatrixRow, pkg: PackageId) =>
  * websiteMatrix mit from: 'onepage' (also in jedem Paket enthalten), oder
  * eine Eigenschaft des Ratenmodells:
  *   - "Ratenzahlung ohne Aufschlag" -> die Rate ist Preis / Laufzeit
- *   - "Eigentum nach vollstaendiger Zahlung" -> faq.ts: "Die
- *     Website-Erstellung ist ein einmaliges Projekt und gehoert danach dir."
+ *   - "Eigentum nach vollstaendiger Zahlung" -> faq.ts: "Die Website ist ein
+ *     einmaliger Kauf - nach vollstaendiger Bezahlung gehoert sie dir."
  */
 export interface InclusiveRow {
   label: string;

@@ -72,7 +72,7 @@ export const websiteFaqs: FaqItem[] = [
   },
   {
     q: 'Ist die monatliche Betreuung Pflicht?',
-    a: 'Nein. Die Website-Erstellung ist ein einmaliges Projekt und gehört danach dir. Die Betreuung ab {{WEB_MONAT}} ist optional und deckt Hosting, technische Wartung, Backups, Monitoring und kleinere Textänderungen ab. Du kannst sie auch später dazunehmen.',
+    a: 'Nein. Die Website ist ein einmaliger Kauf – nach vollständiger Bezahlung gehört sie dir. Die Betreuung ab {{WEB_MONAT}} ist optional und deckt Hosting, technische Wartung, Backups, Monitoring und kleinere Textänderungen ab. Du kannst sie auch später dazunehmen.',
     schema: true,
   },
   {

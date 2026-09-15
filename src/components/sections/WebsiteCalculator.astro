@@ -25,7 +25,7 @@ import Icon from '@/components/Icon.astro';
 import Words from '@/components/Words.astro';
 import {
   websitePricing, financingTerms, defaultFinancingTerm, websiteRate,
-  hostingPlan, premiumPlan, euro, euroRate,
+  hostingPlan, premiumPlan, longestTerm, euro, euroRate,
 } from '@/data/website-pricing';
 
 /** Nur Pakete mit festem Preis lassen sich in Raten aufteilen. */
@@ -53,7 +53,8 @@ const prefix = defaultPkg.priceFrom ? 'ab ' : '';
         </h2>
       </div>
       <p class="fin__lead" data-reveal style="--reveal-delay:140ms">
-        Paketpreis geteilt durch die Laufzeit – 0 % Aufschlag. Danach gehört sie dir.
+        Auf Wunsch in bis zu {longestTerm} Raten: Paketpreis geteilt durch die Laufzeit,
+        0 % Aufschlag. Nach vollständiger Bezahlung gehört sie dir.
       </p>
     </div>
 

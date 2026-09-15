@@ -6,9 +6,11 @@
  * ich schon bezahlt, wie viel ist offen, wann bin ich fertig. Drei Zahlen,
  * ein Balken, ein Regler.
  *
- * BEWUSST KEIN ABLOESEMODELL: Es gibt keinen Restwert, keine Schlussrate und
- * keinen Uebernahmebetrag. Der Paketpreis wird auf die Laufzeit verteilt,
- * nach der letzten Rate steht 0 € offen. Das ist die ganze Rechnung.
+ * DAS MODELL: ein normaler Website-Kauf, auf Wunsch in bis zu 12 Raten
+ * bezahlt. Der Paketpreis wird durch die Laufzeit geteilt, nach der letzten
+ * Rate steht 0 € offen und die Website gehoert dem Kunden. Es folgt kein
+ * weiterer Betrag – das ist die ganze Rechnung. Formulierungen aus Leasing-
+ * und Finanzierungsmodellen sind hier bewusst nicht verwendet.
  *
  * ALLE Betraege kommen aus src/data/website-pricing.ts als data-Attribute.
  * Im Skript steht kein einziger Preis – nur Multiplikation und Differenz.
@@ -45,7 +47,8 @@ const prefix = defaultPkg.priceFrom ? 'ab ' : '';
         </h2>
       </div>
       <p class="pg__lead" data-reveal style="--reveal-delay:140ms">
-        Keine Ablöse, keine Schlussrate. Nach der letzten Rate steht 0 € offen.
+        Der Paketpreis geteilt durch die Laufzeit. Nach der letzten Rate steht
+        0 € offen – die Website gehört dir.
       </p>
     </div>
 

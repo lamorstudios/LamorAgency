@@ -1,21 +1,22 @@
 ---
 /**
- * "Was passiert nach der letzten Rate?" – drei Wege als Tabs.
+ * "Was passiert nach der vollstaendigen Bezahlung?" – drei Wege als Tabs.
  *
- * INHALTLICHE REGEL: Hier steht nur, was im Projekt tatsaechlich definiert
- * ist. Belegt sind:
- *   - "Die Website-Erstellung ist ein einmaliges Projekt und gehoert danach
- *     dir." (faq.ts)
- *   - "Die Betreuung ist optional und kann spaeter dazugenommen werden."
+ * INHALTLICHE REGEL: Hier steht nur, was vom Auftraggeber bestaetigt oder im
+ * Projekt definiert ist. Grundlagen:
+ *   - "Die Website ist ein einmaliger Kauf - nach vollstaendiger Bezahlung
+ *     gehoert sie dir." (faq.ts)
  *   - "Die Domain behaeltst du." (faq.ts)
  *   - Leistungsumfang der Betreuungsstufen (carePlans)
+ *   - Uebergabe und Kuendigung: vom Auftraggeber bestaetigt.
  *
- * NICHT definiert und deshalb als offener Punkt markiert statt erfunden:
- *   - Kuendigungsfrist der laufenden Betreuung
- *   - was bei einer Uebernahme konkret uebergeben wird (Zugaenge, Dateien)
- * Diese Zeilen tragen `open: true` und werden sichtbar als "noch zu
- * bestaetigen" gekennzeichnet. TODO_CONTENT: vom Auftraggeber klaeren, dann
- * `open` entfernen und den Text einsetzen.
+ * WORTWAHL: Das Modell ist ein normaler Website-Kauf mit optionaler
+ * Ratenzahlung – Vokabular aus Leasing- und Finanzierungsmodellen gehoert
+ * hier nicht hin. Nach der letzten Rate folgt kein weiterer Betrag mehr.
+ *
+ * WICHTIG: Betreuung und Ratenzahlung sind zwei getrennte Dinge. Wer die
+ * Betreuung beendet, beendet damit NICHT die laufende Ratenzahlung. Das steht
+ * ausdruecklich im dritten Tab und darf nicht wegredigiert werden.
  *
  * Die Tabs sind echte Buttons mit ARIA-Rollen; ohne JavaScript sind alle
  * drei Bereiche sichtbar untereinander – kein Inhalt geht verloren.
@@ -24,7 +25,7 @@ import Icon from '@/components/Icon.astro';
 import Words from '@/components/Words.astro';
 import { hostingPlan, premiumPlan, euro } from '@/data/website-pricing';
 
-interface Line { text: string; open?: boolean }
+interface Line { text: string }
 interface Option {
   id: string;
   tab: string;
@@ -32,6 +33,8 @@ interface Option {
   claim: string;
   price?: string;
   lines: Line[];
+  /** Klarstellung unter der Liste, wenn ein Missverstaendnis droht. */
+  note?: string;
 }
 
 const options: Option[] = [
@@ -50,33 +53,34 @@ const options: Option[] = [
     id: 'selbst',
     tab: 'Selbst übernehmen',
     title: 'Die Website gehört dir.',
-    claim: 'Nach der letzten Rate ist das Projekt bezahlt. Du kannst es auf eigenes Hosting umziehen.',
+    claim: 'Du betreibst sie selbst weiter – auf eigenem Hosting, mit eigener Technik.',
     lines: [
-      { text: 'Die Website-Erstellung ist ein einmaliges Projekt und gehört danach dir' },
-      { text: 'Deine Domain behältst du – sie lief von Anfang an auf dich' },
-      { text: 'Hosting, Wartung und Backups laufen ab dann nicht mehr über uns' },
-      { text: 'Umfang der Übergabe (Dateien, Zugänge, Ablauf)', open: true },
+      { text: 'Nach vollständiger Bezahlung gehört die Website dir' },
+      { text: 'Auf Wunsch übergeben wir dir die Website-Dateien und die nötigen Zugänge' },
+      { text: 'Deine Domain bleibt bei dir' },
+      { text: 'Hosting, Wartung, Updates und Technik liegen ab der Übergabe bei dir' },
     ],
   },
   {
     id: 'beenden',
     tab: 'Betreuung beenden',
     title: 'Nur die Betreuung endet.',
-    claim: 'Die Betreuung ist eine eigene Leistung – unabhängig davon, dass die Website bezahlt ist.',
+    claim: 'Die Betreuung ist eine eigene Leistung – unabhängig von der Website selbst.',
     lines: [
-      { text: 'Die bezahlte Website bleibt davon unberührt' },
+      { text: 'Monatlich zum Monatsende kündbar' },
+      { text: 'Danach übernehmen wir kein Hosting, keine Wartung und keine technische Betreuung mehr' },
+      { text: 'Die Website selbst bleibt davon unberührt' },
       { text: 'Betreuung lässt sich später jederzeit wieder dazubuchen' },
-      { text: 'Kündigungsfrist und Ablauf', open: true },
     ],
+    note: 'Wichtig: Wer die Betreuung schon während der Ratenzahlung beendet, beendet damit nicht die Ratenzahlung für die Website. Offene Raten des vereinbarten Website-Preises bleiben bestehen.',
   },
 ];
-const hasOpen = options.some((o) => o.lines.some((l) => l.open));
 ---
 <section class="af" id="danach" data-theme="light" data-bg="light" aria-labelledby="af-title">
   <div class="container">
     <div class="af__head">
       <div>
-        <p class="eyebrow af__label" data-reveal="fade">Nach der letzten Rate</p>
+        <p class="eyebrow af__label" data-reveal="fade">Nach vollständiger Bezahlung</p>
         <h2 class="af__title" id="af-title">
           <Words text="Du entscheidest," />
           <span class="af__title-em">wie es weitergeht.</span>
@@ -120,27 +124,21 @@ const hasOpen = options.some((o) => o.lines.some((l) => l.open));
           </div>
           <ul class="af__lines" role="list">
             {o.lines.map((l) => (
-              <li class={`af__line ${l.open ? 'af__line--open' : ''}`}>
-                <span class="af__mark" aria-hidden="true">
-                  <Icon name={l.open ? 'minus' : 'check'} />
-                </span>
-                <span>
-                  {l.text}
-                  {l.open && <span class="af__flag">noch zu bestätigen</span>}
-                </span>
+              <li class="af__line">
+                <span class="af__mark" aria-hidden="true"><Icon name="check" /></span>
+                <span>{l.text}</span>
               </li>
             ))}
           </ul>
+          {o.note && (
+            <p class="af__warn">
+              <span class="af__warn-icon" aria-hidden="true"><Icon name="minus" /></span>
+              <span>{o.note}</span>
+            </p>
+          )}
         </div>
       ))}
     </div>
-
-    {hasOpen && (
-      <p class="af__note">
-        Mit „noch zu bestätigen“ markierte Punkte stehen bewusst ohne Angabe –
-        sie werden erst veröffentlicht, wenn sie vertraglich festgelegt sind.
-      </p>
-    )}
   </div>
 </section>
 
@@ -267,18 +265,21 @@ const hasOpen = options.some((o) => o.lines.some((l) => l.open));
     width: 1.15rem; aspect-ratio: 1; border-radius: 50%;
     background: var(--c-accent); color: #fff; font-size: 0.72rem; margin-top: 0.1rem;
   }
-  /* Offene Punkte tragen keinen Haken – sie sind keine Zusage. */
-  .af__line--open { color: var(--c-grey); }
-  .af__line--open .af__mark { background: rgba(11, 10, 9, 0.12); color: var(--c-grey); }
-  .af__flag {
-    display: inline-block; margin-left: 0.5em; padding: 0.2em 0.55em;
-    border-radius: var(--radius-pill); border: 1px dashed var(--card-light-line);
-    font-size: 0.62rem; font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
-    letter-spacing: var(--ls-wide); text-transform: uppercase; white-space: nowrap;
-  }
-
-  .af__note {
+  /* Klarstellung, wo sonst ein Missverstaendnis entstuende – deutlich
+     sichtbar, nicht im Kleingedruckten. */
+  .af__warn {
+    display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.55rem;
+    align-items: start;
     margin-top: var(--space-4);
-    font-size: 0.78rem; line-height: 1.5; color: var(--fg-muted); max-width: 60ch;
+    padding: clamp(0.6rem, 1.8vw, 0.9rem) clamp(0.7rem, 2vw, 1.1rem);
+    border-radius: calc(var(--radius-card) * 0.55);
+    background: rgba(229, 67, 43, 0.1);
+    border: 1px solid rgba(229, 67, 43, 0.28);
+    font-size: clamp(0.76rem, 1.8vw, 0.9rem); line-height: 1.45; color: var(--c-ink);
+  }
+  .af__warn-icon {
+    display: grid; place-items: center; flex: none;
+    width: 1.15rem; aspect-ratio: 1; border-radius: 50%;
+    background: var(--c-accent); color: #fff; font-size: 0.72rem; margin-top: 0.05rem;
   }
 </style>

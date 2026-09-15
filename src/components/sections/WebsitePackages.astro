@@ -10,7 +10,7 @@
  */
 import Icon from '@/components/Icon.astro';
 import Words from '@/components/Words.astro';
-import { websitePricing, euro, carePlans } from '@/data/website-pricing';
+import { websitePricing, longestTerm, euro, carePlans } from '@/data/website-pricing';
 
 /** Icon je Paket – Reihenfolge wie in der Preisdatei. */
 const icons: Record<string, string> = {
@@ -30,7 +30,7 @@ const careFrom = Math.min(...carePlans.filter((c) => c.price > 0).map((c) => c.p
       </div>
       <p class="pk__note" data-reveal style="--reveal-delay:140ms">
         Alle Pakete inklusive Design, Umsetzung und technischer Einrichtung.
-        Betreuung optional ab {euro(careFrom)} / Monat.
+        Auf Wunsch in bis zu {longestTerm} Raten zahlbar. Betreuung optional ab {euro(careFrom)} / Monat.
       </p>
     </div>
 
