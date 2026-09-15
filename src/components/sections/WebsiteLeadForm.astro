@@ -271,8 +271,22 @@ const formAction = viaNetlify ? '/webdesign-muenchen/?sent=1' : formConfig.endpo
       if (btnLabel) btnLabel.textContent = 'Wird gesendet …';
 
       const transport = form.dataset.transport;
-      const ziel = transport === 'endpoint' ? (form.dataset.endpoint || '') : '/';
       const empfaenger = form.dataset.recipient || 'info@lamoragency.de';
+      /* Netlify Forms nimmt einen POST auf JEDEN Pfad der Seite an. Wir
+         posten deshalb auf den Pfad, auf dem der Besucher gerade steht,
+         statt auf ein fest verdrahtetes "/". Damit haengt der Versand an
+         keiner Regel, die an "/" gebunden ist, und wechselt weder Host
+         noch Schema – der Request bleibt garantiert same-origin. */
+      const ziel = transport === 'endpoint'
+        ? (form.dataset.endpoint || '')
+        : location.pathname;
+
+      const aufraeumen = () => {
+        laeuft = false;
+        form.classList.remove('is-busy');
+        if (submitBtn) submitBtn.disabled = false;
+        if (btnLabel) btnLabel.textContent = btnText;
+      };
 
       try {
         const daten = new FormData(form);
@@ -290,24 +304,41 @@ const formAction = viaNetlify ? '/webdesign-muenchen/?sent=1' : formConfig.endpo
             body,
           });
         }
-        if (!res.ok) throw new Error(String(res.status));
+
+        if (!res.ok) {
+          // Der Server hat geantwortet und die Anfrage abgelehnt. Das ist
+          // ein echter Fehlschlag – hier wird nichts beschoenigt.
+          throw Object.assign(new Error(String(res.status)), { abgelehnt: true });
+        }
 
         // Erfolg nur hier – nach einer tatsaechlich positiven Antwort.
         zuletztGesendet = Date.now();
         form.classList.add('is-sent');
         show('success', 'Danke – Anfrage erhalten.', 'Wir melden uns in der Regel innerhalb eines Werktags mit einer Einschätzung.');
+        aufraeumen();
       } catch (err) {
+        if (!(err as any)?.abgelehnt) {
+          /* Kein HTTP-Status, sondern ein Transportfehler: Netzwerk weg,
+             oder der Browser hat die Antwort verworfen, weil der POST auf
+             eine Weiterleitung zu einem anderen Host gelaufen ist. In dem
+             Fall wissen wir NICHT, ob die Anfrage angekommen ist – eine
+             Fehlermeldung waere also genauso falsch wie eine Erfolgsmeldung.
+             Deshalb hier der normale Formular-POST des Browsers: den nimmt
+             Netlify Forms in jedem Fall an, er folgt Weiterleitungen sauber
+             und landet auf /?sent=1, wo die bestehende Erfolgsmeldung
+             erscheint. form.submit() loest kein submit-Event aus, es kann
+             also keine Schleife entstehen. */
+          if (btnLabel) btnLabel.textContent = 'Wird gesendet …';
+          form.submit();
+          return;
+        }
         // Eingaben bleiben stehen, damit niemand alles neu tippen muss.
         show(
           'error',
           'Das hat leider nicht geklappt.',
           `Deine Eingaben sind noch da – bitte versuch es gleich noch einmal. Wenn es weiterhin nicht klappt, schreib uns direkt an ${empfaenger}.`,
         );
-      } finally {
-        laeuft = false;
-        form.classList.remove('is-busy');
-        if (submitBtn) submitBtn.disabled = false;
-        if (btnLabel) btnLabel.textContent = btnText;
+        aufraeumen();
       }
     });
   }
