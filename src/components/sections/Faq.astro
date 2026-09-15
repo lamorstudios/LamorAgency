@@ -21,6 +21,8 @@ interface Props {
   lead?: string;
   /** Eindeutige id, falls mehrere FAQ-Blöcke auf einer Seite stehen. */
   id?: string;
+  /** Ziel des "Frage stellen"-Links. Auf Landingpages der eigene Anker. */
+  ctaHref?: string;
 }
 const {
   items: given,
@@ -28,6 +30,7 @@ const {
   label = 'FAQ',
   lead = 'Etwas nicht dabei? Schreib uns – wir antworten direkt und ohne Verkaufsgespräch.',
   id = 'faq',
+  ctaHref = '/contact/',
 } = Astro.props;
 
 // Preis-Platzhalter zentral auflösen (siehe src/lib/faq.ts).
@@ -40,7 +43,7 @@ const items = resolveFaqTokens(given ?? faqs);
       <h2 class="t-sec faq__title" id={`${id}-title`}><Words text={heading} /></h2>
       <p class="t-body t-muted faq__lead" data-reveal style="--reveal-delay:140ms">{lead}</p>
       <div class="faq__head-cta" data-reveal="fade" style="--reveal-delay:220ms">
-        <ArrowLink href="/contact/" label="Frage stellen" />
+        <ArrowLink href={ctaHref} label="Frage stellen" />
       </div>
     </div>
 

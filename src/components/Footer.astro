@@ -1,25 +1,36 @@
 ---
 import { footerNav, legalNav } from '@/data/navigation';
 import { site, social } from '@/data/site';
+import { standalone } from '@/lib/standalone';
 const year = new Date().getFullYear();
+
+/* STANDALONE (temporaer, siehe src/lib/standalone.ts):
+   Die Navigationsspalte wuerde in den noch unfertigen Relaunch fuehren und
+   entfaellt deshalb. Impressum und Datenschutz bleiben – Pflichtangaben.
+   Der Abschluss-CTA springt zum Formular auf derselben Seite. */
+const footerCta = standalone.enabled
+  ? { label: 'Website anfragen', href: '#anfrage' }
+  : { label: 'Projekt anfragen', href: '/contact/' };
 ---
 <footer class="footer" data-theme="dark">
   <div class="container">
     <div class="footer__top">
       <p class="footer__claim t-h3" data-reveal>Neue Marke, neuer Content,<br />neuer Auftritt?</p>
-      <a href="/contact/" class="btn footer__cta" data-magnetic>
-        <span>Projekt anfragen</span>
+      <a href={footerCta.href} class="btn footer__cta" data-magnetic>
+        <span>{footerCta.label}</span>
         <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
       </a>
     </div>
 
-    <div class="footer__grid">
+    <div class={`footer__grid ${standalone.enabled ? 'footer__grid--standalone' : ''}`}>
+      {!standalone.enabled && (
       <div class="footer__col">
         <p class="t-label t-muted">Navigation</p>
         <ul role="list" class="footer__list">
           {footerNav.map((i) => <li><a href={i.href} class="link">{i.label}</a></li>)}
         </ul>
       </div>
+      )}
       <div class="footer__col">
         <p class="t-label t-muted">Contact</p>
         <ul role="list" class="footer__list">
@@ -77,6 +88,8 @@ const year = new Date().getFullYear();
   @media (min-width: 768px) {
     .footer__top { grid-template-columns: 1fr auto; }
     .footer__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    /* STANDALONE: ohne Navigationsspalte bleiben drei. */
+    .footer__grid--standalone { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   }
 </style>
 

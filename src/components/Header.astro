@@ -1,16 +1,31 @@
 ---
 import { mainNav, navCta } from '@/data/navigation';
 import { site, social } from '@/data/site';
+import { standalone, logoHref } from '@/lib/standalone';
 const norm = (p: string) => p.replace(/\/+$/, '') || '/';
 const path = norm(Astro.url.pathname);
 const isActive = (href: string) => (norm(href) === '/' ? path === '/' : path.startsWith(norm(href)));
+
+/* STANDALONE (temporaer, siehe src/lib/standalone.ts):
+   Im Landingpage-Build fuehrt kein Link mehr in den unfertigen Relaunch.
+   Navigation und Burger entfallen, der CTA bleibt im Funnel der Seite.
+   Ohne das Build-Flag ist hier alles wie vorher. */
+const cta = standalone.enabled ? { label: 'Website anfragen', href: '#anfrage' } : navCta;
+const logoExternal = standalone.enabled && logoHref.startsWith('http');
 ---
 <header class="header" data-header transition:persist transition:name="header">
   <div class="header__inner">
-    <a href="/" class="header__logo" aria-label={`${site.name} – Startseite`}>
+    <a
+      href={logoHref}
+      class="header__logo"
+      aria-label={standalone.enabled ? `${site.name} – zum Seitenanfang` : `${site.name} – Startseite`}
+      target={logoExternal ? '_blank' : undefined}
+      rel={logoExternal ? 'noopener noreferrer' : undefined}
+    >
       <span class="header__wordmark">{site.shortName}<sup>®</sup></span>
     </a>
 
+    {!standalone.enabled && (
     <nav class="header__nav" aria-label="Hauptnavigation">
       <ul role="list">
         {mainNav.map((item) => (
@@ -24,18 +39,22 @@ const isActive = (href: string) => (norm(href) === '/' ? path === '/' : path.sta
         ))}
       </ul>
     </nav>
+    )}
 
     <div class="header__actions">
-      <a href={navCta.href} class="header__cta btn btn--ghost" data-magnetic>{navCta.label}</a>
+      <a href={cta.href} class="header__cta btn btn--ghost" data-magnetic>{cta.label}</a>
+      {!standalone.enabled && (
       <button class="header__burger" type="button" aria-expanded="false" aria-controls="nav-overlay" data-nav-toggle>
         <span class="visually-hidden">Menü öffnen</span>
         <span class="header__burger-line" aria-hidden="true"></span>
         <span class="header__burger-line" aria-hidden="true"></span>
       </button>
+      )}
     </div>
   </div>
 </header>
 
+{!standalone.enabled && (
 <div id="nav-overlay" class="nav" data-nav aria-hidden="true" role="dialog" aria-modal="true" aria-label="Menü">
   <div class="nav__inner container">
     <nav aria-label="Hauptnavigation (Overlay)">
@@ -77,6 +96,7 @@ const isActive = (href: string) => (norm(href) === '/' ? path === '/' : path.sta
     </div>
   </div>
 </div>
+)}
 
 <style>
   .header {

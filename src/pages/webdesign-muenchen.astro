@@ -4,8 +4,9 @@
  * Läuft eigenständig: Wer über eine Meta Ad nur wegen einer Website kommt,
  * muss nichts über die übrigen Leistungen wissen, um anfragen zu können.
  *
- * Aufbau: Hero → Trust → Problem/Lösung → Beispiele → Vorteile → Prozess →
- * Pakete → Website+Content → Referenzen → FAQ → Formular → finaler CTA.
+ * Aufbau: Hero → Pakete → Rechner → Zahlungsfortschritt → nach der Zahlung →
+ * Leistungen → Problem/Lösung → Referenzen → Vorteile → Prozess →
+ * Kombinationen → Website+Content → FAQ → Formular → finaler CTA.
  */
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import WebsiteHero from '@/components/sections/WebsiteHero.astro';
@@ -20,22 +21,17 @@ import WebsiteProgress from '@/components/sections/WebsiteProgress.astro';
 import WebsiteAfter from '@/components/sections/WebsiteAfter.astro';
 import WebsiteNot from '@/components/sections/WebsiteNot.astro';
 import WebsiteBundles from '@/components/sections/WebsiteBundles.astro';
+import WebsiteShowcase from '@/components/sections/WebsiteShowcase.astro';
 import WebsiteContentUsp from '@/components/sections/WebsiteContentUsp.astro';
 import WebsiteLeadForm from '@/components/sections/WebsiteLeadForm.astro';
 import Testimonials from '@/components/sections/Testimonials.astro';
 import Faq from '@/components/sections/Faq.astro';
-import Media from '@/components/Media.astro';
 import Words from '@/components/Words.astro';
 import { site } from '@/data/site';
 import { websiteFaqs } from '@/data/faq';
 import { websiteEntryPrice, websiteEntryMonthly, euro, websitePricing } from '@/data/website-pricing';
 import { breadcrumb, faqPage, websiteServiceSchema } from '@/lib/schema';
 
-const examples = [
-  { label: '[WEBDESIGN] Beispiel Gastronomie', alt: 'Website-Beispiel Gastronomie', ratio: 'portrait' as const, caption: 'Gastronomie · Onepage' },
-  { label: '[WEBDESIGN] Beispiel Dienstleister', alt: 'Website-Beispiel Dienstleister', ratio: 'portrait' as const, caption: 'Dienstleister · Business' },
-  { label: '[WEBDESIGN] Beispiel Marke', alt: 'Website-Beispiel Markenauftritt', ratio: 'portrait' as const, caption: 'Marke · Premium' },
-];
 
 const description = `Webdesign aus ${site.address.city}: individuelle Websites ab ${euro(websiteEntryPrice)} einmalig, Betreuung optional ab ${euro(websiteEntryMonthly)} pro Monat. Inklusive Foto- und Videoproduktion aus einer Hand.`;
 ---
@@ -58,32 +54,7 @@ const description = `Webdesign aus ${site.address.city}: individuelle Websites a
   <WebsiteNot />
   <WebsiteProblem />
 
-  <!-- Website-Beispiele -->
-  <section class="wx section" data-theme="dark" data-bg="dark" aria-labelledby="wx-title">
-    <div class="container">
-      <div class="wx__head">
-        <p class="t-label wx__label" data-reveal="fade">Beispiele</p>
-        <h2 class="t-sec wx__title" id="wx-title"><Words text="So sehen unsere Websites aus." /></h2>
-      </div>
-      <ul class="wx__grid swipe" role="list">
-        {examples.map((ex, i) => (
-          <li class="wx__item" data-reveal style={`--reveal-delay:${i * 110}ms`}>
-            <Media
-              media={{ type: 'placeholder', alt: ex.alt, label: ex.label }}
-              ratio={ex.ratio}
-              hover
-              reveal
-              sizes="(min-width: 900px) 32vw, 100vw"
-            />
-            <p class="t-label t-muted wx__caption">{ex.caption}</p>
-          </li>
-        ))}
-      </ul>
-      <p class="t-small t-muted wx__note" data-reveal="fade">
-        Jedes Projekt wird individuell gestaltet – die Beispiele zeigen den Aufbau, nicht eine Vorlage.
-      </p>
-    </div>
-  </section>
+  <WebsiteShowcase />
 
   <WebsiteValue />
   <WebsiteProcess />
@@ -97,6 +68,7 @@ const description = `Webdesign aus ${site.address.city}: individuelle Websites a
     label="Häufige Fragen"
     heading="Was Kunden vor dem Start wissen wollen."
     lead="Noch eine Frage offen? Stell sie einfach direkt im Formular – wir antworten persönlich."
+    ctaHref="#anfrage"
   />
 
   <WebsiteLeadForm />
@@ -136,26 +108,6 @@ const description = `Webdesign aus ${site.address.city}: individuelle Websites a
 </BaseLayout>
 
 <style>
-  /* Beispiele */
-  .wx__head { display: grid; gap: var(--space-3); margin-bottom: var(--space-7); }
-  .wx__label { color: var(--c-accent); }
-  .wx__title { max-width: 18ch; }
-  /* Unter 700px waagerechte Swipe-Reihe statt drei gestapelter Hochformate. */
-  @media (min-width: 700px) {
-    .wx__grid {
-      grid-auto-flow: row;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      grid-auto-columns: auto;
-      gap: var(--space-6) var(--grid-gap);
-      overflow: visible;
-      margin-inline: 0;
-      padding-inline: 0;
-      padding-bottom: 0;
-    }
-  }
-  .wx__caption { margin-top: var(--space-3); }
-  .wx__note { margin-top: var(--space-6); max-width: 56ch; }
-
   /* Vorteile */
   /* Finaler CTA */
   .wf__inner { display: grid; gap: var(--space-5); }

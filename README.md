@@ -9,7 +9,38 @@ npm run dev       # http://localhost:4321
 npm run build     # → dist/
 npm run preview   # dist lokal prüfen
 npm run check     # Typprüfung
+
+npm run build:standalone   # TEMPORÄR: nur die Webdesign-Landingpage
 ```
+
+---
+
+## Temporärer Standalone-Modus (Webdesign-Landingpage)
+
+Die öffentliche Hauptwebsite läuft noch über Wix. Bis der Relaunch komplett
+ist, wird **nur** die Webdesign-Seite vorab als eigene Landingpage
+(webdesign.lamoragency.de) ausgespielt – als Zielseite für Meta Ads.
+
+Das ist **kein Fork**. Es gibt weiterhin genau eine Quelle
+(`src/pages/webdesign-muenchen.astro`) mit denselben Komponenten, Preisdaten
+und demselben Rechner. Der Standalone-Modus ist nur ein zweiter Build-Modus:
+
+| Befehl | Ergebnis |
+| --- | --- |
+| `npm run build` | vollständiger Relaunch, Webdesign als normale Unterseite |
+| `npm run build:standalone` | nur die Landingpage, ausgeliefert unter `/` |
+
+Im Standalone-Build entfallen Navigation, Burger-Menü und alle Links in den
+noch unfertigen Relaunch; das Logo führt zum Seitenanfang. Impressum und
+Datenschutz bleiben erhalten (Pflichtangaben). Alles Weitere – warum, was
+genau passiert und wie der Modus wieder verschwindet – steht in
+**`src/lib/standalone.ts`**; der Build-Teil in `astro.config.mjs`
+(`standaloneBuild()`).
+
+**Wenn der Relaunch fertig ist:** einfach wieder `npm run build` verwenden.
+Es ist keine Code-Änderung nötig.
+
+DNS, Subdomain und Deployment sind bewusst **nicht** Teil dieses Codes.
 
 ---
 
@@ -127,22 +158,30 @@ Monochromes SVG nach `src/assets/brand/clients/` und in `clients.ts` eintragen:
 `{ name: 'ZAM München', logo: '/src/assets/brand/clients/zam.svg' }`.
 Ohne Logo wird der Name typografisch gesetzt – bewusst gestaltet, nicht kaputt.
 
-### 3. Projekte
+### 3. Website-Referenzen („So sehen unsere Websites aus.")
+Echte Projekte, gepflegt in `src/data/website-showcase.ts`. Pro Projekt:
+Kundenname, `Branche · Leistung`, Live-URL und echte Screenshots unter
+`src/assets/work/<id>/`. Astro optimiert sie beim Build zu AVIF/WebP.
+Regeln: keine Paketbezeichnungen in der Beschriftung, keine nachgebauten
+Screens, keine Geräte-Mockups. Fehlt eine Bilddatei, rendert
+`WebsiteShowcase.astro` einen sichtbaren Slot statt eines erfundenen Visuals.
+
+### 4. Projekte
 Je Projekt `src/content/projects/<slug>.md` (Felder siehe `src/content.config.ts`).
 Angelegt sind die echten Referenzen aus dem bestehenden Portfolio; Texte und
 Medien sind mit `TODO_CONTENT` markiert.
 
-### 4. Kundenstimmen
+### 5. Kundenstimmen
 `src/data/testimonials.ts`. **Es wird nichts erfunden:** Einträge mit
 `verified: false` werden nicht ausgespielt. Originalwortlaut einsetzen und
 `verified: true` setzen – dann erscheint die Section automatisch.
 
-### 5. Team, Models, Fonts
+### 6. Team, Models, Fonts
 - `team.ts` / `models.ts`: nur belegte Personen und freigegebene Profile.
 - Hausschrift: `.woff2` nach `public/fonts/`, `@font-face` in `src/styles/fonts.css`,
   `--font-display` / `--font-body` in `src/styles/tokens.css` voranstellen.
 
-### 6. Rechtliches
+### 7. Rechtliches
 `src/pages/impressum.astro` und `datenschutz.astro`: bestehende Texte 1:1 einsetzen,
 `TODO_VERIFY`-Stellen prüfen (Rechtsform, Hosting Wix → Netlify, Netlify Forms).
 
