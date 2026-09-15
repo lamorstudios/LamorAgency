@@ -2,10 +2,16 @@
 /**
  * Kurze Lead-Form für die Website-Landingpage.
  * Bewusst knapp: bei bezahltem Traffic kostet jedes zusätzliche Feld Anfragen.
- * Eigener Netlify-Formularname ("website"), damit die Leads getrennt von den
+ * Eigener Formularname ("website"), damit die Leads getrennt von den
  * allgemeinen Anfragen ankommen.
+ *
+ * VERSANDWEG: siehe src/data/forms.ts. Auf Netlify laufen die Anfragen über
+ * Netlify Forms, auf einem statischen Hoster über einen externen Endpunkt.
+ * Das Markup unterscheidet sich nur in wenigen Attributen; die Felder,
+ * die Prüfung und die Rückmeldungen sind in beiden Fällen identisch.
  */
 import { websitePricing, websitePriceLine } from '@/data/website-pricing';
+import { formConfig } from '@/data/forms';
 
 const budgetOptions = [
   'Noch offen',
@@ -25,6 +31,12 @@ const needOptions = [
 
 const packageIds = websitePricing.map((p) => p.id).join(',');
 const entry = websitePriceLine(websitePricing[0]);
+
+const viaNetlify = formConfig.transport === 'netlify';
+/* Ohne JavaScript geht der Submit direkt an den Zielort: auf Netlify an die
+   Seite selbst, sonst an den externen Endpunkt. So bleibt das Formular auch
+   ohne Skript benutzbar. */
+const formAction = viaNetlify ? '/webdesign-muenchen/?sent=1' : formConfig.endpoint;
 ---
 <section class="wl section" id="anfrage" data-theme="dark" data-bg="dark" aria-labelledby="wl-title">
   <div class="container wl__inner">
@@ -45,15 +57,24 @@ const entry = websitePriceLine(websitePricing[0]);
       class="form wl__form"
       name="website"
       method="POST"
-      action="/webdesign-muenchen/?sent=1"
-      data-netlify="true"
-      netlify-honeypot="bot-field"
+      action={formAction}
+      data-netlify={viaNetlify ? 'true' : undefined}
+      netlify-honeypot={viaNetlify ? 'bot-field' : undefined}
       novalidate
       data-website-form
       data-packages={packageIds}
+      data-transport={formConfig.transport}
+      data-endpoint={formConfig.endpoint || undefined}
+      data-recipient={formConfig.recipient}
     >
-      <input type="hidden" name="form-name" value="website" />
+      {viaNetlify && <input type="hidden" name="form-name" value="website" />}
+      <input type="hidden" name="_subject" value="Website-Anfrage über webdesign.lamoragency.de" />
       <input type="hidden" name="paket" value="" data-prefill-package />
+      {/* Stand des Rechners zum Zeitpunkt des Absendens – wird beim Submit
+          aus der Paketwahl und dem Laufzeitregler gefüllt. */}
+      <input type="hidden" name="rechner_paket" value="" data-calc-package />
+      <input type="hidden" name="rechner_laufzeit" value="" data-calc-term />
+      <input type="hidden" name="rechner_rate" value="" data-calc-rate />
       <p class="visually-hidden" aria-hidden="true">
         <label>Bitte leer lassen: <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
       </p>
@@ -208,24 +229,85 @@ const entry = websitePriceLine(websitePricing[0]);
       show('success', 'Danke – Anfrage erhalten.', 'Wir melden uns in der Regel innerhalb eines Werktags mit einer Einschätzung.');
     }
 
+    /* Stand des Rechners mitschicken, damit in der Mail steht, was der
+       Interessent gerade gerechnet hat. Kein Preis wird hier berechnet –
+       es werden nur die sichtbaren Werte uebernommen. */
+    const uebernehmeRechner = () => {
+      const paketWahl = document.querySelector<HTMLInputElement>('input[name="fin-package"]:checked');
+      const laufzeit = document.querySelector<HTMLInputElement>('input#fin-term');
+      const rate = document.querySelector<HTMLElement>('[data-rate]');
+      const setzen = (sel: string, wert: string) => {
+        const el = form.querySelector<HTMLInputElement>(sel);
+        if (el) el.value = wert;
+      };
+      // data-name traegt den Paketnamen, den der Rechner anzeigt.
+      if (paketWahl) setzen('[data-calc-package]', paketWahl.dataset.name || paketWahl.value);
+      if (laufzeit) setzen('[data-calc-term]', `${laufzeit.value} Monate`);
+      if (rate) setzen('[data-calc-rate]', `${rate.textContent?.trim()} / Monat`);
+    };
+
+    const submitBtn = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+    const btnLabel = submitBtn?.querySelector('span');
+    const btnText = btnLabel?.textContent ?? '';
+    let laeuft = false;
+    let zuletztGesendet = 0;
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      // Doppelklick-Schutz: waehrend des Versands und 3 s danach passiert nichts.
+      if (laeuft || Date.now() - zuletztGesendet < 3000) return;
+
       const ok = [fields.map(validateField).every(Boolean), validateConsent()].every(Boolean);
       if (!ok) {
         (form.querySelector<HTMLElement>('[aria-invalid="true"]') ?? consent).focus();
         return;
       }
+
+      uebernehmeRechner();
+
+      laeuft = true;
       form.classList.add('is-busy');
+      if (submitBtn) submitBtn.disabled = true;
+      if (btnLabel) btnLabel.textContent = 'Wird gesendet …';
+
+      const transport = form.dataset.transport;
+      const ziel = transport === 'endpoint' ? (form.dataset.endpoint || '') : '/';
+      const empfaenger = form.dataset.recipient || 'info@lamoragency.de';
+
       try {
-        const body = new URLSearchParams(new FormData(form) as any).toString();
-        const res = await fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
+        const daten = new FormData(form);
+        let res: Response;
+        if (transport === 'endpoint') {
+          // Externe Formular-Dienste erwarten multipart oder JSON und
+          // antworten mit CORS-Headern. Accept: application/json sorgt
+          // dafuer, dass wir eine auswertbare Antwort bekommen.
+          res = await fetch(ziel, { method: 'POST', body: daten, headers: { Accept: 'application/json' } });
+        } else {
+          const body = new URLSearchParams(daten as any).toString();
+          res = await fetch(ziel, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body,
+          });
+        }
         if (!res.ok) throw new Error(String(res.status));
+
+        // Erfolg nur hier – nach einer tatsaechlich positiven Antwort.
+        zuletztGesendet = Date.now();
         form.classList.add('is-sent');
         show('success', 'Danke – Anfrage erhalten.', 'Wir melden uns in der Regel innerhalb eines Werktags mit einer Einschätzung.');
-      } catch {
-        show('error', 'Das hat leider nicht geklappt.', 'Bitte versuch es noch einmal oder schreib uns direkt an info@lamoragency.de.');
+      } catch (err) {
+        // Eingaben bleiben stehen, damit niemand alles neu tippen muss.
+        show(
+          'error',
+          'Das hat leider nicht geklappt.',
+          `Deine Eingaben sind noch da – bitte versuch es gleich noch einmal. Wenn es weiterhin nicht klappt, schreib uns direkt an ${empfaenger}.`,
+        );
       } finally {
+        laeuft = false;
         form.classList.remove('is-busy');
+        if (submitBtn) submitBtn.disabled = false;
+        if (btnLabel) btnLabel.textContent = btnText;
       }
     });
   }
