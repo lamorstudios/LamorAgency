@@ -87,15 +87,15 @@ const heroImage = heroKey ? (await heroFiles[heroKey]()).default : undefined;
     <div class="wh__visual">
       <div class:list={['mock', heroImage && 'mock--photo']}>
         <div class="mock__frame">
+          {/* Motiv unveraendert, unbeschnitten, ohne Overlay – das
+              Seitenverhaeltnis kommt aus der Datei.
+              fallbackFormat JPEG statt PNG: die PNG-Variante waere in voller
+              Breite 2,3 MB gross. AVIF und WebP bedienen praktisch alle
+              Browser, der Rest bekommt ein schlankes JPEG. */}
           {heroImage ? (
-            /* Unveraendert, unbeschnitten, ohne Overlay. Das Seitenverhaeltnis
-               kommt aus der Datei – nichts wird gestreckt oder gecroppt. */
             <Picture
               src={heroImage}
               formats={['avif', 'webp']}
-              /* Fallback als JPEG statt PNG: die PNG-Variante des Motivs waere
-                 2,3 MB gross. AVIF und WebP bedienen praktisch alle Browser,
-                 der Rest bekommt ein schlankes JPEG statt eines Riesen-PNG. */
               fallbackFormat="jpeg"
               widths={[560, 900, 1280, 1600]}
               sizes="(min-width: 1024px) 44vw, 100vw"
