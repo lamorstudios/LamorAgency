@@ -1,0 +1,118 @@
+---
+/**
+ * WHO WE CREATE FOR – horizontaler Slider.
+ * Bewusst nativer Scroll-Container mit Scroll-Snap: funktioniert mit Finger,
+ * Trackpad, Tastatur und auch dann, wenn JS nicht läuft. Die Pfeil-Buttons
+ * sind reine Zugabe und werden erst per JS eingeblendet.
+ */
+import Words from '@/components/Words.astro';
+import { industries } from '@/data/industries';
+---
+<section class="ind section" data-theme="light" data-bg="light" aria-labelledby="ind-title">
+  <div class="container ind__head">
+    <div>
+      <p class="t-label ind__label" data-reveal="fade">Who we create for</p>
+      <h2 class="t-sec ind__title" id="ind-title"><Words text="Branchen, die wir im Schlaf kennen." /></h2>
+    </div>
+    <div class="ind__nav" data-slider-nav hidden>
+      <button type="button" class="ind__btn" data-slider-prev aria-label="Vorherige Branchen">
+        <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M14 8H2M2 8L7 3M2 8L7 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+      </button>
+      <button type="button" class="ind__btn" data-slider-next aria-label="Weitere Branchen">
+        <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8H14M14 8L9 3M14 8L9 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="ind__viewport" data-slider tabindex="0" role="group" aria-label="Branchen – horizontal scrollbar">
+    <ul class="ind__track" role="list">
+      {industries.map((ind, i) => (
+        <li class="ind__card" data-reveal style={`--reveal-delay:${Math.min(i * 60, 360)}ms`}>
+          <span class="ind__card-label t-label">{ind.label}</span>
+          <h3 class="ind__card-title t-h3">{ind.title}</h3>
+          <p class="ind__card-text t-small t-muted">{ind.text}</p>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .ind { overflow: clip; }
+  .ind__head { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-5); margin-bottom: var(--space-7); }
+  .ind__label { color: var(--c-accent); margin-bottom: var(--space-3); }
+  .ind__title { max-width: 18ch; }
+
+  .ind__nav { display: none; gap: var(--space-3); flex-shrink: 0; }
+  @media (min-width: 900px) { .ind__nav:not([hidden]) { display: flex; } }
+  .ind__btn { display: grid; place-items: center; width: 3rem; height: 3rem; border: 1px solid var(--line); border-radius: 50%; color: var(--fg); transition: background var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out); }
+  .ind__btn svg { width: 1rem; height: 1rem; }
+  .ind__btn:hover:not(:disabled) { background: var(--c-accent); border-color: var(--c-accent); color: #fff; }
+  .ind__btn:disabled { opacity: 0.3; cursor: default; }
+
+  .ind__viewport {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    /* Karten starten und enden bündig am Container-Rand. */
+    padding-inline: var(--gutter);
+    padding-bottom: var(--space-3);
+  }
+  .ind__viewport::-webkit-scrollbar { display: none; }
+  .ind__viewport:focus-visible { outline: 2px solid var(--fg); outline-offset: -2px; }
+
+  .ind__track { display: flex; gap: var(--grid-gap); width: max-content; }
+  .ind__card {
+    scroll-snap-align: start;
+    display: grid;
+    align-content: start;
+    gap: var(--space-3);
+    width: clamp(15rem, 72vw, 22rem);
+    padding: clamp(1.25rem, 3vw, 2rem);
+    border: 1px solid var(--line);
+    background: var(--bg);
+    transition: background var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
+  }
+  .ind__card-label { color: var(--c-accent); transition: color var(--dur-base) var(--ease-out); }
+  .ind__card-text { min-height: 4.5em; }
+
+  @media (hover: hover) and (pointer: fine) {
+    .ind__card:hover { background: var(--c-ink); color: var(--c-paper); border-color: var(--c-ink); }
+    .ind__card:hover .ind__card-text { color: var(--c-grey-dark); }
+  }
+  @media (min-width: 900px) { .ind__card { width: clamp(20rem, 26vw, 26rem); } }
+</style>
+
+<script>
+  function initSlider() {
+    document.querySelectorAll<HTMLElement>('[data-slider]').forEach((viewport) => {
+      if ((viewport as any).__init) return;
+      (viewport as any).__init = true;
+      const section = viewport.closest('section');
+      const nav = section?.querySelector<HTMLElement>('[data-slider-nav]');
+      const prev = section?.querySelector<HTMLButtonElement>('[data-slider-prev]');
+      const next = section?.querySelector<HTMLButtonElement>('[data-slider-next]');
+      if (!nav || !prev || !next) return;
+      nav.hidden = false;
+
+      const card = viewport.querySelector<HTMLElement>('li');
+      const step = () => (card?.getBoundingClientRect().width ?? 320) + 16;
+      const scrollBy = (dir: number) =>
+        viewport.scrollBy({ left: dir * step(), behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+
+      prev.addEventListener('click', () => scrollBy(-1));
+      next.addEventListener('click', () => scrollBy(1));
+
+      const sync = () => {
+        const max = viewport.scrollWidth - viewport.clientWidth - 2;
+        prev.disabled = viewport.scrollLeft <= 2;
+        next.disabled = viewport.scrollLeft >= max;
+      };
+      sync();
+      viewport.addEventListener('scroll', () => requestAnimationFrame(sync), { passive: true });
+      window.addEventListener('resize', sync, { passive: true });
+    });
+  }
+  document.addEventListener('astro:page-load', initSlider);
+</script>

@@ -1,0 +1,190 @@
+---
+/**
+ * Problem → Loesung als direkte Gegenueberstellung.
+ *
+ * Der Vergleich steht IMMER nebeneinander – auch auf dem Telefon. Statt zu
+ * stapeln, wird der Text kuerzer: `badShort`/`goodShort` aus den Daten. Ein
+ * Vergleich, der untereinander steht, ist kein Vergleich mehr.
+ *
+ * Links zurueckhaltend hell, rechts dunkel mit rotem Schein, dazwischen das
+ * schwebende VS. Darunter der Kennzahlenstreifen – echte Werte aus stats.ts.
+ */
+import Icon from '@/components/Icon.astro';
+import Words from '@/components/Words.astro';
+import { comparison } from '@/data/comparison';
+import { stats } from '@/data/stats';
+
+const figures = stats.slice(0, 3);
+---
+<section class="cmp wash" data-theme="light" data-bg="light" aria-labelledby="cmp-title">
+  <div class="container">
+    <div class="cmp__head">
+      <p class="eyebrow cmp__label" data-reveal="fade">Problem → Lösung</p>
+      <h2 class="cmp__title" id="cmp-title">
+        <Words text={comparison.headline} />
+        <span class="cmp__title-em">{comparison.headlineAccent}</span>
+      </h2>
+      <p class="cmp__lead" data-reveal style="--reveal-delay:140ms">{comparison.lead}</p>
+    </div>
+
+    <div class="cmp__duel" data-reveal>
+      <!-- Ist-Zustand -->
+      <article class="card card--light cmp__panel">
+        <header class="cmp__panel-head">
+          <span class="rmark rmark--bad"><Icon name="minus" /></span>
+          <h3 class="cmp__panel-title">{comparison.badLabel}</h3>
+        </header>
+        <ul class="cmp__rows" role="list">
+          {comparison.pairs.map((p) => (
+            <li class="crow">
+              <span class="itile itile--bad"><Icon name={p.iconBad} /></span>
+              <span class="crow__text">
+                <span class="cmp__long">{p.bad}</span>
+                <span class="cmp__short">{p.badShort}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+        <p class="cmp__closing cmp__closing--bad">
+          <span class="rmark rmark--quiet"><Icon name="close" /></span>
+          <span>{comparison.badClosing}</span>
+        </p>
+      </article>
+
+      <span class="vs cmp__vs" aria-hidden="true">vs.</span>
+
+      <!-- Mit LAMOR -->
+      <article class="card card--dark cmp__panel cmp__panel--good">
+        <header class="cmp__panel-head">
+          <span class="rmark rmark--good"><Icon name="check" /></span>
+          <h3 class="cmp__panel-title">{comparison.goodLabel}</h3>
+        </header>
+        <ul class="cmp__rows" role="list">
+          {comparison.pairs.map((p) => (
+            <li class="crow">
+              <span class="itile itile--good"><Icon name={p.iconGood} /></span>
+              <span class="crow__text">
+                <span class="cmp__long">{p.good}</span>
+                <span class="cmp__short">{p.goodShort}</span>
+              </span>
+              <span class="spill crow__pill">{p.gain}</span>
+            </li>
+          ))}
+        </ul>
+        <p class="cmp__closing cmp__closing--good">
+          <span class="rmark rmark--onred"><Icon name="check" /></span>
+          <span>{comparison.goodClosing}</span>
+        </p>
+      </article>
+    </div>
+
+    <!-- Beleg in Zahlen: nur Werte, die in src/data/stats.ts stehen. -->
+    <div class="card card--dark metrics cmp__metrics" data-reveal>
+      {figures.map((s) => (
+        <div class="metric">
+          <span class="metric__value">
+            {s.prefix ?? ''}<span data-count={s.value} data-grouped={s.grouped ? '' : undefined}>{s.grouped ? new Intl.NumberFormat('de-DE').format(s.value) : s.value}</span>{s.suffix ?? ''}
+          </span>
+          <span class="metric__label">{s.label}</span>
+          {s.note && <span class="metric__note">{s.note}</span>}
+        </div>
+      ))}
+      <div class="metric">
+        <span class="metric__value">1</span>
+        <span class="metric__label">Partner</span>
+        <span class="metric__note">Strategie, Content, Web &amp; Branding</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cmp { padding-block: clamp(2.75rem, 6vw, 5.5rem); }
+
+  .cmp__head { display: grid; gap: var(--space-3); margin-bottom: clamp(1.5rem, 3.5vw, 2.75rem); }
+  .cmp__label { color: var(--c-accent-text); }
+  .cmp__title {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 112%;
+    font-size: clamp(2rem, 0.9rem + 4.6vw, 4.6rem);
+    line-height: 0.98; letter-spacing: -0.04em; max-width: 24ch; text-wrap: balance;
+  }
+  .cmp__title-em { color: var(--c-accent); }
+  .cmp__lead {
+    color: var(--fg-muted); max-width: 46ch;
+    font-size: clamp(0.95rem, 2.4vw, 1.2rem); line-height: 1.45;
+  }
+
+  /* ---------- Die Gegenueberstellung ----------
+     Zwei Spalten, immer. Der Mittelspalt traegt das VS. */
+  .cmp__duel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(0.5rem, 1.6vw, 2.25rem);
+    align-items: stretch;
+    position: relative;
+  }
+  .cmp__panel {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    padding: clamp(0.75rem, 2.2vw, 1.6rem);
+    min-width: 0;
+  }
+
+  .cmp__panel-head {
+    display: flex; align-items: center; gap: clamp(0.45rem, 1.4vw, 0.8rem);
+    padding-bottom: clamp(0.5rem, 1.4vw, 0.9rem);
+  }
+  .cmp__panel-title {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 108%;
+    font-size: clamp(0.82rem, 2.5vw, 1.5rem);
+    line-height: 1.05; letter-spacing: -0.03em;
+    text-wrap: balance; min-width: 0; hyphens: auto;
+  }
+  /* Unter 400px bekommt "Mit LAMOR AGENCY" die volle Spaltenbreite –
+     neben der Marke bliebe sonst zu wenig Platz. */
+  @media (max-width: 399px) {
+    .cmp__panel-head { display: grid; justify-items: start; gap: 0.4rem; }
+  }
+  .rmark--quiet { background: rgba(11, 10, 9, 0.08); color: var(--c-grey); }
+  .rmark--onred { background: rgba(255, 255, 255, 0.22); color: #fff; }
+
+  .cmp__rows { display: grid; align-content: start; }
+
+  /* Auf schmalen Displays steht die Kurzfassung – gleiche Aussage, weniger Wörter. */
+  .cmp__long { display: none; }
+  .cmp__short { display: block; }
+  @media (min-width: 760px) {
+    .cmp__long { display: block; }
+    .cmp__short { display: none; }
+  }
+  /* Unter 600px braucht die Zeile keine Pill – der Platz gehoert dem Vergleich. */
+  .crow__pill { display: none; }
+  @media (min-width: 600px) { .crow__pill { display: inline-flex; } }
+
+  .cmp__closing {
+    display: flex; align-items: center; gap: clamp(0.45rem, 1.4vw, 0.75rem);
+    margin-top: clamp(0.6rem, 1.6vw, 1rem);
+    padding: clamp(0.55rem, 1.6vw, 0.95rem) clamp(0.6rem, 1.6vw, 1.1rem);
+    border-radius: calc(var(--radius-card) * 0.62);
+    font-family: var(--font-display); font-weight: 800; font-stretch: 105%;
+    font-size: clamp(0.75rem, 2vw, 1.02rem); line-height: 1.15; letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .cmp__closing--bad { background: rgba(11, 10, 9, 0.045); border: 1px solid var(--card-light-line-soft); color: var(--c-grey); }
+  .cmp__closing--good { background: var(--card-accent-bg); border: 1px solid var(--card-accent-line); color: #fff; }
+
+  /* Das VS. schwebt im Spalt zwischen beiden Flaechen. */
+  .cmp__vs {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+  }
+
+  .cmp__metrics { margin-top: clamp(1rem, 2.5vw, 2rem); }
+
+  /* Ab Tablet darf die rechte Flaeche etwas mehr Raum nehmen: sie traegt
+     die Pills und ist die Antwort. */
+  @media (min-width: 1024px) {
+    .cmp__duel { grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr); }
+  }
+</style>

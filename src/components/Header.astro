@@ -1,102 +1,180 @@
 ---
-import { mainNav } from '@/data/navigation';
+import { mainNav, navCta } from '@/data/navigation';
 import { site, social } from '@/data/site';
+import { standalone, logoHref } from '@/lib/standalone';
 const norm = (p: string) => p.replace(/\/+$/, '') || '/';
 const path = norm(Astro.url.pathname);
-const isActive = (href: string) => norm(href) === '/' ? path === '/' : path.startsWith(norm(href));
+const isActive = (href: string) => (norm(href) === '/' ? path === '/' : path.startsWith(norm(href)));
+
+/* STANDALONE (temporaer, siehe src/lib/standalone.ts):
+   Im Landingpage-Build fuehrt kein Link mehr in den unfertigen Relaunch.
+   Navigation und Burger entfallen, der CTA bleibt im Funnel der Seite.
+   Ohne das Build-Flag ist hier alles wie vorher. */
+const cta = standalone.enabled ? { label: 'Website anfragen', href: '#anfrage' } : navCta;
+const logoExternal = standalone.enabled && logoHref.startsWith('http');
 ---
 <header class="header" data-header transition:persist transition:name="header">
   <div class="header__inner">
-    <a href="/" class="header__logo" aria-label={`${site.name} – Startseite`}>
+    <a
+      href={logoHref}
+      class="header__logo"
+      aria-label={standalone.enabled ? `${site.name} – zum Seitenanfang` : `${site.name} – Startseite`}
+      target={logoExternal ? '_blank' : undefined}
+      rel={logoExternal ? 'noopener noreferrer' : undefined}
+    >
       <span class="header__wordmark">{site.shortName}<sup>®</sup></span>
     </a>
 
+    {!standalone.enabled && (
     <nav class="header__nav" aria-label="Hauptnavigation">
       <ul role="list">
         {mainNav.map((item) => (
-          <li><a href={item.href} class={`header__link link ${isActive(item.href) ? 'link--active' : ''}`} aria-current={isActive(item.href) ? 'page' : undefined}>{item.label}</a></li>
+          <li>
+            <a
+              href={item.href}
+              class={`header__link link ${isActive(item.href) ? 'link--active' : ''}`}
+              aria-current={isActive(item.href) ? 'page' : undefined}
+            >{item.label}</a>
+          </li>
         ))}
       </ul>
     </nav>
+    )}
 
     <div class="header__actions">
-      <a href="/contact/" class="header__cta btn btn--ghost" data-magnetic>Let's talk</a>
+      <a href={cta.href} class="header__cta btn btn--ghost" data-magnetic>{cta.label}</a>
+      {!standalone.enabled && (
       <button class="header__burger" type="button" aria-expanded="false" aria-controls="nav-overlay" data-nav-toggle>
-        <span class="visually-hidden">Menü</span>
+        <span class="visually-hidden">Menü öffnen</span>
         <span class="header__burger-line" aria-hidden="true"></span>
         <span class="header__burger-line" aria-hidden="true"></span>
       </button>
+      )}
     </div>
   </div>
 </header>
 
+{!standalone.enabled && (
 <div id="nav-overlay" class="nav" data-nav aria-hidden="true" role="dialog" aria-modal="true" aria-label="Menü">
   <div class="nav__inner container">
-    <nav aria-label="Mobile Navigation">
+    <nav aria-label="Hauptnavigation (Overlay)">
       <ul role="list" class="nav__list">
         {mainNav.map((item, i) => (
           <li class="nav__item" style={`--i:${i}`}>
             <a href={item.href} class="nav__link" aria-current={isActive(item.href) ? 'page' : undefined}>
+              <span class="nav__index t-label" aria-hidden="true">{item.index}</span>
               <span class="nav__label">{item.label}</span>
+              {item.desc && <span class="nav__desc t-label" aria-hidden="true">{item.desc}</span>}
             </a>
           </li>
         ))}
       </ul>
     </nav>
-    <div class="nav__meta">
-      <div class="nav__block" style="--i:6">
-        <p class="t-label t-muted">Contact</p>
-        <a href={`mailto:${site.email}`} class="nav__meta-link">{site.email}</a>
-        <a href={site.phoneHref} class="nav__meta-link">{site.phone}</a>
-      </div>
-      <div class="nav__block" style="--i:7">
-        <p class="t-label t-muted">Social</p>
-        {social.map((s) => <a href={s.href} class="nav__meta-link" target="_blank" rel="noopener noreferrer">{s.label}</a>)}
-      </div>
-      <div class="nav__block nav__claim" style="--i:8">
-        <p class="t-label">{site.claim}</p>
+
+    <div class="nav__foot">
+      <a href={navCta.href} class="btn nav__cta" style="--i:6">
+        <span>{navCta.label}</span>
+        <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+      </a>
+
+      <div class="nav__meta">
+        <div class="nav__block" style="--i:7">
+          <p class="t-label t-muted">Contact</p>
+          <a href={`mailto:${site.email}`} class="nav__meta-link">{site.email}</a>
+          <a href={site.phoneHref} class="nav__meta-link">{site.phone}</a>
+        </div>
+        <div class="nav__block" style="--i:8">
+          <p class="t-label t-muted">Social</p>
+          {social.map((s) => (
+            <a href={s.href} class="nav__meta-link" target="_blank" rel="noopener noreferrer">{s.label}</a>
+          ))}
+        </div>
+        <div class="nav__block nav__claim" style="--i:9">
+          <p class="t-label">{site.claim}</p>
+        </div>
       </div>
     </div>
   </div>
 </div>
+)}
 
 <style>
   .header {
     position: fixed; inset: 0 0 auto 0; z-index: var(--z-header);
-    color: #fff; mix-blend-mode: difference;
-    transition: transform var(--dur-base) var(--ease-out);
+    color: #fff;
+    /* Oben: der Header rechnet sich gegen den Untergrund – dunkel wie hell. */
+    mix-blend-mode: difference;
+    transition: transform var(--dur-base) var(--ease-out), background var(--dur-base) var(--ease-out);
   }
   .header.is-hidden { transform: translateY(-100%); }
+
+  /* Ueber bewegtem, farbigem Material rechnet "difference" unvorhersehbar
+     (auf Rot wird Weiss zu Cyan). Ueber dem Video-Hero steht der Header
+     deshalb einfach hell – bis er beim Scrollen ohnehin seine eigene
+     Leiste bekommt. */
+  body:has([data-video-hero]) .header:not(.is-scrolled) {
+    mix-blend-mode: normal;
+    color: var(--c-paper);
+    text-shadow: 0 1px 12px rgba(11, 10, 9, 0.5);
+  }
+
+  /* Beim Scrollen wird aus der Überlagerung eine eigene, unscharfe Leiste. */
+  .header.is-scrolled {
+    mix-blend-mode: normal;
+    background: rgba(10, 10, 10, 0.72);
+    -webkit-backdrop-filter: blur(14px) saturate(1.4);
+    backdrop-filter: blur(14px) saturate(1.4);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--c-paper);
+  }
+  /* Solange das Overlay offen ist, gehört der Header optisch zum Overlay. */
+  body.nav-open .header { mix-blend-mode: normal; background: transparent; border-color: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; color: var(--c-paper); }
+
   .header__inner {
     display: flex; align-items: center; justify-content: space-between; gap: var(--space-5);
     height: var(--header-h); padding-inline: var(--gutter);
     transition: height var(--dur-base) var(--ease-out);
   }
   .header.is-scrolled .header__inner { height: calc(var(--header-h) - 0.75rem); }
+
   .header__logo { display: inline-flex; align-items: center; min-height: 44px; }
-  .header__wordmark { font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: var(--wd-mega); letter-spacing: var(--ls-tight); font-size: 1.4rem; text-transform: uppercase; }
+  .header__wordmark {
+    font-family: var(--font-display); font-weight: var(--fw-display);
+    font-stretch: var(--wd-mega); letter-spacing: var(--ls-tight);
+    /* "LAMOR AGENCY" muss einzeilig bleiben – ein Umbruch verdoppelt die
+       Kopfhoehe. Die Groesse laeuft daher mit der Breite mit. */
+    font-size: clamp(0.95rem, 0.62rem + 1.6vw, 1.4rem); text-transform: uppercase;
+    white-space: nowrap;
+  }
   .header__wordmark sup { font-size: 0.5em; vertical-align: top; margin-left: 0.1em; font-weight: var(--fw-regular); }
+
   .header__nav { display: none; }
-  .header__nav ul { display: flex; gap: clamp(1.25rem, 2.5vw, 2.75rem); }
-  .header__link { font-family: var(--font-body); font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight); letter-spacing: var(--ls-wide); text-transform: uppercase; padding-block: 0.5rem; }
-  .header__nav ul { gap: clamp(1.1rem, 2.2vw, 2.4rem); }
-  .header__link.link--active::after { background: var(--c-accent); }
+  .header__nav ul { display: flex; gap: clamp(1rem, 2vw, 2.25rem); }
+  .header__link {
+    font-family: var(--font-body); font-size: var(--fs-eyebrow);
+    font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; padding-block: 0.5rem;
+  }
+  .header__link.link--active::after { transform: scaleX(1); background: var(--c-accent); }
+
   .header__actions { display: flex; align-items: center; gap: var(--space-4); }
-  .header__cta { display: none; --btn-fg: #fff; border-color: #fff; }
-  .header__cta::before { background: #fff; }
-  .header__cta:hover { color: #000; }
+  .header__cta { display: none; --btn-fg: currentColor; border-color: currentColor; min-height: 2.75rem; padding: 0.7em 1.3em; }
+  .header__cta::before { background: var(--c-accent); }
+  .header__cta:hover, .header__cta:focus-visible { color: #fff; border-color: var(--c-accent); }
+
   .header__burger { position: relative; width: 44px; height: 44px; display: grid; place-items: center; gap: 6px; align-content: center; }
   .header__burger-line { display: block; width: 26px; height: 1.5px; background: currentColor; transition: transform var(--dur-base) var(--ease-out); transform-origin: center; }
   .header__burger[aria-expanded='true'] .header__burger-line:nth-child(2) { transform: translateY(3.75px) rotate(45deg); }
   .header__burger[aria-expanded='true'] .header__burger-line:nth-child(3) { transform: translateY(-3.75px) rotate(-45deg); }
 
-  @media (min-width: 900px) {
+  /* Sechs Punkte brauchen Platz – darunter bleibt das Overlay die bessere Lösung. */
+  @media (min-width: 1040px) {
     .header__nav { display: block; }
     .header__cta { display: inline-flex; }
     .header__burger { display: none; }
   }
 
-  /* ---------- Fullscreen Overlay Navigation (Mobile) */
+  /* ---------- Fullscreen Overlay Navigation */
   .nav {
     position: fixed; inset: 0; z-index: var(--z-nav);
     background: var(--c-ink); color: var(--c-paper);
@@ -105,55 +183,141 @@ const isActive = (href: string) => norm(href) === '/' ? path === '/' : path.star
     overflow-y: auto; overscroll-behavior: contain;
   }
   .nav.is-open { visibility: visible; clip-path: inset(0 0 0 0); transition: clip-path var(--dur-slow) var(--ease-expo), visibility 0s; }
-  .nav__inner { min-height: 100%; display: grid; align-content: space-between; gap: var(--space-8); padding-top: calc(var(--header-h) + var(--space-6)); padding-bottom: var(--space-7); }
+  .nav__inner {
+    min-height: 100%; display: grid; align-content: space-between; gap: var(--space-7);
+    padding-top: calc(var(--header-h) + var(--space-5));
+    padding-bottom: var(--space-7);
+  }
+
   .nav__list { display: grid; }
-  .nav__item + .nav__item { border-top: 1px solid rgba(255,255,255,0.12); }
-  .nav__link { display: flex; align-items: baseline; gap: var(--space-4); padding-block: clamp(0.7rem, 2.4vw, 1.2rem); font-family: var(--font-display); font-size: clamp(2.6rem, 11vw, 5.5rem); line-height: 0.98; letter-spacing: var(--ls-tight); text-transform: uppercase; font-weight: var(--fw-display); font-stretch: var(--wd-mega); transition: color var(--dur-fast), transform var(--dur-base) var(--ease-out); }
-  @media (hover: hover) { .nav__link:hover { transform: translateX(0.15em); } }
-  .nav__link[aria-current='page'] { color: var(--c-grey-dark); }
-  .nav__link:hover { color: var(--c-accent); }
-  .nav__meta { display: grid; gap: var(--space-6); grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); }
+  .nav__item + .nav__item { border-top: 1px solid rgba(255, 255, 255, 0.12); }
+  .nav__link {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas: 'index label' '. desc';
+    align-items: baseline;
+    column-gap: var(--space-4);
+    padding-block: clamp(0.55rem, 2vw, 1rem);
+    transition: color var(--dur-fast), transform var(--dur-base) var(--ease-out);
+  }
+  .nav__index { grid-area: index; color: var(--c-grey-dark); }
+  .nav__label {
+    grid-area: label;
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 10vw, 5rem);
+    line-height: 0.98;
+    letter-spacing: var(--ls-tight);
+    text-transform: uppercase;
+    font-weight: var(--fw-display);
+    font-stretch: var(--wd-mega);
+  }
+  .nav__desc { grid-area: desc; color: var(--c-grey-dark); }
+  @media (hover: hover) { .nav__link:hover { transform: translateX(0.15em); color: var(--c-accent); } }
+  .nav__link[aria-current='page'] .nav__label { color: var(--c-grey-dark); }
+
+  .nav__foot { display: grid; gap: var(--space-6); }
+  .nav__cta { justify-self: start; }
+  .nav__meta { display: grid; gap: var(--space-6); grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); }
   .nav__block { display: grid; gap: var(--space-2); align-content: start; }
-  .nav__meta-link { font-size: var(--fs-body); min-height: 44px; display: inline-flex; align-items: center; }
-  .nav__claim { align-self: end; }
-  /* Stagger beim Öffnen */
-  .nav__item, .nav__block { opacity: 0; transform: translateY(1.25rem); transition: opacity var(--dur-base) var(--ease-out), transform var(--dur-slow) var(--ease-out); }
-  .nav.is-open .nav__item, .nav.is-open .nav__block { opacity: 1; transform: none; transition-delay: calc(140ms + var(--i, 0) * 55ms); }
-  @media (min-width: 900px) { .nav { display: none; } }
-  @media (prefers-reduced-motion: reduce) { .nav, .nav__item, .nav__block { transition: none; } }
+  .nav__meta-link { font-size: var(--fs-body); min-height: 44px; display: inline-flex; align-items: center; overflow-wrap: anywhere; }
+  .nav__claim { align-self: end; color: var(--c-accent); }
+
+  /* Stagger beim Öffnen – Inhalt ist auch ohne die Animation vorhanden. */
+  .nav__item, .nav__block, .nav__cta {
+    opacity: 0; transform: translateY(1.25rem);
+    transition: opacity var(--dur-base) var(--ease-out), transform var(--dur-slow) var(--ease-out);
+  }
+  .nav.is-open .nav__item, .nav.is-open .nav__block, .nav.is-open .nav__cta {
+    opacity: 1; transform: none; transition-delay: calc(140ms + var(--i, 0) * 55ms);
+  }
+  @media (min-width: 1040px) { .nav { display: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .nav, .nav__item, .nav__block, .nav__cta { transition: none; }
+    .nav__item, .nav__block, .nav__cta { opacity: 1; transform: none; }
+  }
 </style>
 
 <script>
+  /**
+   * Mobile-Navigation.
+   *
+   * Achtung beim Seitenwechsel: Der Header traegt transition:persist und
+   * ueberlebt den Swap, das Overlay darunter NICHT – es wird ersetzt.
+   * Wer den Button nur einmal verdrahtet, schaltet danach ein Overlay um,
+   * das nicht mehr im Dokument haengt: aria-expanded springt, sichtbar
+   * passiert nichts. Deshalb wird bei jedem Seitenaufbau geprueft, ob das
+   * Overlay noch dasselbe ist, und bei Bedarf neu verdrahtet.
+   */
+  let globalsBound = false;
+
+  function currentNav() { return document.querySelector<HTMLElement>('[data-nav]'); }
+  function currentBtn() { return document.querySelector<HTMLButtonElement>('[data-nav-toggle]'); }
+
+  function closeNav(refocus = true) {
+    const nav = currentNav();
+    const btn = currentBtn();
+    if (!nav || !btn) return;
+    nav.classList.remove('is-open');
+    nav.setAttribute('aria-hidden', 'true');
+    btn.setAttribute('aria-expanded', 'false');
+    const label = btn.querySelector('.visually-hidden');
+    if (label) label.textContent = 'Menü öffnen';
+    document.body.classList.remove('nav-open');
+    if (refocus) btn.focus();
+  }
+
+  function openNav() {
+    const nav = currentNav();
+    const btn = currentBtn();
+    if (!nav || !btn) return;
+    nav.classList.add('is-open');
+    nav.setAttribute('aria-hidden', 'false');
+    btn.setAttribute('aria-expanded', 'true');
+    const label = btn.querySelector('.visually-hidden');
+    if (label) label.textContent = 'Menü schließen';
+    document.body.classList.add('nav-open');
+    setTimeout(() => nav.querySelector<HTMLElement>('a[href], button')?.focus(), 200);
+  }
+
   function initNav() {
-    const btn = document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
-    const nav = document.querySelector<HTMLElement>('[data-nav]');
-    if (!btn || !nav || (btn as any).__init) return; (btn as any).__init = true;
-    const focusables = () => Array.from(nav.querySelectorAll<HTMLElement>('a[href], button, [tabindex]:not([tabindex="-1"])'));
-    const open = () => {
-      nav.classList.add('is-open'); nav.setAttribute('aria-hidden', 'false');
-      btn.setAttribute('aria-expanded', 'true'); document.body.classList.add('nav-open');
-      setTimeout(() => focusables()[0]?.focus(), 200);
-    };
-    const close = (refocus = true) => {
-      nav.classList.remove('is-open'); nav.setAttribute('aria-hidden', 'true');
-      btn.setAttribute('aria-expanded', 'false'); document.body.classList.remove('nav-open');
-      if (refocus) btn.focus();
-    };
-    btn.addEventListener('click', () => (nav.classList.contains('is-open') ? close() : open()));
+    const btn = currentBtn();
+    const nav = currentNav();
+    if (!btn || !nav) return;
+
+    // Nur neu verdrahten, wenn der Button ein anderes Overlay bedienen muss.
+    if ((btn as any).__nav !== nav) {
+      const prev = (btn as any).__onClick;
+      if (prev) btn.removeEventListener('click', prev);
+      const onClick = () => (nav.classList.contains('is-open') ? closeNav() : openNav());
+      btn.addEventListener('click', onClick);
+      (btn as any).__onClick = onClick;
+      (btn as any).__nav = nav;
+      // Links im frisch eingesetzten Overlay schliessen es wieder.
+      nav.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => closeNav(false)));
+    }
+
+    // Dokumentweite Handler nur einmal – sie holen sich ihre Elemente selbst.
+    if (globalsBound) return;
+    globalsBound = true;
+
     document.addEventListener('keydown', (e) => {
-      if (!nav.classList.contains('is-open')) return;
-      if (e.key === 'Escape') { close(); return; }
+      const n = currentNav();
+      const b = currentBtn();
+      if (!n || !b || !n.classList.contains('is-open')) return;
+      if (e.key === 'Escape') { closeNav(); return; }
       if (e.key === 'Tab') {
-        const f = focusables(); if (!f.length) return;
+        const f = Array.from(n.querySelectorAll<HTMLElement>('a[href], button, [tabindex]:not([tabindex="-1"])'));
+        if (!f.length) return;
         const first = f[0], last = f[f.length - 1];
-        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); (btn as HTMLElement).focus(); }
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); b.focus(); }
         else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-        else if (!e.shiftKey && document.activeElement === btn) { e.preventDefault(); first.focus(); }
+        else if (!e.shiftKey && document.activeElement === b) { e.preventDefault(); first.focus(); }
       }
     });
-    nav.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => close(false)));
-    matchMedia('(min-width: 900px)').addEventListener('change', (e) => { if (e.matches) close(false); });
-    document.addEventListener('astro:before-swap', () => close(false));
+
+    matchMedia('(min-width: 1040px)').addEventListener('change', (e) => { if (e.matches) closeNav(false); });
+    document.addEventListener('astro:before-swap', () => closeNav(false));
   }
+
   document.addEventListener('astro:page-load', initNav);
 </script>

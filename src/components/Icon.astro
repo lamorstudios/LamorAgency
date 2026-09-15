@@ -1,0 +1,29 @@
+---
+/**
+ * Kleines, konsistentes Icon-Set. Bewusst ein einziger Stil:
+ * 24er-Raster, 1.6 Strichstaerke, runde Enden, keine Fuellungen.
+ * Neue Icons nur hier ergaenzen, damit nichts auseinanderlaeuft.
+ */
+interface Props { name: string; class?: string }
+const { name, class: cls } = Astro.props;
+
+const paths: Record<string, string> = {
+  // Ist-Zustand
+  image: 'M3 5.5h18v13H3zM3 15l5-4 4 3 3-2.5 6 4.5',
+  unlink: 'M9.5 14.5 7 17a3.5 3.5 0 0 1-5-5l2.5-2.5M14.5 9.5 17 7a3.5 3.5 0 0 1 5 5l-2.5 2.5M4 4l16 16',
+  head: 'M15 20v-2.2a5.5 5.5 0 1 0-7-7.6L6 13l2 1v3a2 2 0 0 0 2 2z',
+  bars: 'M5 19V12M10 19V9M15 19v-4M20 19v-9',
+  // Mit LAMOR
+  cube: 'm12 3 8 4.5v9L12 21l-8-4.5v-9zM4 7.5l8 4.5 8-4.5M12 12v9',
+  bolt: 'M13 3 5 13.5h6L11 21l8-10.5h-6z',
+  heart: 'M12 20s-7-4.4-7-9.2A3.9 3.9 0 0 1 12 8a3.9 3.9 0 0 1 7 2.8C19 15.6 12 20 12 20z',
+  trend: 'M4 16.5 10 10l3.5 3.5L20 7M20 7h-5M20 7v5',
+  // Allgemein
+  check: 'M4.5 12.5 9.5 17.5 19.5 6.5',
+  minus: 'M6 12h12',
+  close: 'M6.5 6.5l11 11M17.5 6.5l-11 11',
+  arrow: 'M4 12h15M13 6l6 6-6 6',
+};
+const d = paths[name] ?? paths.check;
+---
+<svg class={`icon ${cls ?? ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d={d} /></svg>

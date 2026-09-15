@@ -1,0 +1,216 @@
+---
+/**
+ * Hero der Website-Landingpage – bewusst kurz.
+ *
+ * Er beantwortet nur: Was ist das, was kostet es ab, was bekomme ich, was tue
+ * ich jetzt. Preisaufteilung, Ablauf und Leistungsumfang stehen unmittelbar
+ * darunter in den Paketkarten, im Rechner und in der Leistungsmatrix – im Hero
+ * waeren sie doppelt und wuerden die Pakete nach unten druecken.
+ */
+import { Picture } from 'astro:assets';
+import Media from '@/components/Media.astro';
+import { site } from '@/data/site';
+import {
+  websitePricing, websiteEntryPrice, euro, euroRate,
+  lowestRate, longestTerm, hostingPlan,
+} from '@/data/website-pricing';
+
+const pages = websitePricing.length;
+
+/**
+ * Hero-Visual: das gelieferte Geraete-Motiv, sobald es im Projekt liegt.
+ * Ablage: src/assets/webdesign/hero-devices.<png|jpg|webp|avif>
+ * (Anleitung: src/assets/webdesign/README.md)
+ *
+ * Solange die Datei fehlt, bleibt die bisherige abstrakte Media-Surface
+ * stehen. Es wird nie ein Motiv nachgebaut.
+ *
+ * WICHTIG: Im Motiv stehen "Conversion-Struktur" und "Desktop & Mobile"
+ * bereits drin. Die beiden HTML-Badges wuerden die Beschriftung doppeln und
+ * entfallen deshalb automatisch, sobald das Bild vorhanden ist.
+ */
+const heroFiles = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/webdesign/hero-devices.{png,jpg,jpeg,webp,avif}',
+);
+const heroKey = Object.keys(heroFiles)[0];
+const heroImage = heroKey ? (await heroFiles[heroKey]()).default : undefined;
+---
+<section class="wh wash" data-theme="dark" data-bg="dark" aria-labelledby="wh-title">
+  <div class="container wh__grid">
+    <div class="wh__copy">
+      <p class="eyebrow">Website erstellen lassen · {site.address.city}</p>
+
+      <h1 class="wh__title" id="wh-title">
+        Deine neue Website.<br />
+        <span class="wh__price">
+          <span class="wh__price-value">Ab {euroRate(lowestRate)}</span>
+          <span class="wh__price-unit">/ Monat</span>
+        </span>
+      </h1>
+
+      <!-- Der Gesamtpreis steht direkt an der Rate, nicht irgendwo darunter. -->
+      <p class="wh__basis">
+        <span class="wh__basis-main">
+          bei {longestTerm} Monaten Ratenzahlung · Gesamtpreis ab {euro(websiteEntryPrice)} netto
+        </span>
+        <span class="wh__basis-flag">0 % Aufschlag</span>
+      </p>
+      <p class="wh__basis wh__basis--soft">
+        Hosting optional ab {euro(hostingPlan.price)} / Monat – nicht Teil der Rate
+      </p>
+
+      <p class="wh__lead">
+        Individuell entwickelt, vollständig responsive und auf Anfragen ausgerichtet.
+      </p>
+
+      <ul class="chips wh__chips" role="list">
+        <li class="chip">Keine Template-Massenware</li>
+        <li class="chip">Mobile optimiert</li>
+        <li class="chip">SEO-Grundoptimierung</li>
+        <li class="chip">Persönlicher Ansprechpartner</li>
+      </ul>
+
+      <div class="wh__actions">
+        <a href="#anfrage" class="btn wh__cta" data-magnetic>
+          <span>Website anfragen</span>
+          <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+        </a>
+        <a href="#pakete" class="wh__ghost">
+          <span>{pages} Pakete ansehen</span>
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2V14M8 14L3 9M8 14L13 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+        </a>
+      </div>
+
+      <p class="wh__vat">Alle Preise netto zzgl. gesetzlicher Umsatzsteuer.</p>
+    </div>
+
+    <div class="wh__visual">
+      <div class:list={['mock', heroImage && 'mock--photo']}>
+        <div class="mock__frame">
+          {heroImage ? (
+            /* Unveraendert, unbeschnitten, ohne Overlay. Das Seitenverhaeltnis
+               kommt aus der Datei – nichts wird gestreckt oder gecroppt. */
+            <Picture
+              src={heroImage}
+              formats={['avif', 'webp']}
+              /* Fallback als JPEG statt PNG: die PNG-Variante des Motivs waere
+                 2,3 MB gross. AVIF und WebP bedienen praktisch alle Browser,
+                 der Rest bekommt ein schlankes JPEG statt eines Riesen-PNG. */
+              fallbackFormat="jpeg"
+              widths={[560, 900, 1280, 1600]}
+              sizes="(min-width: 1024px) 44vw, 100vw"
+              alt="Responsive Webdesign auf Desktop und Smartphone"
+              loading="eager"
+              decoding="async"
+              fetchpriority="high"
+            />
+          ) : (
+            <Fragment>
+              <div class="mock__bar" aria-hidden="true"><span></span><span></span><span></span></div>
+              <Media
+                media={{ type: 'placeholder', alt: 'Beispiel einer von LAMOR AGENCY gebauten Website', label: '[WEBDESIGN] Website-Mockup' }}
+                ratio="wide"
+                sizes="(min-width: 1024px) 44vw, 100vw"
+                widths={[560, 900, 1280]}
+              />
+            </Fragment>
+          )}
+        </div>
+        {!heroImage && (
+          <Fragment>
+            <span class="mock__tag mock__tag--tl"><i aria-hidden="true"></i>Conversion-Struktur</span>
+            <span class="mock__tag mock__tag--br">Desktop &amp; Mobile</span>
+          </Fragment>
+        )}
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Liegt das echte Motiv vor, faellt der Fensterrahmen weg: das Bild fuellt
+     die Karte randlos aus und behaelt nur deren runde Ecken. Keine Verlaeufe,
+     keine Overlays, kein Zoom – nur das Motiv. */
+  .mock--photo .mock__frame { padding: 0; border-color: transparent; background: transparent; }
+  .mock--photo :global(img),
+  .mock--photo :global(picture) { display: block; width: 100%; height: auto; }
+
+  .wh {
+    /* Farben aus dem Theme, nicht fest verdrahtet – sonst laufen Chips und
+       Buttons ins Leere, sobald die Section dunkel wird. */
+    background: var(--bg);
+    color: var(--fg);
+    padding-top: calc(var(--header-h) + clamp(1.5rem, 5vh, 3rem));
+    padding-bottom: clamp(2.5rem, 6vw, 4.5rem);
+    overflow: clip;
+  }
+  .wh__grid { display: grid; gap: clamp(2rem, 5vw, 3.5rem); }
+  @media (min-width: 1024px) {
+    .wh__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: clamp(2.5rem, 5vw, 4.5rem); }
+  }
+
+  /* Die Rate traegt die Headline, die Einheit bleibt kleiner – sonst reicht
+     die Spaltenbreite nicht und "/ Monat" laeuft ins Bild. */
+  .wh__price { display: block; color: var(--c-accent-on-dark); }
+  .wh__price-value { white-space: nowrap; }
+  .wh__price-unit {
+    font-size: 0.42em; font-stretch: var(--wd-tight); letter-spacing: var(--ls-wide);
+    white-space: nowrap; margin-left: 0.15em;
+  }
+
+  /* Preisbasis: Rate ohne Gesamtpreis waere irrefuehrend – beides steht
+     zusammen, und das Hosting ist ausdruecklich als optional markiert. */
+  .wh__basis {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem;
+    margin-top: var(--space-3);
+    font-size: var(--fs-small); line-height: 1.4; color: var(--fg-muted);
+  }
+  .wh__basis--soft { margin-top: 0.35rem; font-size: 0.82rem; }
+  .wh__basis-main { color: var(--c-paper); }
+  .wh__basis-flag {
+    padding: 0.35em 0.7em; border-radius: var(--radius-pill);
+    background: rgba(229, 67, 43, 0.16); border: 1px solid rgba(229, 67, 43, 0.35);
+    color: var(--c-accent-on-dark); white-space: nowrap;
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase;
+  }
+  .wh__title {
+    margin-top: var(--space-4);
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-stretch: 108%;
+    text-transform: uppercase;
+    font-size: clamp(1.9rem, 0.5rem + 5.6vw, 4.5rem);
+    line-height: 0.98;
+    letter-spacing: -0.038em;
+    margin-left: -0.03em;
+  }
+  .wh__lead { margin-top: var(--space-4); max-width: 46ch; color: var(--fg-muted); font-size: var(--fs-body); line-height: 1.55; }
+
+  .wh__chips { margin-top: var(--space-5); }
+  .wh__split { margin-top: var(--space-5); background: var(--bg); }
+
+  .wh__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4) var(--space-6); margin-top: var(--space-5); }
+  .wh__cta { min-height: 3.25rem; }
+  .wh__ghost {
+    display: inline-flex; align-items: center; gap: 0.6em; min-height: 44px;
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase;
+    border-bottom: 1px solid currentColor; padding-bottom: 0.25em;
+  }
+  .wh__ghost svg { width: 1em; height: 1em; transition: transform var(--dur-base) var(--ease-out); }
+  .wh__ghost:hover { color: var(--c-accent-on-dark); }
+  .wh__ghost:hover svg { transform: translateY(0.25em); }
+
+  .wh__vat { margin-top: var(--space-4); font-size: var(--fs-small); color: var(--fg-muted); }
+
+  .wh__visual { display: grid; gap: clamp(1.25rem, 3vw, 2rem); }
+  .wh__steps {
+    padding: clamp(1rem, 2.5vw, 1.5rem);
+    border: 1px solid var(--line);
+    border-radius: clamp(0.6rem, 1.6vw, 1rem);
+    background: var(--bg);
+  }
+  .wh__steps-label { color: var(--fg-muted); margin-bottom: var(--space-3); }
+</style>

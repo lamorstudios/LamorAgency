@@ -1,18 +1,39 @@
+# ============================================================================
+# NETLIFY-KONFIGURATION – Projekt "lamorwebdesign"
+# ----------------------------------------------------------------------------
+# WICHTIG: Diese Datei hat VORRANG vor den Einstellungen in der Netlify-
+# Oberflaeche. Ein hier gesetztes `command` ueberschreibt das, was im UI
+# unter "Build command" steht – auch wenn dort etwas anderes eingetragen ist.
+#
+# Dieses Netlify-Projekt liefert AUSSCHLIESSLICH die temporaere
+# Webdesign-Landingpage aus. Deshalb steht hier `build:standalone`.
+# Der Build erzeugt: / (Landingpage), /impressum/, /datenschutz/ – und
+# entfernt alle uebrigen, noch unfertigen Relaunch-Seiten aus dist/.
+# Hintergrund: src/lib/standalone.ts
+#
+# WENN SPAETER DER VOLLSTAENDIGE RELAUNCH AUF NETLIFY SOLL:
+# dafuer ein EIGENES Netlify-Projekt anlegen und dort `npm run build`
+# verwenden – nicht diese Zeile umstellen, sonst geht die Landingpage
+# wieder unter dem kompletten Relaunch unter. Zusaetzlich die weiter unten
+# auskommentierten Wix-Redirects wieder aktivieren.
+# ============================================================================
 [build]
-  command = "npm run build"
+  command = "npm run build:standalone"
   publish = "dist"
 
 [build.environment]
   NODE_VERSION = "22"
 
-# Sicherheits- und Cache-Header
+# ============================================================================
+# SICHERHEITS- UND CACHE-HEADER
+# ============================================================================
 [[headers]]
   for = "/*"
   [headers.values]
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), interest-cohort=()"
 
 [[headers]]
   for = "/_astro/*"
@@ -23,19 +44,166 @@
   for = "/fonts/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+    Access-Control-Allow-Origin = "*"
 
 [[headers]]
   for = "/media/*"
   [headers.values]
     Cache-Control = "public, max-age=604800"
 
-# Redirects von alten Wix-URLs -> neue URLs.
-# Die Wix-URLs werden nach der Prüfung der Live-Site ergänzt (Beispiel):
+# ============================================================================
+# BOT- / BANDBREITENSCHUTZ
+# ----------------------------------------------------------------------------
+# WordPress-Scanner klopfen dauerhaft an Pfade, die es hier nie geben wird.
+# Ohne diese Regeln bekaemen sie die vollstaendige 404-Seite inklusive CSS,
+# Fonts und JS ausgeliefert. Stattdessen: winzige 410-Antwort (~40 Bytes).
+# `force = true` ist noetig, damit die Regel vor dem Static-Handler greift.
+# ============================================================================
+[[redirects]]
+  from = "/wp-login.php"
+  to = "/blocked.html"
+  status = 410
+  force = true
+
+[[redirects]]
+  from = "/wp-login"
+  to = "/blocked.html"
+  status = 410
+  force = true
+
+[[redirects]]
+  from = "/xmlrpc.php"
+  to = "/blocked.html"
+  status = 410
+  force = true
+
+[[redirects]]
+  from = "/wp-admin/*"
+  to = "/blocked.html"
+  status = 410
+  force = true
+
+[[redirects]]
+  from = "/wp-content/*"
+  to = "/blocked.html"
+  status = 410
+  force = true
+
+[[redirects]]
+  from = "/wp-includes/*"
+  to = "/blocked.html"
+  status = 410
+  force = true
+
+[[redirects]]
+  from = "/wordpress/*"
+  to = "/blocked.html"
+  status = 410
+  force = true
+
+[[redirects]]
+  from = "/wp/*"
+  to = "/blocked.html"
+  status = 410
+  force = true
+
+[[redirects]]
+  from = "/ai1ec/*"
+  to = "/blocked.html"
+  status = 410
+  force = true
+
+# Haeufig gescannte Konfigurations- und Admin-Pfade
+[[redirects]]
+  from = "/.env"
+  to = "/blocked.html"
+  status = 410
+  force = true
+
+[[redirects]]
+  from = "/.git/*"
+  to = "/blocked.html"
+  status = 410
+  force = true
+
+[[redirects]]
+  from = "/vendor/*"
+  to = "/blocked.html"
+  status = 410
+  force = true
+
+[[redirects]]
+  from = "/administrator/*"
+  to = "/blocked.html"
+  status = 410
+  force = true
+
+[[redirects]]
+  from = "/phpmyadmin/*"
+  to = "/blocked.html"
+  status = 410
+  force = true
+
+# WordPress-Permalinks der Form /?page_id=123
+[[redirects]]
+  from = "/"
+  to = "/blocked.html"
+  status = 410
+  force = true
+  query = { page_id = ":id" }
+
+# ============================================================================
+# REDIRECTS – Landingpage
+# ----------------------------------------------------------------------------
+# In diesem Projekt liegt die Webdesign-Seite auf "/". Alles, was frueher
+# auf den Unterpfad zeigte, landet deshalb direkt auf der Startseite.
+# ============================================================================
+[[redirects]]
+  from = "/webdesign"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/website-erstellen-lassen"
+  to = "/"
+  status = 301
+
+# Der Standalone-Build legt die Seite zusaetzlich unter ihrem regulaeren
+# Pfad ab. Damit es nur EINE gueltige Adresse gibt, zeigt der Unterpfad
+# dauerhaft auf die Wurzel.
+# force = true ist noetig: ohne das gewinnt die vorhandene Datei und der
+# Redirect greift nie.
+[[redirects]]
+  from = "/webdesign-muenchen/*"
+  to = "/"
+  status = 301
+  force = true
+
+# ============================================================================
+# REDIRECTS – vollstaendiger Relaunch (DEAKTIVIERT)
+# ----------------------------------------------------------------------------
+# Diese Ziele existieren in diesem Deploy nicht: /contact/, /agency/ und
+# /models/ gehoeren zum Relaunch und werden hier bewusst nicht ausgeliefert.
+# Aktive Regeln wuerden nur ins Leere zeigen. Wieder einkommentieren, sobald
+# der vollstaendige Relaunch auf einem eigenen Netlify-Projekt liegt.
+#
 # [[redirects]]
 #   from = "/contact-1"
 #   to = "/contact/"
 #   status = 301
-[[redirects]]
-  from = "/contact-1"
-  to = "/contact/"
-  status = 301
+#
+# [[redirects]]
+#   from = "/about"
+#   to = "/agency/"
+#   status = 301
+#
+# [[redirects]]
+#   from = "/about/"
+#   to = "/agency/"
+#   status = 301
+#
+# [[redirects]]
+#   from = "/models-talents"
+#   to = "/models/"
+#   status = 301
+# ============================================================================

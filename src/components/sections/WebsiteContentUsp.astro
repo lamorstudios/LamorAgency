@@ -1,0 +1,79 @@
+---
+/**
+ * Der stärkste Unterschied zu einer reinen Webdesign-Agentur:
+ * LAMOR baut nicht nur die Seite, sondern produziert auch, was darauf zu sehen ist.
+ */
+import Media from '@/components/Media.astro';
+import Words from '@/components/Words.astro';
+import { websiteBundles } from '@/data/website-pricing';
+
+const bundle = websiteBundles.find((b) => b.id === 'website-content');
+const roles = ['Fotograf', 'Videograf', 'Webdesigner', 'Grafiker'];
+---
+<section class="wu section" data-theme="accent" data-bg="accent" aria-labelledby="wu-title">
+  <div class="container">
+    <p class="t-label wu__label" data-reveal="fade">Website + Content</p>
+    <h2 class="t-display wu__title" id="wu-title">
+      <Words lines={['Deine Website.', 'Deine Bilder.', 'Deine Videos.', 'Aus einer Hand.']} />
+    </h2>
+
+    <div class="wu__grid">
+      <div class="wu__text">
+        <p class="t-lead wu__lead" data-reveal style="--reveal-delay:200ms">
+          Websites scheitern selten am Design – meist am fehlenden Material.
+          Fotos, Videos und Social-Assets entstehen bei uns im Haus.
+        </p>
+
+        <ul class="wu__roles" role="list" data-reveal style="--reveal-delay:320ms">
+          {roles.map((r) => (
+            <li class="wu__role"><span class="wu__role-text">{r}</span></li>
+          ))}
+          <li class="wu__role wu__role--us"><span>LAMOR AGENCY</span></li>
+        </ul>
+
+        {bundle && (
+          <div class="wu__cta" data-reveal style="--reveal-delay:420ms">
+            <a href={bundle.cta.href} class="btn wu__btn" data-magnetic>
+              <span>{bundle.cta.label}</span>
+              <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+            </a>
+            <p class="t-small wu__cta-note">{bundle.priceNote}</p>
+          </div>
+        )}
+      </div>
+
+      <div class="wu__media" data-reveal="fade" style="--reveal-delay:280ms">
+        <Media
+          media={{ type: 'placeholder', alt: 'Foto- und Videoproduktion für eine Website', label: '[WEBDESIGN] Content-Produktion' }}
+          ratio="square"
+          reveal
+          sizes="(min-width: 1024px) 40vw, 100vw"
+        />
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .wu { background: var(--c-accent); color: #fff; }
+  .wu__label { color: rgba(255, 255, 255, 0.75); margin-bottom: var(--space-5); }
+  .wu__title { margin-bottom: var(--space-8); max-width: 14ch; }
+
+  .wu__grid { display: grid; gap: var(--space-7); align-items: start; }
+  @media (min-width: 1024px) { .wu__grid { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--space-8); } }
+
+  .wu__lead { max-width: 40ch; }
+  .wu__body { margin-top: var(--space-4); max-width: 54ch; color: rgba(255, 255, 255, 0.82); }
+
+  .wu__roles { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-top: var(--space-6); }
+  .wu__role { padding: 0.5em 0.9em; border: 1px solid rgba(255, 255, 255, 0.35); border-radius: var(--radius-pill); font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); letter-spacing: var(--ls-wide); text-transform: uppercase; }
+  .wu__role-text { text-decoration: line-through; opacity: 0.7; }
+  .wu__role--us { background: #fff; color: var(--c-accent); border-color: #fff; }
+  .wu__roles-note { margin-top: var(--space-3); color: rgba(255, 255, 255, 0.82); max-width: 44ch; }
+
+  .wu__cta { display: grid; gap: var(--space-3); justify-items: start; margin-top: var(--space-6); }
+  .wu__btn { --btn-bg: #fff; --btn-fg: var(--c-accent); border-color: #fff; }
+  .wu__btn::before { background: var(--c-ink); }
+  .wu__btn:hover, .wu__btn:focus-visible { color: #fff; border-color: var(--c-ink); }
+  .wu__cta-note { color: rgba(255, 255, 255, 0.82); }
+</style>

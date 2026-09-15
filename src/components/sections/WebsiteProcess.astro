@@ -1,0 +1,127 @@
+---
+/**
+ * Ablauf eines Website-Projekts als waagerechte Leiste.
+ * Schritte zentral in src/data/website-pricing.ts (websiteProcess).
+ *
+ * Ab 1150px stehen alle sechs Schritte nebeneinander auf einer durchgehenden
+ * Linie; darunter laesst sich die Leiste nativ seitlich schieben.
+ */
+import Words from '@/components/Words.astro';
+import { websiteProcess } from '@/data/website-pricing';
+---
+<section class="wpc" data-theme="dark" data-bg="dark" aria-labelledby="wpc-title">
+  <div class="container">
+    <div class="wpc__head">
+      <div>
+        <p class="eyebrow wpc__label" data-reveal="fade">Ablauf</p>
+        <h2 class="wpc__title" id="wpc-title">
+          <Words text="So entsteht" />
+          <span class="wpc__title-em t-serif-i">deine Website.</span>
+        </h2>
+      </div>
+      <p class="wpc__lead" data-reveal style="--reveal-delay:160ms">
+        Sechs Schritte, ein Ansprechpartner.
+      </p>
+    </div>
+
+    <div class="wpc__railwrap">
+      <div class="wpc__rail" tabindex="0" role="group" aria-label="Ablauf in sechs Schritten">
+        <ol class="wpc__track" role="list">
+          {websiteProcess.map((s) => (
+            <li class={`wpc__step ${s.optional ? 'wpc__step--optional' : ''}`}>
+              <span class="wpc__index">{s.index}</span>
+              <h3 class="wpc__name">
+                {s.title}
+                {s.optional && <span class="wpc__tag">optional</span>}
+              </h3>
+              <p class="wpc__text">{s.text}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+      <span class="wpc__hint" aria-hidden="true">Leiste seitlich scrollen</span>
+    </div>
+  </div>
+</section>
+
+<style>
+  .wpc { padding-block: clamp(2.5rem, 6vw, 5rem); }
+
+  .wpc__head { display: grid; gap: var(--space-4); margin-bottom: clamp(1.75rem, 4vw, 3rem); }
+  .wpc__label { color: var(--c-accent-on-dark); }
+  .wpc__title {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 118%;
+    text-transform: uppercase;
+    font-size: clamp(1.9rem, 0.7rem + 4.6vw, 4.5rem);
+    line-height: 0.95; letter-spacing: -0.045em;
+  }
+  .wpc__title-em { display: block; color: var(--c-accent-on-dark); text-transform: none; letter-spacing: -0.02em; }
+  .wpc__lead { color: var(--fg-muted); font-size: var(--fs-small); line-height: 1.6; max-width: 46ch; }
+  @media (min-width: 1000px) {
+    .wpc__head { grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr); gap: var(--space-8); align-items: end; }
+  }
+
+  .wpc__railwrap { position: relative; }
+  .wpc__rail {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline-start: var(--gutter);
+    scrollbar-width: thin;
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+    padding-bottom: var(--space-4);
+  }
+  .wpc__rail:focus-visible { outline: 2px solid var(--c-accent-on-dark); outline-offset: 4px; }
+
+  .wpc__track {
+    --col: clamp(11.5rem, 17vw, 14.5rem);
+    display: grid;
+    grid-template-columns: repeat(6, var(--col));
+    width: max-content;
+  }
+
+  .wpc__step {
+    position: relative;
+    scroll-snap-align: start;
+    border-top: 2px solid var(--c-accent);
+    padding: var(--space-4) 1.25rem 0 0;
+    display: grid; gap: 0.3rem; align-content: start;
+  }
+  /* Der optionale Schritt steht sichtbar ausserhalb der festen Kette. */
+  .wpc__step--optional { border-top-style: dashed; border-top-color: var(--fg-muted); }
+
+  .wpc__index {
+    font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: 130%;
+    font-size: clamp(1.9rem, 1.2rem + 1.8vw, 2.9rem);
+    line-height: 0.9; letter-spacing: -0.04em;
+    color: var(--c-accent-on-dark);
+    font-variant-numeric: tabular-nums;
+  }
+  .wpc__step--optional .wpc__index { color: var(--fg-muted); }
+  .wpc__name {
+    display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.5em;
+    font-family: var(--font-display); font-weight: 900; font-stretch: 112%;
+    text-transform: uppercase; font-size: clamp(1rem, 0.85rem + 0.5vw, 1.25rem);
+    line-height: 1.05; letter-spacing: -0.025em;
+    margin-top: 0.15rem;
+  }
+  .wpc__tag {
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--fg-muted);
+  }
+  .wpc__text { font-size: 0.82rem; line-height: 1.5; color: var(--fg-muted); }
+
+  .wpc__hint {
+    display: block; margin-top: var(--space-3);
+    font-size: var(--fs-eyebrow); letter-spacing: var(--ls-wide);
+    text-transform: uppercase; color: var(--fg-muted);
+  }
+
+  /* Ab hier passen alle sechs Schritte nebeneinander – kein Scrollen noetig. */
+  @media (min-width: 1150px) {
+    .wpc__rail { overflow-x: visible; margin-inline: 0; padding-inline: 0; }
+    .wpc__track { width: 100%; grid-template-columns: repeat(6, minmax(0, 1fr)); }
+    .wpc__hint { display: none; }
+  }
+</style>

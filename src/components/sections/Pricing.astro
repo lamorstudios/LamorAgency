@@ -1,0 +1,193 @@
+---
+/**
+ * Preis-Pakete. ALLE Werte kommen aus src/data/pricing.ts – hier steht kein
+ * einziger Betrag im Markup. Logik: monatlicher Betrag + einmaliger Projektstart.
+ */
+import Words from '@/components/Words.astro';
+import ArrowLink from '@/components/ArrowLink.astro';
+import { packages, priceLine, formatPrice, priceNote } from '@/data/pricing';
+
+interface Props { compact?: boolean }
+const { compact = false } = Astro.props;
+---
+<section class="pr section" id="pricing" data-theme="light" data-bg="light" aria-labelledby="pr-title">
+  <div class="container">
+    <div class="pr__head">
+      <p class="t-label pr__label" data-reveal="fade">Modelle</p>
+      <h2 class="t-sec pr__title" id="pr-title"><Words text="Klare Modelle statt Angebots-Dschungel." /></h2>
+      <p class="t-lead t-muted pr__lead" data-reveal style="--reveal-delay:140ms">
+        Monatlicher Betrag für die laufende Arbeit, einmaliger Projektstart für den Aufbau.
+      </p>
+      <p class="swipe-hint pr__hint" aria-hidden="true">Wischen für alle Modelle</p>
+    </div>
+
+    <ul class="pr__grid swipe" role="list">
+      {packages.map((p, i) => (
+        <li
+          class={`card pr__card ${p.featured ? 'card--dark pr__card--featured' : 'card--light'}`}
+          data-reveal
+          style={`--reveal-delay:${i * 110}ms`}
+        >
+          {/* Links die Zahl, rechts der Umfang – dieselbe Komposition wie bei den Website-Paketen. */}
+          <div class="pr__figure">
+            {!p.featured && <span class="pr__card-label t-label">{p.label}</span>}
+            <h3 class="pr__name">{p.name}</h3>
+            <p class="pr__monthly">
+              <span class="pr__monthly-value">{priceLine(p.monthly)}</span>
+            </p>
+            <p class="pr__setup t-small">
+              <span class="pr__setup-value">{p.setup.from ? 'ab ' : ''}{formatPrice(p.setup)}</span>
+              <span class="t-muted"> {p.setup.note}</span>
+            </p>
+            <a href={p.cta.href} class={`btn pr__cta ${p.featured ? '' : 'btn--ghost'}`} data-magnetic>
+              <span>{p.cta.label}</span>
+              <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+            </a>
+          </div>
+
+          <div class="pr__scope">
+            <p class="pr__for t-small">{p.for}</p>
+            <ul class="pr__features" role="list">
+              {p.features.map((f) => (
+                <li class="pr__feature">
+                  <svg class="pr__check" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 6.5L4.8 9L10 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"/></svg>
+                  <span>{f}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {p.featured && <span class="pr__badge t-label">{p.label}</span>}
+        </li>
+      ))}
+    </ul>
+
+    <p class="pr__note t-small t-muted" data-reveal="fade">{priceNote}</p>
+
+    <div class="pr__foot" data-reveal>
+      <p class="pr__foot-title">Noch nicht sicher, welches Modell passt?</p>
+      <div class="pr__foot-actions">
+        <a href="/contact/" class="btn" data-magnetic>
+          <span>Kostenloses Erstgespräch</span>
+          <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+        </a>
+        {compact && <ArrowLink href="/pricing/" label="Alle Modelle und Einzelleistungen" />}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .pr__head { display: grid; gap: var(--space-4); margin-bottom: var(--space-8); }
+  .pr__label { color: var(--c-accent); }
+  .pr__title { max-width: 18ch; }
+  .pr__lead { max-width: 50ch; }
+
+  /* Unter 900px waagerechte Swipe-Reihe statt drei gestapelter Zeilen. */
+  @media (min-width: 900px) {
+    .pr__grid {
+      grid-auto-flow: row;
+      grid-template-columns: minmax(0, 1fr);
+      grid-auto-columns: auto;
+      gap: var(--space-4);
+      overflow: visible;
+      margin-inline: 0;
+      padding-inline: 0;
+      padding-bottom: 0;
+    }
+    .pr__hint { display: none; }
+  }
+  @media (max-width: 899px) {
+    .pr__card { height: 100%; align-content: start; }
+  }
+
+  .pr__card {
+    display: grid;
+    gap: clamp(1.1rem, 2.5vw, 2rem);
+    padding: clamp(1.25rem, 3vw, 2.25rem);
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .pr__card:hover { transform: translateY(-3px); }
+  }
+  @media (min-width: 900px) {
+    .pr__card { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: clamp(1.75rem, 4vw, 3.5rem); }
+  }
+
+  /* Hauptempfehlung: dunkle Flaeche, damit die Wahl sofort lesbar ist. */
+  .pr__card--featured .pr__feature { border-color: var(--card-dark-line-soft); }
+  .pr__card--featured .pr__for,
+  .pr__card--featured .pr__card-label,
+  .pr__card--featured .t-muted { color: var(--c-grey-dark); }
+  .pr__card--featured .pr__check { color: var(--c-accent-on-dark); }
+  .pr__card--featured .pr__cta { --btn-bg: var(--c-paper); --btn-fg: var(--c-ink); border-color: var(--c-paper); }
+
+  .pr__badge {
+    position: absolute;
+    top: 0; right: clamp(1.4rem, 3vw, 2.25rem);
+    transform: translateY(-50%);
+    padding: 0.5em 0.9em;
+    background: var(--c-accent);
+    color: #fff;
+    border-radius: var(--radius-pill);
+    white-space: nowrap;
+    z-index: 2;
+  }
+
+  /* Linke Haelfte: die Zahl. */
+  .pr__figure { display: grid; gap: var(--space-2); align-content: start; }
+  .pr__card-label { color: var(--fg-muted); }
+  .pr__name {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-stretch: 112%;
+    font-size: clamp(1.25rem, 1rem + 1.1vw, 1.75rem);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+    overflow-wrap: break-word;
+  }
+  .pr__monthly { margin: 0; margin-top: var(--space-3); }
+  .pr__monthly-value {
+    font-family: var(--font-display);
+    font-weight: var(--fw-display);
+    font-stretch: 118%;
+    font-size: clamp(1.9rem, 1.1rem + 2.8vw, 3.4rem);
+    line-height: 0.94;
+    letter-spacing: -0.05em;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: break-word;
+  }
+  .pr__setup-value { font-weight: var(--fw-semi); }
+  .pr__cta { justify-self: start; margin-top: var(--space-4); }
+
+  /* Rechte Haelfte: der Umfang. */
+  .pr__scope { display: grid; gap: var(--space-3); align-content: start; }
+  .pr__for { color: var(--fg-muted); max-width: 48ch; }
+  .pr__features { display: grid; align-content: start; }
+  @media (min-width: 620px) {
+    .pr__features { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--space-5); }
+  }
+  .pr__feature { display: flex; align-items: flex-start; gap: 0.7em; padding-block: 0.5rem; border-top: 1px solid var(--card-light-line-soft); font-size: var(--fs-small); }
+  .pr__check { width: 0.85rem; height: 0.85rem; margin-top: 0.3em; flex-shrink: 0; color: var(--c-accent); }
+
+  .pr__note { margin-top: var(--space-5); }
+
+  .pr__foot {
+    display: grid;
+    gap: var(--space-5);
+    margin-top: var(--space-8);
+    padding-top: var(--space-7);
+    border-top: 1px solid var(--line);
+  }
+  .pr__foot-title {
+    max-width: 20ch;
+    font-family: var(--font-display); font-weight: 900; font-stretch: 108%;
+    font-size: clamp(1.25rem, 1rem + 1.4vw, 2rem);
+    line-height: 1.02; letter-spacing: -0.035em; text-transform: uppercase;
+  }
+  .pr__foot-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-5); }
+  @media (min-width: 900px) {
+    .pr__foot { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+  }
+</style>

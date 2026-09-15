@@ -1,0 +1,346 @@
+---
+/**
+ * Kurze Lead-Form für die Website-Landingpage.
+ * Bewusst knapp: bei bezahltem Traffic kostet jedes zusätzliche Feld Anfragen.
+ * Eigener Formularname ("website"), damit die Leads getrennt von den
+ * allgemeinen Anfragen ankommen.
+ *
+ * VERSANDWEG: siehe src/data/forms.ts. Auf Netlify laufen die Anfragen über
+ * Netlify Forms, auf einem statischen Hoster über einen externen Endpunkt.
+ * Das Markup unterscheidet sich nur in wenigen Attributen; die Felder,
+ * die Prüfung und die Rückmeldungen sind in beiden Fällen identisch.
+ */
+import { websitePricing, websitePriceLine } from '@/data/website-pricing';
+import { formConfig } from '@/data/forms';
+
+const budgetOptions = [
+  'Noch offen',
+  'bis 1.500 €',
+  '1.500 – 2.500 €',
+  '2.500 – 4.000 €',
+  '4.000 – 6.000 €',
+  'über 6.000 €',
+];
+
+const needOptions = [
+  ...websitePricing.map((p) => p.name),
+  'Website + Branding',
+  'Website + Content',
+  'Weiß ich noch nicht',
+];
+
+const packageIds = websitePricing.map((p) => p.id).join(',');
+const entry = websitePriceLine(websitePricing[0]);
+
+const viaNetlify = formConfig.transport === 'netlify';
+/* Ohne JavaScript geht der Submit direkt an den Zielort: auf Netlify an die
+   Seite selbst, sonst an den externen Endpunkt. So bleibt das Formular auch
+   ohne Skript benutzbar. */
+const formAction = viaNetlify ? '/webdesign-muenchen/?sent=1' : formConfig.endpoint;
+---
+<section class="wl section" id="anfrage" data-theme="dark" data-bg="dark" aria-labelledby="wl-title">
+  <div class="container wl__inner">
+    <div class="wl__text">
+      <p class="t-label wl__label" data-reveal="fade">Kostenlose Einschätzung</p>
+      <h2 class="t-display wl__title" id="wl-title">Wir sagen dir, was deine Website kostet.</h2>
+      <p class="t-lead wl__lead" data-reveal style="--reveal-delay:150ms">
+        Kurz schildern, worum es geht – du bekommst eine ehrliche Einschätzung zu Umfang, Preis und Dauer.
+      </p>
+      <ul class="wl__points" role="list" data-reveal style="--reveal-delay:220ms">
+        <li class="wl__point">Antwort in der Regel innerhalb eines Werktags</li>
+        <li class="wl__point">Fester Preis, bevor du dich entscheidest</li>
+        <li class="wl__point">Websites {entry} einmalig</li>
+      </ul>
+    </div>
+
+    <form
+      class="form wl__form"
+      name="website"
+      method="POST"
+      action={formAction}
+      data-netlify={viaNetlify ? 'true' : undefined}
+      netlify-honeypot={viaNetlify ? 'bot-field' : undefined}
+      novalidate
+      data-website-form
+      data-packages={packageIds}
+      data-transport={formConfig.transport}
+      data-endpoint={formConfig.endpoint || undefined}
+      data-recipient={formConfig.recipient}
+    >
+      {viaNetlify && <input type="hidden" name="form-name" value="website" />}
+      <input type="hidden" name="_subject" value="Website-Anfrage über webdesign.lamoragency.de" />
+      <input type="hidden" name="paket" value="" data-prefill-package />
+      {/* Stand des Rechners zum Zeitpunkt des Absendens – wird beim Submit
+          aus der Paketwahl und dem Laufzeitregler gefüllt. */}
+      <input type="hidden" name="rechner_paket" value="" data-calc-package />
+      <input type="hidden" name="rechner_laufzeit" value="" data-calc-term />
+      <input type="hidden" name="rechner_rate" value="" data-calc-rate />
+      <p class="visually-hidden" aria-hidden="true">
+        <label>Bitte leer lassen: <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
+      </p>
+
+      <div class="form__row">
+        <div class="form__field">
+          <label for="w-name" class="t-label">Name *</label>
+          <input id="w-name" name="name" type="text" autocomplete="name" required minlength="2" placeholder="Dein Name" aria-describedby="we-name" />
+          <p class="form__error t-small" id="we-name" aria-live="polite"></p>
+        </div>
+        <div class="form__field">
+          <label for="w-company" class="t-label">Firma</label>
+          <input id="w-company" name="firma" type="text" autocomplete="organization" placeholder="Unternehmen" />
+        </div>
+      </div>
+
+      <div class="form__row">
+        <div class="form__field">
+          <label for="w-contact" class="t-label">Telefon oder E-Mail *</label>
+          <input id="w-contact" name="kontakt" type="text" autocomplete="email" required minlength="5" placeholder="So erreichen wir dich" aria-describedby="we-contact" />
+          <p class="form__error t-small" id="we-contact" aria-live="polite"></p>
+        </div>
+        <div class="form__field">
+          <label for="w-current" class="t-label">Aktuelle Website</label>
+          <input id="w-current" name="aktuelle_website" type="text" inputmode="url" placeholder="deine-seite.de – oder: noch keine" />
+        </div>
+      </div>
+
+      <div class="form__row">
+        <div class="form__field">
+          <label for="w-need" class="t-label">Was wird benötigt?</label>
+          <div class="form__select">
+            <select id="w-need" name="bedarf">
+              {needOptions.map((n) => <option value={n}>{n}</option>)}
+            </select>
+            <svg class="form__select-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6L8 11L13 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+          </div>
+        </div>
+        <div class="form__field">
+          <label for="w-budget" class="t-label">Budget</label>
+          <div class="form__select">
+            <select id="w-budget" name="budget">
+              {budgetOptions.map((b) => <option value={b}>{b}</option>)}
+            </select>
+            <svg class="form__select-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6L8 11L13 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="form__field">
+        <label for="w-message" class="t-label">Kurz zum Projekt</label>
+        <textarea id="w-message" name="projekt" rows="3" placeholder="Worum geht es? Bis wann soll es live sein?"></textarea>
+      </div>
+
+      <div class="form__consent">
+        <label class="form__check">
+          <input type="checkbox" name="datenschutz" value="akzeptiert" required aria-describedby="we-consent" />
+          <span class="t-small">
+            Ich habe die <a href="/datenschutz/" class="link">Datenschutzerklärung</a> gelesen und stimme der
+            Verarbeitung meiner Angaben zu. *
+          </span>
+        </label>
+        <p class="form__error t-small" id="we-consent" aria-live="polite"></p>
+      </div>
+
+      <div class="form__actions">
+        <button type="submit" class="btn wl__submit">
+          <span>Kostenlose Website-Einschätzung</span>
+          <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+        </button>
+        <p class="t-small t-muted form__hint">Pflichtfelder sind mit * markiert.</p>
+      </div>
+
+      <div class="form__status" role="status" aria-live="polite" tabindex="-1" data-form-status hidden></div>
+    </form>
+  </div>
+</section>
+
+<style>
+  .wl__inner { display: grid; gap: var(--space-8); align-items: start; }
+  @media (min-width: 1024px) {
+    .wl__inner { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: var(--space-9); }
+    .wl__text { position: sticky; top: calc(var(--header-h) + var(--space-6)); }
+  }
+  .wl__label { color: var(--c-accent); margin-bottom: var(--space-4); }
+  .wl__title { max-width: 14ch; }
+  .wl__lead { margin-top: var(--space-5); max-width: 44ch; color: var(--c-grey-dark); }
+  .wl__points { display: grid; gap: var(--space-3); margin-top: var(--space-6); }
+  .wl__point { position: relative; padding-left: 1.5em; font-size: var(--fs-small); }
+  .wl__point::before {
+    content: ''; position: absolute; left: 0; top: 0.5em;
+    width: 0.45rem; height: 0.45rem; border-radius: 50%; background: var(--c-accent);
+  }
+  .wl__submit { width: 100%; justify-content: space-between; }
+  @media (min-width: 480px) { .wl__submit { width: auto; } }
+</style>
+
+<script>
+  function initWebsiteForm() {
+    const form = document.querySelector<HTMLFormElement>('[data-website-form]');
+    if (!form || (form as any).__init) return;
+    (form as any).__init = true;
+
+    const status = form.querySelector<HTMLElement>('[data-form-status]')!;
+    const consent = form.querySelector<HTMLInputElement>('input[name="datenschutz"]')!;
+    const fields = Array.from(form.querySelectorAll<HTMLInputElement>('input[required]:not([type=checkbox])'));
+    const params = new URLSearchParams(location.search);
+
+    // ?paket=business → versteckt mitschicken und im Bedarf-Select vorwählen
+    const paket = params.get('paket');
+    const allowed = (form.dataset.packages || '').split(',').filter(Boolean);
+    if (paket && allowed.includes(paket)) {
+      const hidden = form.querySelector<HTMLInputElement>('[data-prefill-package]');
+      if (hidden) hidden.value = paket;
+      const select = form.querySelector<HTMLSelectElement>('select[name="bedarf"]');
+      const match = Array.from(select?.options ?? []).find((o) => o.value.toLowerCase().includes(paket));
+      if (select && match) select.value = match.value;
+    }
+
+    const setError = (id: string, message: string) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = message;
+    };
+    const validateField = (el: HTMLInputElement) => {
+      let m = '';
+      if (el.validity.valueMissing) m = 'Bitte ausfüllen.';
+      else if (el.validity.tooShort) m = `Mindestens ${el.minLength} Zeichen.`;
+      el.setAttribute('aria-invalid', m ? 'true' : 'false');
+      setError(el.getAttribute('aria-describedby') || '', m);
+      return !m;
+    };
+    const validateConsent = () => {
+      const ok = consent.checked;
+      setError('we-consent', ok ? '' : 'Ohne Zustimmung können wir die Anfrage nicht verarbeiten.');
+      return ok;
+    };
+
+    fields.forEach((f) => {
+      f.addEventListener('blur', () => validateField(f));
+      f.addEventListener('input', () => { if (f.getAttribute('aria-invalid') === 'true') validateField(f); });
+    });
+    consent.addEventListener('change', () => { if (consent.checked) setError('we-consent', ''); });
+
+    const show = (type: 'success' | 'error', title: string, text: string) => {
+      status.hidden = false;
+      status.className = `form__status is-${type}`;
+      status.innerHTML = `<h2>${title}</h2><p>${text}</p>`;
+      status.focus();
+    };
+    if (params.get('sent') === '1') {
+      form.classList.add('is-sent');
+      show('success', 'Danke – Anfrage erhalten.', 'Wir melden uns in der Regel innerhalb eines Werktags mit einer Einschätzung.');
+    }
+
+    /* Stand des Rechners mitschicken, damit in der Mail steht, was der
+       Interessent gerade gerechnet hat. Kein Preis wird hier berechnet –
+       es werden nur die sichtbaren Werte uebernommen. */
+    const uebernehmeRechner = () => {
+      const paketWahl = document.querySelector<HTMLInputElement>('input[name="fin-package"]:checked');
+      const laufzeit = document.querySelector<HTMLInputElement>('input#fin-term');
+      const rate = document.querySelector<HTMLElement>('[data-rate]');
+      const setzen = (sel: string, wert: string) => {
+        const el = form.querySelector<HTMLInputElement>(sel);
+        if (el) el.value = wert;
+      };
+      // data-name traegt den Paketnamen, den der Rechner anzeigt.
+      if (paketWahl) setzen('[data-calc-package]', paketWahl.dataset.name || paketWahl.value);
+      if (laufzeit) setzen('[data-calc-term]', `${laufzeit.value} Monate`);
+      if (rate) setzen('[data-calc-rate]', `${rate.textContent?.trim()} / Monat`);
+    };
+
+    const submitBtn = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+    const btnLabel = submitBtn?.querySelector('span');
+    const btnText = btnLabel?.textContent ?? '';
+    let laeuft = false;
+    let zuletztGesendet = 0;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      // Doppelklick-Schutz: waehrend des Versands und 3 s danach passiert nichts.
+      if (laeuft || Date.now() - zuletztGesendet < 3000) return;
+
+      const ok = [fields.map(validateField).every(Boolean), validateConsent()].every(Boolean);
+      if (!ok) {
+        (form.querySelector<HTMLElement>('[aria-invalid="true"]') ?? consent).focus();
+        return;
+      }
+
+      uebernehmeRechner();
+
+      laeuft = true;
+      form.classList.add('is-busy');
+      if (submitBtn) submitBtn.disabled = true;
+      if (btnLabel) btnLabel.textContent = 'Wird gesendet …';
+
+      const transport = form.dataset.transport;
+      const empfaenger = form.dataset.recipient || 'info@lamoragency.de';
+      /* Netlify Forms nimmt einen POST auf JEDEN Pfad der Seite an. Wir
+         posten deshalb auf den Pfad, auf dem der Besucher gerade steht,
+         statt auf ein fest verdrahtetes "/". Damit haengt der Versand an
+         keiner Regel, die an "/" gebunden ist, und wechselt weder Host
+         noch Schema – der Request bleibt garantiert same-origin. */
+      const ziel = transport === 'endpoint'
+        ? (form.dataset.endpoint || '')
+        : location.pathname;
+
+      const aufraeumen = () => {
+        laeuft = false;
+        form.classList.remove('is-busy');
+        if (submitBtn) submitBtn.disabled = false;
+        if (btnLabel) btnLabel.textContent = btnText;
+      };
+
+      try {
+        const daten = new FormData(form);
+        let res: Response;
+        if (transport === 'endpoint') {
+          // Externe Formular-Dienste erwarten multipart oder JSON und
+          // antworten mit CORS-Headern. Accept: application/json sorgt
+          // dafuer, dass wir eine auswertbare Antwort bekommen.
+          res = await fetch(ziel, { method: 'POST', body: daten, headers: { Accept: 'application/json' } });
+        } else {
+          const body = new URLSearchParams(daten as any).toString();
+          res = await fetch(ziel, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body,
+          });
+        }
+
+        if (!res.ok) {
+          // Der Server hat geantwortet und die Anfrage abgelehnt. Das ist
+          // ein echter Fehlschlag – hier wird nichts beschoenigt.
+          throw Object.assign(new Error(String(res.status)), { abgelehnt: true });
+        }
+
+        // Erfolg nur hier – nach einer tatsaechlich positiven Antwort.
+        zuletztGesendet = Date.now();
+        form.classList.add('is-sent');
+        show('success', 'Danke – Anfrage erhalten.', 'Wir melden uns in der Regel innerhalb eines Werktags mit einer Einschätzung.');
+        aufraeumen();
+      } catch (err) {
+        if (!(err as any)?.abgelehnt) {
+          /* Kein HTTP-Status, sondern ein Transportfehler: Netzwerk weg,
+             oder der Browser hat die Antwort verworfen, weil der POST auf
+             eine Weiterleitung zu einem anderen Host gelaufen ist. In dem
+             Fall wissen wir NICHT, ob die Anfrage angekommen ist – eine
+             Fehlermeldung waere also genauso falsch wie eine Erfolgsmeldung.
+             Deshalb hier der normale Formular-POST des Browsers: den nimmt
+             Netlify Forms in jedem Fall an, er folgt Weiterleitungen sauber
+             und landet auf /?sent=1, wo die bestehende Erfolgsmeldung
+             erscheint. form.submit() loest kein submit-Event aus, es kann
+             also keine Schleife entstehen. */
+          if (btnLabel) btnLabel.textContent = 'Wird gesendet …';
+          form.submit();
+          return;
+        }
+        // Eingaben bleiben stehen, damit niemand alles neu tippen muss.
+        show(
+          'error',
+          'Das hat leider nicht geklappt.',
+          `Deine Eingaben sind noch da – bitte versuch es gleich noch einmal. Wenn es weiterhin nicht klappt, schreib uns direkt an ${empfaenger}.`,
+        );
+        aufraeumen();
+      }
+    });
+  }
+  document.addEventListener('astro:page-load', initWebsiteForm);
+</script>

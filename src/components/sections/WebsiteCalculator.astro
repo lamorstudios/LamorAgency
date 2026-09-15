@@ -1,0 +1,516 @@
+---
+/**
+ * RATENZAHLUNGS-RECHNER
+ *
+ * Beantwortet in dieser Reihenfolge genau vier Fragen:
+ *   1. Was kostet meine Website?          -> Paketwahl
+ *   2. Was zahle ich monatlich?           -> Rate aus Preis / Laufzeit
+ *   3. Wann ist sie bezahlt?              -> Ende der Laufzeit, sichtbar markiert
+ *   4. Was zahle ich danach noch?         -> Hosting ODER Betreuung
+ *
+ * TRENNUNG DER BETRÄGE (der eigentliche Punkt dieses Moduls):
+ * Website-Rate und Hosting werden getrennt ausgewiesen und erst am Ende zu
+ * einer Monatsbelastung addiert. Nach der letzten Rate faellt der
+ * Website-Anteil auf 0 € und taucht nirgends mehr als laufende Kosten auf.
+ *
+ * ALLE Betraege stammen aus src/data/website-pricing.ts und stehen als
+ * data-Attribute im Markup. Im Skript wird kein einziger Betrag geschrieben –
+ * nur gerechnet und formatiert.
+ *
+ * OHNE JAVASCRIPT: Der Startzustand (Empfehlungspaket, Standardlaufzeit) ist
+ * serverseitig ausgerechnet und steht vollstaendig im HTML. Der Rechner zeigt
+ * dann einen gueltigen Fall statt Platzhalter.
+ */
+import Icon from '@/components/Icon.astro';
+import Words from '@/components/Words.astro';
+import {
+  websitePricing, financingTerms, defaultFinancingTerm, websiteRate,
+  hostingPlan, premiumPlan, longestTerm, euro, euroRate,
+} from '@/data/website-pricing';
+
+/** Nur Pakete mit festem Preis lassen sich in Raten aufteilen. */
+const packages = websitePricing.filter((p) => p.price !== null);
+const defaultPkg = packages.find((p) => p.highlighted) ?? packages[0];
+
+const minTerm = financingTerms[0];
+const maxTerm = financingTerms[financingTerms.length - 1];
+const step = financingTerms[1] - financingTerms[0];
+
+// Startzustand serverseitig – identisch zu dem, was das Skript spaeter rechnet.
+const startPrice = defaultPkg.price as number;
+const startRate = websiteRate(startPrice, defaultFinancingTerm);
+const startFill = ((defaultFinancingTerm - minTerm) / (maxTerm - minTerm)) * 100;
+const prefix = defaultPkg.priceFrom ? 'ab ' : '';
+---
+<section class="fin wash" id="rechner" data-theme="light" data-bg="light" aria-labelledby="fin-title">
+  <div class="container">
+    <div class="fin__head">
+      <div>
+        <p class="eyebrow fin__label" data-reveal="fade">Ratenzahlung</p>
+        <h2 class="fin__title" id="fin-title">
+          <Words text="Deine Website" />
+          <span class="fin__title-em">monatlich bezahlen.</span>
+        </h2>
+      </div>
+      <p class="fin__lead" data-reveal style="--reveal-delay:140ms">
+        Auf Wunsch in bis zu {longestTerm} Raten: Paketpreis geteilt durch die Laufzeit,
+        0 % Aufschlag. Nach vollständiger Bezahlung gehört sie dir.
+      </p>
+    </div>
+
+    <div
+      class="card card--dark fin__card"
+      data-calc
+      data-min={minTerm}
+      data-max={maxTerm}
+      data-hosting={hostingPlan.price}
+      data-reveal
+    >
+      <div class="fin__inputs">
+      <!-- Schritt 1: Paket -->
+      <fieldset class="fin__step">
+        <legend class="fin__legend"><span class="fin__num">1</span> Paket wählen</legend>
+        <div class="fin__pkgs">
+          {packages.map((p) => (
+            <label class="fin__pkg">
+              <input
+                type="radio"
+                name="fin-package"
+                value={p.id}
+                data-price={p.price}
+                data-from={p.priceFrom ? '1' : '0'}
+                data-name={p.name.split(' ')[0]}
+                checked={p.id === defaultPkg.id}
+              />
+              <span class="fin__pkg-box">
+                <span class="fin__pkg-name">{p.name.split(' ')[0]}</span>
+                <span class="fin__pkg-price">{p.priceFrom ? 'ab ' : ''}{euro(p.price as number)}</span>
+              </span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <!-- Schritt 2: Laufzeit -->
+      <div class="fin__step">
+        <label class="fin__legend" for="fin-term">
+          <span class="fin__num">2</span> Ratenzahlung ·
+          <output class="fin__term" data-term-out for="fin-term">{defaultFinancingTerm}</output> Monate
+        </label>
+        <div class="fin__slider">
+          <input
+            type="range"
+            id="fin-term"
+            min={minTerm}
+            max={maxTerm}
+            step={step}
+            value={defaultFinancingTerm}
+            data-term
+            aria-valuetext={`${defaultFinancingTerm} Monate`}
+            style={`--fill:${startFill}%`}
+          />
+          <div class="fin__ticks" aria-hidden="true">
+            {financingTerms.map((t) => <span>{t}</span>)}
+          </div>
+        </div>
+      </div>
+      </div>
+
+      <!-- Ergebnis -->
+      <div class="fin__result card card--accent" role="status" aria-live="polite">
+        <p class="fin__result-pkg">
+          <span data-pkg-name>{defaultPkg.name.split(' ')[0]}</span> Website ·
+          <span data-pkg-price>{prefix}{euro(startPrice)}</span>
+        </p>
+        <p class="fin__rate">
+          <span data-rate>{prefix}{euroRate(startRate)}</span>
+          <span class="fin__rate-unit">/ Monat</span>
+        </p>
+        <p class="fin__rate-sub">
+          für <span data-term-echo>{defaultFinancingTerm}</span> Monate · Hosting optional {euro(hostingPlan.price)} / Monat
+        </p>
+        <p class="fin__paid">
+          <span class="rmark rmark--onred"><Icon name="check" /></span>
+          <span>Nach <span data-term-echo>{defaultFinancingTerm}</span> Monaten ist deine Website vollständig bezahlt.</span>
+        </p>
+      </div>
+
+      <!-- Aufschluesselung: nichts wird zu einer Summe verschmolzen -->
+      <dl class="fin__rows">
+        <div class="fin__row">
+          <dt>Website einmalig</dt>
+          <dd data-once>{prefix}{euro(startPrice)}</dd>
+        </div>
+        <div class="fin__row">
+          <dt><span data-term-echo>{defaultFinancingTerm}</span>&nbsp;Monatsraten</dt>
+          <dd data-rate-row>{prefix}{euroRate(startRate)} / Monat</dd>
+        </div>
+        <div class="fin__row">
+          <dt>Hosting <span class="fin__opt">optional</span></dt>
+          <dd>{euro(hostingPlan.price)} / Monat</dd>
+        </div>
+        <div class="fin__row fin__row--sum">
+          <dt>Monatlich mit Hosting</dt>
+          <dd data-sum>{prefix}{euroRate(startRate + hostingPlan.price)} / Monat</dd>
+        </div>
+      </dl>
+
+      <!-- Zeitstrahl -->
+      <ol class="fin__time" role="list">
+        <li class="fin__stage">
+          <span class="fin__stage-label">Heute</span>
+          <span class="fin__stage-value">Projektstart</span>
+        </li>
+        <li class="fin__stage">
+          <span class="fin__stage-label">Ratenzahlung</span>
+          <span class="fin__stage-value"><span data-term-echo>{defaultFinancingTerm}</span> Monate</span>
+        </li>
+        <li class="fin__stage fin__stage--done">
+          <span class="fin__stage-label">Website bezahlt</span>
+          <span class="fin__stage-value">0 €</span>
+        </li>
+        <li class="fin__stage">
+          <span class="fin__stage-label">Danach</span>
+          <span class="fin__stage-value">Hosting oder Betreuung</span>
+        </li>
+      </ol>
+    </div>
+
+    <div class="fin__foot">
+      <a href="#anfrage" class="btn fin__cta" data-magnetic>
+        <span>Projekt anfragen</span>
+        <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+      </a>
+      <p class="fin__vat">Netto zzgl. USt. Richtwert, kein verbindliches Angebot.</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .fin { padding-block: clamp(2.75rem, 6vw, 5.5rem); }
+
+  .fin__head { display: grid; gap: var(--space-3); margin-bottom: clamp(1.5rem, 3.5vw, 2.5rem); }
+  .fin__label { color: var(--c-accent-text); }
+  .fin__title {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 112%;
+    font-size: clamp(1.9rem, 0.9rem + 4.2vw, 4.2rem);
+    line-height: 0.98; letter-spacing: -0.04em; max-width: 20ch; text-wrap: balance;
+  }
+  .fin__title-em { color: var(--c-accent); }
+  .fin__lead { color: var(--fg-muted); max-width: 42ch; font-size: clamp(0.95rem, 2.2vw, 1.2rem); line-height: 1.45; }
+  @media (min-width: 1024px) {
+    .fin__head { grid-template-columns: minmax(0, 1fr) minmax(0, 0.7fr); gap: var(--space-8); align-items: end; }
+  }
+
+  /* ---------- Das Modul ---------- */
+  .fin__card {
+    display: grid;
+    gap: clamp(1rem, 2.5vw, 1.75rem);
+    padding: clamp(1rem, 2.8vw, 2rem);
+  }
+  @media (min-width: 1000px) {
+    /* Links die Eingabe, rechts das Ergebnis – beides gleichzeitig im Blick. */
+    .fin__card {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 0.82fr);
+      align-items: start;
+      column-gap: clamp(1.5rem, 3.5vw, 3rem);
+    }
+    /* Links die Eingabe, rechts die Zahlen. */
+    .fin__inputs { grid-column: 1; grid-row: 1 / span 2; align-content: start; }
+    .fin__result { grid-column: 2; grid-row: 1; }
+    .fin__rows { grid-column: 2; grid-row: 2; align-self: start; }
+    .fin__time { grid-column: 1 / -1; }
+  }
+
+  .fin__inputs { display: grid; gap: clamp(1rem, 2.5vw, 1.75rem); align-content: start; min-width: 0; }
+  .fin__step { border: 0; padding: 0; margin: 0; min-width: 0; display: grid; gap: var(--space-3); align-content: start; }
+  .fin__legend {
+    display: flex; align-items: center; gap: 0.5em; padding: 0;
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--fg-muted);
+  }
+  .fin__num {
+    display: grid; place-items: center; flex: none;
+    width: 1.45rem; aspect-ratio: 1; border-radius: 50%;
+    background: rgba(229, 67, 43, 0.16); border: 1px solid rgba(229, 67, 43, 0.35);
+    color: var(--c-accent-on-dark);
+    font-family: var(--font-display); font-weight: var(--fw-display); font-size: 0.7rem;
+  }
+  .fin__term { color: var(--c-accent-on-dark); font-weight: var(--fw-bold); font-variant-numeric: tabular-nums; }
+
+  /* Paketwahl: 2x2 auf dem Telefon, vier nebeneinander ab Tablet. */
+  .fin__pkgs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
+  @media (min-width: 620px) { .fin__pkgs { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  .fin__pkg { position: relative; display: block; min-width: 0; }
+  .fin__pkg input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+  .fin__pkg-box {
+    display: grid; gap: 0.15rem; align-content: center;
+    min-height: 3.25rem;
+    padding: 0.6rem 0.7rem;
+    border-radius: calc(var(--radius-card) * 0.55);
+    border: 1px solid var(--card-dark-line);
+    background: var(--tile-dark-bg);
+    transition: border-color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
+  }
+  .fin__pkg-name {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 105%;
+    text-transform: uppercase; font-size: clamp(0.72rem, 1.9vw, 0.88rem);
+    line-height: 1.05; letter-spacing: -0.02em;
+  }
+  .fin__pkg-price { font-size: 0.72rem; color: var(--c-grey-dark); font-variant-numeric: tabular-nums; }
+  .fin__pkg input:checked + .fin__pkg-box {
+    border-color: var(--c-accent);
+    background: color-mix(in srgb, var(--c-accent) 18%, transparent);
+  }
+  .fin__pkg input:checked + .fin__pkg-box .fin__pkg-price { color: var(--c-paper); }
+  .fin__pkg input:focus-visible + .fin__pkg-box { outline: 2px solid var(--c-paper); outline-offset: 2px; }
+  @media (hover: hover) and (pointer: fine) {
+    .fin__pkg:hover .fin__pkg-box { border-color: var(--c-grey-dark); }
+  }
+
+  /* ---------- Schieberegler ---------- */
+  .fin__slider { display: grid; gap: 0.35rem; }
+  .fin__slider input[type='range'] {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 2.75rem; margin: 0; background: transparent; cursor: pointer;
+  }
+  .fin__slider input[type='range']::-webkit-slider-runnable-track {
+    height: 0.5rem; border-radius: var(--radius-pill);
+    background: linear-gradient(to right, var(--c-accent) 0 var(--fill, 50%), rgba(242, 237, 228, 0.16) var(--fill, 50%) 100%);
+  }
+  .fin__slider input[type='range']::-moz-range-track {
+    height: 0.5rem; border-radius: var(--radius-pill);
+    background: linear-gradient(to right, var(--c-accent) 0 var(--fill, 50%), rgba(242, 237, 228, 0.16) var(--fill, 50%) 100%);
+  }
+  .fin__slider input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 2rem; height: 2rem; margin-top: -0.75rem;
+    border-radius: 50%; border: 3px solid var(--c-ink);
+    background: var(--c-paper);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(229, 67, 43, 0.35);
+    transition: transform var(--dur-fast) var(--ease-out);
+  }
+  .fin__slider input[type='range']::-moz-range-thumb {
+    width: 2rem; height: 2rem;
+    border-radius: 50%; border: 3px solid var(--c-ink);
+    background: var(--c-paper);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+  }
+  .fin__slider input[type='range']:active::-webkit-slider-thumb { transform: scale(1.12); }
+  .fin__slider input[type='range']:focus-visible { outline: none; }
+  .fin__slider input[type='range']:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--c-accent-on-dark); outline-offset: 3px; }
+  .fin__slider input[type='range']:focus-visible::-moz-range-thumb { outline: 2px solid var(--c-accent-on-dark); outline-offset: 3px; }
+  @media (prefers-reduced-motion: reduce) {
+    .fin__slider input[type='range']::-webkit-slider-thumb { transition: none; }
+  }
+  .fin__ticks {
+    display: flex; justify-content: space-between;
+    font-size: 0.7rem; color: var(--fg-muted); font-variant-numeric: tabular-nums;
+    padding-inline: 0.4rem;
+  }
+
+  /* ---------- Ergebnis ---------- */
+  .fin__result {
+    display: grid; align-content: center; gap: 0.3rem;
+    padding: clamp(1rem, 2.6vw, 1.6rem);
+  }
+  .fin__result-pkg {
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; color: rgba(255, 255, 255, 0.85);
+  }
+  .fin__rate {
+    display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.4rem;
+    font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: 118%;
+    font-size: clamp(2rem, 1rem + 4.6vw, 3.6rem);
+    line-height: 0.95; letter-spacing: -0.05em;
+    font-variant-numeric: tabular-nums; color: #fff;
+  }
+  .fin__rate-unit {
+    font-size: clamp(0.8rem, 2vw, 1.05rem); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.85);
+  }
+  .fin__rate-sub { font-size: var(--fs-small); color: rgba(255, 255, 255, 0.85); font-variant-numeric: tabular-nums; }
+  .fin__paid {
+    display: flex; align-items: center; gap: 0.55rem;
+    margin-top: var(--space-3); padding-top: var(--space-3);
+    border-top: 1px solid rgba(255, 255, 255, 0.28);
+    font-weight: var(--fw-semi); font-size: clamp(0.82rem, 2vw, 1rem); line-height: 1.25;
+  }
+
+  /* ---------- Aufschluesselung ---------- */
+  .fin__rows { display: grid; align-content: start; }
+  .fin__row {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
+    padding-block: 0.5rem;
+    border-top: 1px solid var(--card-dark-line-soft);
+    font-size: var(--fs-small);
+  }
+  .fin__row dt { color: var(--c-grey-dark); }
+  .fin__row dd { margin: 0; font-weight: var(--fw-semi); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .fin__row--sum { border-top-color: var(--card-dark-line); }
+  .fin__row--sum dt { color: var(--c-paper); font-weight: var(--fw-semi); }
+  .fin__row--sum dd { color: var(--c-accent-on-dark); }
+  /* Hosting ist keine Pflichtposition – das muss in der Zeile stehen. */
+  .fin__opt {
+    margin-left: 0.4em; padding: 0.2em 0.5em; border-radius: var(--radius-pill);
+    border: 1px solid var(--card-dark-line); color: var(--fg-muted);
+    font-size: 0.62rem; font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase;
+  }
+
+  /* ---------- Zeitstrahl ---------- */
+  .fin__time {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+    margin-top: var(--space-2);
+    border-top: 1px solid var(--card-dark-line);
+    padding-top: var(--space-4);
+  }
+  @media (min-width: 700px) { .fin__time { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  .fin__stage {
+    position: relative; display: grid; gap: 0.1rem; align-content: start;
+    padding: 0.6rem 0.75rem 0.6rem 1.1rem;
+  }
+  /* Punkt auf der Linie – der erledigte Schritt ist der rote. */
+  .fin__stage::before {
+    content: ''; position: absolute; left: 0; top: 0.95rem;
+    width: 0.45rem; height: 0.45rem; border-radius: 50%;
+    background: var(--c-grey-dark); opacity: 0.5;
+  }
+  .fin__stage--done::before { background: var(--c-accent); opacity: 1; box-shadow: 0 0 0 3px rgba(229, 67, 43, 0.22); }
+  .fin__stage-label {
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--fg-muted);
+  }
+  .fin__stage-value { font-size: clamp(0.78rem, 1.9vw, 0.95rem); line-height: 1.25; font-weight: var(--fw-semi); }
+  .fin__stage--done .fin__stage-value { color: var(--c-accent-on-dark); }
+
+  /* ---------- Die zwei Wege danach ---------- */
+  .fin__after { margin-top: clamp(1rem, 2.5vw, 1.75rem); }
+  .fin__after-label {
+    margin-bottom: var(--space-3);
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--fg-muted);
+  }
+  .fin__after-label span { color: var(--c-accent-text); font-variant-numeric: tabular-nums; }
+  .fin__plans {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(0.5rem, 1.6vw, 1.25rem);
+    align-items: stretch;
+  }
+  .fin__plan {
+    display: grid; align-content: start; gap: clamp(0.4rem, 1.2vw, 0.7rem);
+    padding: clamp(0.75rem, 2.2vw, 1.5rem);
+  }
+  .fin__plan-head { display: flex; align-items: center; gap: clamp(0.4rem, 1.2vw, 0.7rem); min-width: 0; }
+  .fin__plan-name {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 106%;
+    text-transform: uppercase; font-size: clamp(0.78rem, 2.1vw, 1.15rem);
+    line-height: 1.05; letter-spacing: -0.03em;
+    /* Normal umbrechen; nur im Extremfall trennen (html lang="de"). */
+    min-width: 0; overflow-wrap: normal; hyphens: auto;
+  }
+  /* Unter 400px bekommt der Name die volle Spaltenbreite – nebeneinander
+     mit der Kachel bliebe fuer "Premium Betreuung" zu wenig Platz. */
+  @media (max-width: 399px) {
+    .fin__plan-head { display: grid; justify-items: start; gap: 0.4rem; }
+  }
+  .fin__plan-price {
+    display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.3rem;
+    font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: 118%;
+    font-size: clamp(1.5rem, 0.9rem + 3vw, 2.6rem);
+    line-height: 0.95; letter-spacing: -0.05em; font-variant-numeric: tabular-nums;
+  }
+  .fin__plan--premium .fin__plan-price { color: var(--c-accent-on-dark); }
+  .fin__plan-unit {
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--card-muted);
+  }
+  .fin__plan-note {
+    font-size: clamp(0.72rem, 1.8vw, 0.9rem); line-height: 1.35; color: var(--card-muted);
+    padding-bottom: clamp(0.4rem, 1.2vw, 0.7rem);
+    border-bottom: 1px solid var(--card-line);
+  }
+  .fin__plan-items { display: grid; gap: clamp(0.25rem, 0.9vw, 0.45rem); }
+  .fin__plan-item {
+    display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.4rem; align-items: start;
+    font-size: clamp(0.74rem, 1.8vw, 0.92rem); line-height: 1.3;
+  }
+  .fin__check { width: 0.8rem; height: 0.8rem; margin-top: 0.25em; color: var(--c-accent); }
+  .fin__plan--premium .fin__check { color: var(--c-accent-on-dark); }
+
+  /* ---------- Abschluss ---------- */
+  .fin__foot {
+    display: grid; gap: var(--space-3);
+    margin-top: clamp(1rem, 2.5vw, 1.75rem);
+  }
+  @media (min-width: 620px) {
+    .fin__foot { grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: var(--space-5); }
+  }
+  .fin__cta { justify-self: start; }
+  .fin__vat { font-size: 0.72rem; color: var(--fg-muted); }
+</style>
+
+<script>
+  function initFinance() {
+    const root = document.querySelector<HTMLElement>('[data-calc]');
+    if (!root || (root as any).__init) return;
+    (root as any).__init = true;
+
+    const term = root.querySelector<HTMLInputElement>('[data-term]')!;
+    const pkgs = Array.from(root.querySelectorAll<HTMLInputElement>('input[name="fin-package"]'));
+    const minTerm = Number(root.dataset.min || 6);
+    const maxTerm = Number(root.dataset.max || 24);
+    // Der Hostingpreis kommt aus der Preisdatei, nicht aus diesem Skript.
+    const hosting = Number(root.dataset.hosting || 0);
+
+    const out = {
+      rate: root.querySelector<HTMLElement>('[data-rate]')!,
+      rateRow: root.querySelector<HTMLElement>('[data-rate-row]')!,
+      once: root.querySelector<HTMLElement>('[data-once]')!,
+      sum: root.querySelector<HTMLElement>('[data-sum]')!,
+      pkgName: root.querySelector<HTMLElement>('[data-pkg-name]')!,
+      pkgPrice: root.querySelector<HTMLElement>('[data-pkg-price]')!,
+      termOut: root.querySelector<HTMLElement>('[data-term-out]')!,
+      echoes: Array.from(document.querySelectorAll<HTMLElement>('[data-term-echo]')),
+      next: document.querySelector<HTMLElement>('[data-term-next]'),
+    };
+
+    const eur = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
+    const eurRate = new Intl.NumberFormat('de-DE', {
+      style: 'currency', currency: 'EUR', minimumFractionDigits: 2, maximumFractionDigits: 2,
+    });
+
+    function render() {
+      const pkg = pkgs.find((p) => p.checked) ?? pkgs[0];
+      const price = Number(pkg.dataset.price || 0);
+      const months = Number(term.value);
+      const prefix = pkg.dataset.from === '1' ? 'ab ' : '';
+
+      // Die einzige Rechnung des Moduls: Preis geteilt durch Laufzeit.
+      const rate = price / months;
+
+      out.pkgName.textContent = pkg.dataset.name || '';
+      out.pkgPrice.textContent = prefix + eur.format(price);
+      out.once.textContent = prefix + eur.format(price);
+      out.rate.textContent = prefix + eurRate.format(rate);
+      out.rateRow.textContent = `${prefix}${eurRate.format(rate)} / Monat`;
+      out.sum.textContent = `${prefix}${eurRate.format(rate + hosting)} / Monat`;
+
+      out.termOut.textContent = String(months);
+      out.echoes.forEach((e) => (e.textContent = String(months)));
+      if (out.next) out.next.textContent = String(months + 1);
+
+      term.setAttribute('aria-valuetext', `${months} Monate`);
+      term.style.setProperty('--fill', `${((months - minTerm) / (maxTerm - minTerm)) * 100}%`);
+    }
+
+    term.addEventListener('input', render);
+    pkgs.forEach((p) => p.addEventListener('change', render));
+    render();
+  }
+
+  initFinance();
+  document.addEventListener('astro:page-load', initFinance);
+</script>
