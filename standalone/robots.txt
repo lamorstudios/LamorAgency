@@ -1,0 +1,6 @@
+# LAMOR AGENCY – temporaere Webdesign-Landingpage
+User-agent: *
+Allow: /
+Disallow: /404
+
+Sitemap: https://webdesign.lamoragency.de/sitemap.xml
