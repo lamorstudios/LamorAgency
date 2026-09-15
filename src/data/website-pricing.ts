@@ -372,7 +372,12 @@ export const matrixIncludes = (row: MatrixRow, pkg: PackageId) =>
  *
  * REGEL: Links steht ausschliesslich, wie ein Angebot ueblicherweise
  * ZUGESCHNITTEN ist – nie ein Preis, nie eine Wertung ueber Dritte. Rechts
- * steht nur, was in JEDEM Paket enthalten ist (Zeilen mit from: 'onepage').
+ * steht nur, was tatsaechlich zugesagt ist: entweder eine Zeile aus
+ * websiteMatrix mit from: 'onepage' (also in jedem Paket enthalten), oder
+ * eine Eigenschaft des Ratenmodells:
+ *   - "Ratenzahlung ohne Aufschlag" -> die Rate ist Preis / Laufzeit
+ *   - "Eigentum nach vollstaendiger Zahlung" -> faq.ts: "Die
+ *     Website-Erstellung ist ein einmaliges Projekt und gehoert danach dir."
  */
 export interface InclusiveRow {
   label: string;
@@ -384,7 +389,8 @@ export const inclusiveComparison: InclusiveRow[] = [
   { label: 'Individuelles Design', usual: 'je nach Angebot', icon: 'image' },
   { label: 'Responsive Umsetzung', usual: 'je nach Angebot', icon: 'cube' },
   { label: 'SEO-Grundoptimierung', usual: 'häufig Zusatzleistung', icon: 'trend' },
-  { label: 'Performance-Optimierung', usual: 'je nach Anbieter', icon: 'bolt' },
+  { label: 'Ratenzahlung ohne Aufschlag', usual: 'oft nur Einmalzahlung', icon: 'bolt' },
+  { label: 'Eigentum nach vollständiger Zahlung', usual: 'je nach Modell gebunden', icon: 'heart' },
   { label: 'Rechtstexte technisch eingebunden', usual: 'oft separat', icon: 'heart' },
   { label: 'Deployment & Einrichtung', usual: 'je nach Anbieter separat', icon: 'cube' },
   { label: 'Fester Ansprechpartner', usual: 'abhängig vom Anbieter', icon: 'head' },
@@ -438,7 +444,13 @@ export const euroRate = (n: number) => nfRate.format(n);
  *     nirgends mehr als laufende Kosten auftauchen.
  * ============================================================================
  */
-export const financingTerms = [6, 12, 18, 24] as const;
+/**
+ * Waehlbare Laufzeiten. MAXIMUM IST 12 MONATE – eine Agenturleistung ueber
+ * zwei Jahre zu strecken wirkt wie die Finanzierung eines Konsumprodukts.
+ * Alles andere (Regler, Hero-Rate, Zahlungsfortschritt) leitet sich hieraus
+ * ab; es gibt keine zweite Stelle mit Laufzeiten.
+ */
+export const financingTerms = [3, 6, 9, 12] as const;
 export const defaultFinancingTerm = 12;
 
 /** Monatliche Website-Rate. Einzige Stelle, an der diese Formel steht. */

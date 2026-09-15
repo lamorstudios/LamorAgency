@@ -1,0 +1,342 @@
+---
+/**
+ * Zahlungsfortschritt – "Wo stehe ich nach Monat X?"
+ *
+ * Beantwortet die Frage, die hinter jeder Ratenzahlung steht: Wie viel habe
+ * ich schon bezahlt, wie viel ist offen, wann bin ich fertig. Drei Zahlen,
+ * ein Balken, ein Regler.
+ *
+ * BEWUSST KEIN ABLOESEMODELL: Es gibt keinen Restwert, keine Schlussrate und
+ * keinen Uebernahmebetrag. Der Paketpreis wird auf die Laufzeit verteilt,
+ * nach der letzten Rate steht 0 € offen. Das ist die ganze Rechnung.
+ *
+ * ALLE Betraege kommen aus src/data/website-pricing.ts als data-Attribute.
+ * Im Skript steht kein einziger Preis – nur Multiplikation und Differenz.
+ *
+ * OHNE JAVASCRIPT: Der Startzustand (Empfehlungspaket, volle Laufzeit) ist
+ * serverseitig gerechnet und steht komplett im HTML.
+ */
+import Icon from '@/components/Icon.astro';
+import Words from '@/components/Words.astro';
+import {
+  websitePricing, financingTerms, defaultFinancingTerm, websiteRate, euro, euroRate,
+} from '@/data/website-pricing';
+
+const packages = websitePricing.filter((p) => p.price !== null);
+const defaultPkg = packages.find((p) => p.highlighted) ?? packages[0];
+
+const term = defaultFinancingTerm;
+const startMonth = Math.round(term / 2);
+const startPrice = defaultPkg.price as number;
+const startRate = websiteRate(startPrice, term);
+const startPaid = startRate * startMonth;
+const startOpen = startPrice - startPaid;
+const startPct = (startMonth / term) * 100;
+const prefix = defaultPkg.priceFrom ? 'ab ' : '';
+---
+<section class="pg" id="fortschritt" data-theme="dark" data-bg="dark" aria-labelledby="pg-title">
+  <div class="container">
+    <div class="pg__head">
+      <div>
+        <p class="eyebrow pg__label" data-reveal="fade">Zahlungsfortschritt</p>
+        <h2 class="pg__title" id="pg-title">
+          <Words text="Wo du nach Monat" />
+          <span class="pg__title-em">X stehst.</span>
+        </h2>
+      </div>
+      <p class="pg__lead" data-reveal style="--reveal-delay:140ms">
+        Keine Ablöse, keine Schlussrate. Nach der letzten Rate steht 0 € offen.
+      </p>
+    </div>
+
+    <div
+      class="card card--dark pg__card"
+      data-progress
+      data-term={term}
+      data-reveal
+    >
+      <!-- Paketwahl -->
+      <fieldset class="pg__step">
+        <legend class="pg__legend">Paket</legend>
+        <div class="pg__pkgs">
+          {packages.map((p) => (
+            <label class="pg__pkg">
+              <input
+                type="radio"
+                name="pg-package"
+                value={p.id}
+                data-price={p.price}
+                data-from={p.priceFrom ? '1' : '0'}
+                data-name={p.name.split(' ')[0]}
+                checked={p.id === defaultPkg.id}
+              />
+              <span class="pg__pkg-box">
+                <span class="pg__pkg-name">{p.name.split(' ')[0]}</span>
+                <span class="pg__pkg-price">{p.priceFrom ? 'ab ' : ''}{euro(p.price as number)}</span>
+              </span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <!-- Regler: Stand nach Monat -->
+      <div class="pg__step">
+        <label class="pg__legend" for="pg-month">
+          Stand nach Monat <output class="pg__month" data-month-out for="pg-month">{startMonth}</output>
+          <span class="pg__of">von {term}</span>
+        </label>
+        <div class="pg__slider">
+          <input
+            type="range"
+            id="pg-month"
+            min="0"
+            max={term}
+            step="1"
+            value={startMonth}
+            data-month
+            aria-valuetext={`Monat ${startMonth} von ${term}`}
+            style={`--fill:${startPct}%`}
+          />
+          <div class="pg__ticks" aria-hidden="true">
+            <span>0</span>{financingTerms.map((t) => <span>{t}</span>)}
+          </div>
+        </div>
+      </div>
+
+      <!-- Balken -->
+      <div class="pg__bar" role="img" aria-label="Anteil der bereits gezahlten Raten" data-bar-wrap>
+        <span class="pg__bar-fill" data-bar style={`width:${startPct}%`}></span>
+      </div>
+
+      <!-- Die drei Zahlen -->
+      <div class="pg__figures" role="status" aria-live="polite">
+        <div class="pg__fig">
+          <span class="pg__fig-label">Bereits gezahlt</span>
+          <span class="pg__fig-value" data-paid>{prefix}{euroRate(startPaid)}</span>
+          <span class="pg__fig-note"><span data-month-echo>{startMonth}</span> × <span data-rate>{prefix}{euroRate(startRate)}</span></span>
+        </div>
+        <div class="pg__fig pg__fig--open">
+          <span class="pg__fig-label">Noch offen</span>
+          <span class="pg__fig-value" data-open>{prefix}{euroRate(startOpen)}</span>
+          <span class="pg__fig-note"><span data-left>{term - startMonth}</span> Raten</span>
+        </div>
+        <div class="pg__fig">
+          <span class="pg__fig-label">Gesamtpreis</span>
+          <span class="pg__fig-value" data-total>{prefix}{euroRate(startPrice)}</span>
+          <span class="pg__fig-note">unverändert</span>
+        </div>
+      </div>
+
+      <!-- Abschluss – nur sichtbar, wenn die letzte Rate erreicht ist -->
+      <p class="pg__done" data-done hidden>
+        <span class="rmark rmark--onred"><Icon name="check" /></span>
+        <span>Website vollständig bezahlt. Ab hier läuft nur noch, was du dir aussuchst.</span>
+      </p>
+    </div>
+  </div>
+</section>
+
+<script>
+  function initProgress() {
+    const root = document.querySelector<HTMLElement>('[data-progress]');
+    if (!root || (root as any).__init) return;
+    (root as any).__init = true;
+
+    const month = root.querySelector<HTMLInputElement>('[data-month]')!;
+    const pkgs = Array.from(root.querySelectorAll<HTMLInputElement>('input[name="pg-package"]'));
+    const term = Number(root.dataset.term || 12);
+
+    const out = {
+      paid: root.querySelector<HTMLElement>('[data-paid]')!,
+      open: root.querySelector<HTMLElement>('[data-open]')!,
+      total: root.querySelector<HTMLElement>('[data-total]')!,
+      rate: root.querySelector<HTMLElement>('[data-rate]')!,
+      left: root.querySelector<HTMLElement>('[data-left]')!,
+      bar: root.querySelector<HTMLElement>('[data-bar]')!,
+      monthOut: root.querySelector<HTMLElement>('[data-month-out]')!,
+      echo: root.querySelector<HTMLElement>('[data-month-echo]')!,
+      done: root.querySelector<HTMLElement>('[data-done]')!,
+    };
+
+    const eur = new Intl.NumberFormat('de-DE', {
+      style: 'currency', currency: 'EUR', minimumFractionDigits: 2, maximumFractionDigits: 2,
+    });
+
+    function render() {
+      const pkg = pkgs.find((p) => p.checked) ?? pkgs[0];
+      const price = Number(pkg.dataset.price || 0);
+      const m = Number(month.value);
+      const prefix = pkg.dataset.from === '1' ? 'ab ' : '';
+
+      // Die ganze Rechnung: Rate mal Monate, Rest ist die Differenz.
+      const rate = price / term;
+      const paid = rate * m;
+      const open = price - paid;
+
+      out.rate.textContent = prefix + eur.format(rate);
+      out.paid.textContent = prefix + eur.format(paid);
+      // Rundungsreste duerfen nicht als "0,01 € offen" stehenbleiben.
+      out.open.textContent = m >= term ? eur.format(0) : prefix + eur.format(open);
+      out.total.textContent = prefix + eur.format(price);
+      out.left.textContent = String(term - m);
+      out.monthOut.textContent = String(m);
+      out.echo.textContent = String(m);
+
+      out.bar.style.width = `${(m / term) * 100}%`;
+      month.setAttribute('aria-valuetext', `Monat ${m} von ${term}`);
+      month.style.setProperty('--fill', `${(m / term) * 100}%`);
+
+      const done = m >= term;
+      out.done.hidden = !done;
+      root.classList.toggle('is-done', done);
+    }
+
+    month.addEventListener('input', render);
+    pkgs.forEach((p) => p.addEventListener('change', render));
+    render();
+  }
+  initProgress();
+  document.addEventListener('astro:page-load', initProgress);
+</script>
+
+<style>
+  .pg { padding-block: clamp(2rem, 5vw, 4rem); }
+
+  .pg__head { display: grid; gap: var(--space-3); margin-bottom: clamp(1.25rem, 3vw, 2rem); }
+  .pg__label { color: var(--c-accent-on-dark); }
+  .pg__title {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 112%;
+    font-size: clamp(1.7rem, 0.9rem + 3.4vw, 3.4rem);
+    line-height: 1; letter-spacing: -0.04em; text-transform: uppercase; text-wrap: balance;
+  }
+  .pg__title-em { color: var(--c-accent-on-dark); }
+  .pg__lead { color: var(--fg-muted); font-size: var(--fs-small); line-height: 1.5; max-width: 40ch; }
+  @media (min-width: 1000px) {
+    .pg__head { grid-template-columns: minmax(0, 1fr) minmax(0, 0.6fr); gap: var(--space-7); align-items: end; }
+  }
+
+  .pg__card { display: grid; gap: clamp(0.9rem, 2.4vw, 1.5rem); padding: clamp(1rem, 2.8vw, 2rem); }
+
+  .pg__step { border: 0; padding: 0; margin: 0; min-width: 0; display: grid; gap: var(--space-3); }
+  .pg__legend {
+    display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.4em; padding: 0;
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--fg-muted);
+  }
+  .pg__month { color: var(--c-accent-on-dark); font-weight: var(--fw-bold); font-variant-numeric: tabular-nums; }
+  .pg__of { color: var(--fg-muted); }
+
+  .pg__pkgs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
+  @media (min-width: 620px) { .pg__pkgs { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  .pg__pkg { position: relative; display: block; min-width: 0; }
+  .pg__pkg input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+  .pg__pkg-box {
+    display: grid; gap: 0.15rem; align-content: center; min-height: 3.1rem;
+    padding: 0.55rem 0.7rem; border-radius: calc(var(--radius-card) * 0.55);
+    border: 1px solid var(--card-dark-line); background: var(--tile-dark-bg);
+    transition: border-color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
+  }
+  .pg__pkg-name {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 105%;
+    text-transform: uppercase; font-size: clamp(0.7rem, 1.8vw, 0.85rem);
+    line-height: 1.05; letter-spacing: -0.02em;
+  }
+  .pg__pkg-price { font-size: 0.7rem; color: var(--c-grey-dark); font-variant-numeric: tabular-nums; }
+  .pg__pkg input:checked + .pg__pkg-box {
+    border-color: var(--c-accent); background: color-mix(in srgb, var(--c-accent) 18%, transparent);
+  }
+  .pg__pkg input:checked + .pg__pkg-box .pg__pkg-price { color: var(--c-paper); }
+  .pg__pkg input:focus-visible + .pg__pkg-box { outline: 2px solid var(--c-paper); outline-offset: 2px; }
+
+  /* ---------- Regler ---------- */
+  .pg__slider { display: grid; gap: 0.35rem; }
+  .pg__slider input[type='range'] {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 2.75rem; margin: 0; background: transparent; cursor: pointer;
+  }
+  .pg__slider input[type='range']::-webkit-slider-runnable-track {
+    height: 0.5rem; border-radius: var(--radius-pill);
+    background: linear-gradient(to right, var(--c-accent) 0 var(--fill, 50%), rgba(242, 237, 228, 0.16) var(--fill, 50%) 100%);
+  }
+  .pg__slider input[type='range']::-moz-range-track {
+    height: 0.5rem; border-radius: var(--radius-pill);
+    background: linear-gradient(to right, var(--c-accent) 0 var(--fill, 50%), rgba(242, 237, 228, 0.16) var(--fill, 50%) 100%);
+  }
+  .pg__slider input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 2rem; height: 2rem; margin-top: -0.75rem;
+    border-radius: 50%; border: 3px solid var(--c-ink); background: var(--c-paper);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(229, 67, 43, 0.35);
+    transition: transform var(--dur-fast) var(--ease-out);
+  }
+  .pg__slider input[type='range']::-moz-range-thumb {
+    width: 2rem; height: 2rem; border-radius: 50%;
+    border: 3px solid var(--c-ink); background: var(--c-paper);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+  }
+  .pg__slider input[type='range']:active::-webkit-slider-thumb { transform: scale(1.12); }
+  .pg__slider input[type='range']:focus-visible { outline: none; }
+  .pg__slider input[type='range']:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--c-accent-on-dark); outline-offset: 3px; }
+  .pg__slider input[type='range']:focus-visible::-moz-range-thumb { outline: 2px solid var(--c-accent-on-dark); outline-offset: 3px; }
+  @media (prefers-reduced-motion: reduce) {
+    .pg__slider input[type='range']::-webkit-slider-thumb { transition: none; }
+  }
+  .pg__ticks {
+    display: flex; justify-content: space-between; padding-inline: 0.4rem;
+    font-size: 0.7rem; color: var(--fg-muted); font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- Balken ---------- */
+  .pg__bar {
+    position: relative; height: 0.6rem; border-radius: var(--radius-pill);
+    background: rgba(242, 237, 228, 0.12); overflow: hidden;
+  }
+  .pg__bar-fill {
+    display: block; height: 100%; border-radius: inherit;
+    background: var(--card-accent-bg);
+    transition: width var(--dur-base) var(--ease-out);
+  }
+  @media (prefers-reduced-motion: reduce) { .pg__bar-fill { transition: none; } }
+
+  /* ---------- Die drei Zahlen ---------- */
+  .pg__figures {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px; border-radius: calc(var(--radius-card) * 0.6); overflow: hidden;
+  }
+  @media (min-width: 760px) { .pg__figures { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .pg__fig {
+    position: relative; display: grid; gap: 0.15rem; align-content: start;
+    padding: clamp(0.75rem, 2vw, 1.1rem);
+    background: var(--tile-dark-bg);
+  }
+  /* Die dritte Zahl nimmt auf dem Telefon die volle Breite. */
+  .pg__fig:last-child { grid-column: 1 / -1; }
+  @media (min-width: 760px) { .pg__fig:last-child { grid-column: auto; } }
+  .pg__fig-label {
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--fg-muted);
+  }
+  .pg__fig-value {
+    font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: 118%;
+    font-size: clamp(1.3rem, 0.85rem + 2.2vw, 2.2rem);
+    line-height: 0.98; letter-spacing: -0.05em;
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+  .pg__fig--open .pg__fig-value { color: var(--c-accent-on-dark); }
+  .pg__fig-note { font-size: 0.75rem; color: var(--fg-muted); font-variant-numeric: tabular-nums; }
+
+  /* Ist alles bezahlt, wird aus "noch offen" der ruhige Zustand. */
+  .pg__card.is-done .pg__fig--open .pg__fig-value { color: var(--c-paper); }
+
+  /* display:flex schlaegt den Browser-Default fuer [hidden] – ohne diese
+     Zeile stuende "vollstaendig bezahlt" schon ab Monat 1 da. */
+  .pg__done[hidden] { display: none; }
+  .pg__done {
+    display: flex; align-items: center; gap: 0.6rem;
+    padding: clamp(0.7rem, 2vw, 1.1rem) clamp(0.8rem, 2vw, 1.25rem);
+    border-radius: calc(var(--radius-card) * 0.6);
+    background: var(--card-accent-bg); border: 1px solid var(--card-accent-line);
+    color: #fff; font-weight: var(--fw-semi);
+    font-size: clamp(0.8rem, 1.9vw, 1rem); line-height: 1.3;
+  }
+</style>

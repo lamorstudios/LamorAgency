@@ -1,0 +1,284 @@
+---
+/**
+ * "Was passiert nach der letzten Rate?" – drei Wege als Tabs.
+ *
+ * INHALTLICHE REGEL: Hier steht nur, was im Projekt tatsaechlich definiert
+ * ist. Belegt sind:
+ *   - "Die Website-Erstellung ist ein einmaliges Projekt und gehoert danach
+ *     dir." (faq.ts)
+ *   - "Die Betreuung ist optional und kann spaeter dazugenommen werden."
+ *   - "Die Domain behaeltst du." (faq.ts)
+ *   - Leistungsumfang der Betreuungsstufen (carePlans)
+ *
+ * NICHT definiert und deshalb als offener Punkt markiert statt erfunden:
+ *   - Kuendigungsfrist der laufenden Betreuung
+ *   - was bei einer Uebernahme konkret uebergeben wird (Zugaenge, Dateien)
+ * Diese Zeilen tragen `open: true` und werden sichtbar als "noch zu
+ * bestaetigen" gekennzeichnet. TODO_CONTENT: vom Auftraggeber klaeren, dann
+ * `open` entfernen und den Text einsetzen.
+ *
+ * Die Tabs sind echte Buttons mit ARIA-Rollen; ohne JavaScript sind alle
+ * drei Bereiche sichtbar untereinander – kein Inhalt geht verloren.
+ */
+import Icon from '@/components/Icon.astro';
+import Words from '@/components/Words.astro';
+import { hostingPlan, premiumPlan, euro } from '@/data/website-pricing';
+
+interface Line { text: string; open?: boolean }
+interface Option {
+  id: string;
+  tab: string;
+  title: string;
+  claim: string;
+  price?: string;
+  lines: Line[];
+}
+
+const options: Option[] = [
+  {
+    id: 'weiter',
+    tab: 'Weiter betreuen lassen',
+    title: 'Du kümmerst dich um dein Business. Wir um deine Website.',
+    claim: 'Technik, Sicherheit und kleinere Änderungen laufen weiter über uns – mit demselben Ansprechpartner wie im Projekt.',
+    price: `ab ${euro(hostingPlan.price)} / Monat`,
+    lines: [
+      ...hostingPlan.includes.map((t) => ({ text: t })),
+      { text: `Mehr Umfang mit der Premium-Betreuung: ${euro(premiumPlan.price)} / Monat` },
+    ],
+  },
+  {
+    id: 'selbst',
+    tab: 'Selbst übernehmen',
+    title: 'Die Website gehört dir.',
+    claim: 'Nach der letzten Rate ist das Projekt bezahlt. Du kannst es auf eigenes Hosting umziehen.',
+    lines: [
+      { text: 'Die Website-Erstellung ist ein einmaliges Projekt und gehört danach dir' },
+      { text: 'Deine Domain behältst du – sie lief von Anfang an auf dich' },
+      { text: 'Hosting, Wartung und Backups laufen ab dann nicht mehr über uns' },
+      { text: 'Umfang der Übergabe (Dateien, Zugänge, Ablauf)', open: true },
+    ],
+  },
+  {
+    id: 'beenden',
+    tab: 'Betreuung beenden',
+    title: 'Nur die Betreuung endet.',
+    claim: 'Die Betreuung ist eine eigene Leistung – unabhängig davon, dass die Website bezahlt ist.',
+    lines: [
+      { text: 'Die bezahlte Website bleibt davon unberührt' },
+      { text: 'Betreuung lässt sich später jederzeit wieder dazubuchen' },
+      { text: 'Kündigungsfrist und Ablauf', open: true },
+    ],
+  },
+];
+const hasOpen = options.some((o) => o.lines.some((l) => l.open));
+---
+<section class="af" id="danach" data-theme="light" data-bg="light" aria-labelledby="af-title">
+  <div class="container">
+    <div class="af__head">
+      <div>
+        <p class="eyebrow af__label" data-reveal="fade">Nach der letzten Rate</p>
+        <h2 class="af__title" id="af-title">
+          <Words text="Du entscheidest," />
+          <span class="af__title-em">wie es weitergeht.</span>
+        </h2>
+      </div>
+      <p class="af__lead" data-reveal style="--reveal-delay:140ms">
+        Die Website ist bezahlt. Die laufende Betreuung ist eine eigene
+        Leistung – keine verlängerte Finanzierung.
+      </p>
+    </div>
+
+    <div class="card card--light af__panel" data-after data-reveal>
+      <div class="af__tabs" role="tablist" aria-label="Wege nach der Ratenzahlung">
+        {options.map((o, i) => (
+          <button
+            type="button"
+            class="af__tab"
+            role="tab"
+            id={`af-tab-${o.id}`}
+            aria-controls={`af-panel-${o.id}`}
+            aria-selected={i === 0 ? 'true' : 'false'}
+            tabindex={i === 0 ? 0 : -1}
+            data-tab={o.id}
+          >{o.tab}</button>
+        ))}
+      </div>
+
+      {options.map((o, i) => (
+        <div
+          class="af__body"
+          role="tabpanel"
+          id={`af-panel-${o.id}`}
+          aria-labelledby={`af-tab-${o.id}`}
+          data-panel={o.id}
+          data-active={i === 0 ? '' : undefined}
+        >
+          <div class="af__copy">
+            <h3 class="af__body-title">{o.title}</h3>
+            <p class="af__claim">{o.claim}</p>
+            {o.price && <p class="af__price">{o.price}</p>}
+          </div>
+          <ul class="af__lines" role="list">
+            {o.lines.map((l) => (
+              <li class={`af__line ${l.open ? 'af__line--open' : ''}`}>
+                <span class="af__mark" aria-hidden="true">
+                  <Icon name={l.open ? 'minus' : 'check'} />
+                </span>
+                <span>
+                  {l.text}
+                  {l.open && <span class="af__flag">noch zu bestätigen</span>}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+
+    {hasOpen && (
+      <p class="af__note">
+        Mit „noch zu bestätigen“ markierte Punkte stehen bewusst ohne Angabe –
+        sie werden erst veröffentlicht, wenn sie vertraglich festgelegt sind.
+      </p>
+    )}
+  </div>
+</section>
+
+<script>
+  /**
+   * Tabs mit Pfeiltasten-Navigation. Ohne JavaScript bleiben alle Panels
+   * sichtbar (CSS blendet nur aus, wenn das Skript uebernommen hat).
+   */
+  function initAfter() {
+    const root = document.querySelector<HTMLElement>('[data-after]');
+    if (!root || (root as any).__init) return;
+    (root as any).__init = true;
+    root.dataset.enhanced = '';
+
+    const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-tab]'));
+    const panels = Array.from(root.querySelectorAll<HTMLElement>('[data-panel]'));
+
+    const select = (id: string, focus = false) => {
+      tabs.forEach((t) => {
+        const on = t.dataset.tab === id;
+        t.setAttribute('aria-selected', String(on));
+        t.tabIndex = on ? 0 : -1;
+        if (on && focus) t.focus();
+      });
+      panels.forEach((p) => {
+        if (p.dataset.panel === id) p.setAttribute('data-active', '');
+        else p.removeAttribute('data-active');
+      });
+    };
+
+    tabs.forEach((t) => t.addEventListener('click', () => select(t.dataset.tab!)));
+    root.querySelector('[role="tablist"]')?.addEventListener('keydown', (e) => {
+      const key = (e as KeyboardEvent).key;
+      const i = tabs.findIndex((t) => t.getAttribute('aria-selected') === 'true');
+      if (key === 'ArrowRight' || key === 'ArrowLeft') {
+        e.preventDefault();
+        const next = key === 'ArrowRight' ? (i + 1) % tabs.length : (i - 1 + tabs.length) % tabs.length;
+        select(tabs[next].dataset.tab!, true);
+      }
+    });
+  }
+  initAfter();
+  document.addEventListener('astro:page-load', initAfter);
+</script>
+
+<style>
+  .af { padding-block: clamp(2rem, 5vw, 4rem); }
+
+  .af__head { display: grid; gap: var(--space-3); margin-bottom: clamp(1.25rem, 3vw, 2rem); }
+  .af__label { color: var(--c-accent-text); }
+  .af__title {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 112%;
+    font-size: clamp(1.7rem, 0.9rem + 3.4vw, 3.4rem);
+    line-height: 1; letter-spacing: -0.04em; text-transform: uppercase; text-wrap: balance;
+  }
+  .af__title-em { color: var(--c-accent-text); }
+  .af__lead { color: var(--fg-muted); font-size: var(--fs-small); line-height: 1.5; max-width: 42ch; }
+  @media (min-width: 1000px) {
+    .af__head { grid-template-columns: minmax(0, 1fr) minmax(0, 0.7fr); gap: var(--space-7); align-items: end; }
+  }
+
+  .af__panel { padding: clamp(0.85rem, 2.2vw, 1.6rem); }
+
+  /* ---------- Tabs ---------- */
+  .af__tabs {
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.35rem; margin-bottom: clamp(0.85rem, 2.2vw, 1.5rem);
+  }
+  .af__tab {
+    min-height: 2.9rem; padding: 0.6rem 0.5rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--card-light-line);
+    background: transparent; color: var(--c-grey);
+    font-family: inherit; cursor: pointer;
+    font-size: clamp(0.6rem, 1.5vw, 0.74rem); font-weight: var(--fw-semi);
+    font-stretch: var(--wd-tight); letter-spacing: var(--ls-wide); text-transform: uppercase;
+    line-height: 1.2; text-wrap: balance;
+    transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+  }
+  .af__tab[aria-selected='true'] {
+    background: var(--c-ink); border-color: var(--c-ink); color: var(--c-paper);
+  }
+  .af__tab:focus-visible { outline: 2px solid var(--c-accent-text); outline-offset: 2px; }
+  @media (hover: hover) and (pointer: fine) {
+    .af__tab:not([aria-selected='true']):hover { border-color: var(--c-ink); color: var(--c-ink); }
+  }
+
+  /* ---------- Inhalt ----------
+     Ohne JavaScript stehen alle drei Bereiche untereinander; erst wenn das
+     Skript uebernommen hat (data-enhanced), wird umgeschaltet. */
+  .af__body { display: grid; gap: clamp(0.85rem, 2.2vw, 1.75rem); }
+  .af__body + .af__body { margin-top: var(--space-5); padding-top: var(--space-5); border-top: 1px solid var(--card-light-line-soft); }
+  [data-enhanced] .af__body { display: none; margin: 0; padding: 0; border: 0; }
+  [data-enhanced] .af__body[data-active] { display: grid; }
+  @media (min-width: 860px) {
+    .af__body { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); align-items: start; gap: clamp(1.5rem, 3.5vw, 3rem); }
+    [data-enhanced] .af__body[data-active] { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); }
+  }
+
+  .af__copy { display: grid; gap: 0.4rem; align-content: start; }
+  .af__body-title {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 108%;
+    font-size: clamp(1.15rem, 0.9rem + 1.4vw, 2rem);
+    line-height: 1.02; letter-spacing: -0.035em; text-transform: uppercase; max-width: 18ch;
+  }
+  .af__claim { font-size: var(--fs-small); line-height: 1.5; color: var(--c-grey); max-width: 42ch; }
+  .af__price {
+    margin-top: var(--space-2);
+    font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: 118%;
+    font-size: clamp(1.3rem, 0.9rem + 1.8vw, 2rem);
+    line-height: 1; letter-spacing: -0.05em; color: var(--c-accent-text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .af__lines { display: grid; }
+  .af__line {
+    display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.5rem; align-items: start;
+    padding-block: clamp(0.4rem, 1.2vw, 0.6rem);
+    font-size: clamp(0.78rem, 1.9vw, 0.95rem); line-height: 1.35;
+  }
+  .af__line + .af__line { border-top: 1px solid var(--card-light-line-soft); }
+  .af__mark {
+    display: grid; place-items: center; flex: none;
+    width: 1.15rem; aspect-ratio: 1; border-radius: 50%;
+    background: var(--c-accent); color: #fff; font-size: 0.72rem; margin-top: 0.1rem;
+  }
+  /* Offene Punkte tragen keinen Haken – sie sind keine Zusage. */
+  .af__line--open { color: var(--c-grey); }
+  .af__line--open .af__mark { background: rgba(11, 10, 9, 0.12); color: var(--c-grey); }
+  .af__flag {
+    display: inline-block; margin-left: 0.5em; padding: 0.2em 0.55em;
+    border-radius: var(--radius-pill); border: 1px dashed var(--card-light-line);
+    font-size: 0.62rem; font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; white-space: nowrap;
+  }
+
+  .af__note {
+    margin-top: var(--space-4);
+    font-size: 0.78rem; line-height: 1.5; color: var(--fg-muted); max-width: 60ch;
+  }
+</style>

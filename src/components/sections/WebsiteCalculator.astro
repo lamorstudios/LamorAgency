@@ -175,40 +175,6 @@ const prefix = defaultPkg.priceFrom ? 'ab ' : '';
       </ol>
     </div>
 
-    <!-- Die zwei Wege nach der letzten Rate -->
-    <div class="fin__after" data-reveal>
-      <p class="fin__after-label">Ab Monat <span data-term-next>{defaultFinancingTerm + 1}</span> zahlst du nur noch</p>
-      <div class="fin__plans">
-        <article class="card card--light fin__plan">
-          <header class="fin__plan-head">
-            <span class="itile"><Icon name="cube" /></span>
-            <h3 class="fin__plan-name">Nur Hosting</h3>
-          </header>
-          <p class="fin__plan-price">{euro(hostingPlan.price)}<span class="fin__plan-unit">/ Monat</span></p>
-          <p class="fin__plan-note">{hostingPlan.note}</p>
-          <ul class="fin__plan-items" role="list">
-            {hostingPlan.includes.map((i) => (
-              <li class="fin__plan-item"><Icon name="check" class="fin__check" /><span>{i}</span></li>
-            ))}
-          </ul>
-        </article>
-
-        <article class="card card--dark fin__plan fin__plan--premium">
-          <header class="fin__plan-head">
-            <span class="itile"><Icon name="trend" /></span>
-            <h3 class="fin__plan-name">Premium Betreuung</h3>
-          </header>
-          <p class="fin__plan-price">{euro(premiumPlan.price)}<span class="fin__plan-unit">/ Monat</span></p>
-          <p class="fin__plan-note">{premiumPlan.note}</p>
-          <ul class="fin__plan-items" role="list">
-            {premiumPlan.includes.map((i) => (
-              <li class="fin__plan-item"><Icon name="check" class="fin__check" /><span>{i}</span></li>
-            ))}
-          </ul>
-        </article>
-      </div>
-    </div>
-
     <div class="fin__foot">
       <a href="#anfrage" class="btn fin__cta" data-magnetic>
         <span>Projekt anfragen</span>
