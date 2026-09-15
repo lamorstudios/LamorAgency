@@ -19,6 +19,28 @@
  * erfundenen Bildes – sie erfindet nie ein Visual.
  */
 
+/**
+ * ============================================================================
+ * SCHALTER: Wird der Showcase auf der Webdesign-Landingpage ausgespielt?
+ * ============================================================================
+ * Steht bewusst auf `false`.
+ *
+ * Grund: Die Landingpage geht kurzfristig live und dient bis auf Weiteres
+ * nur einem Zweck – Angebot verstehen, Pakete sehen, Preis und Raten
+ * rechnen, anfragen. Der Showcase ist erst fertig, wenn echte Projekte mit
+ * Originalscreenshots vorliegen; ein halbfertiger Referenzbereich mit
+ * "Screenshot folgt" wuerde in dieser Phase Vertrauen kosten. Bis dahin
+ * uebernehmen die vorhandenen Kundenstimmen den Social Proof.
+ *
+ * NICHTS ist geloescht: Komponente, Daten, KFZ-Chaves-Eintrag, Bildaufloesung
+ * und Ueberblend-Logik bleiben vollstaendig erhalten. Zum Aktivieren reicht
+ * es, hier `true` zu setzen – vorher sollten die Screenshots unter
+ * src/assets/work/<id>/ liegen, sonst zeigt der Abschnitt einen Slot.
+ *
+ * Ausgewertet in src/pages/webdesign-muenchen.astro.
+ */
+export const showWebsiteShowcase = false;
+
 export interface ShowcaseShot {
   /** Dateiname in src/assets/work/<case.id>/ – ohne Pfad. */
   file: string;

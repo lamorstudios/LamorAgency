@@ -29,6 +29,7 @@ import Faq from '@/components/sections/Faq.astro';
 import Words from '@/components/Words.astro';
 import { site } from '@/data/site';
 import { websiteFaqs } from '@/data/faq';
+import { showWebsiteShowcase } from '@/data/website-showcase';
 import { websiteEntryPrice, websiteEntryMonthly, euro, websitePricing } from '@/data/website-pricing';
 import { breadcrumb, faqPage, websiteServiceSchema } from '@/lib/schema';
 
@@ -54,7 +55,10 @@ const description = `Webdesign aus ${site.address.city}: individuelle Websites a
   <WebsiteNot />
   <WebsiteProblem />
 
-  <WebsiteShowcase />
+  {/* Referenzbereich "So sehen unsere Websites aus." – vorerst abgeschaltet.
+      Der Schalter liegt zentral in src/data/website-showcase.ts. Nichts an
+      der Komponente oder den Daten ist entfernt. */}
+  {showWebsiteShowcase && <WebsiteShowcase />}
 
   <WebsiteValue />
   <WebsiteProcess />

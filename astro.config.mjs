@@ -68,7 +68,10 @@ function standaloneBuild() {
             const before = s;
             s = s.replaceAll(`https://www.lamoragency.de/${STANDALONE_PAGE}/`, `${STANDALONE_ORIGIN}/`);
             s = s.replaceAll('https://www.lamoragency.de/', `${STANDALONE_ORIGIN}/`);
-            s = s.replaceAll(`href="/${STANDALONE_PAGE}/#`, 'href="/#');
+            // Die Landingpage liegt hier auf "/". Links und das Ziel des
+            // Formulars sollen dorthin zeigen, nicht auf den alten Unterpfad.
+            s = s.replaceAll(`href="/${STANDALONE_PAGE}/`, 'href="/');
+            s = s.replaceAll(`action="/${STANDALONE_PAGE}/`, 'action="/');
             if (s !== before) writeFileSync(p, s);
           }
         };
