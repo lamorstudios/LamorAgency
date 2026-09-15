@@ -7,6 +7,7 @@
  * darunter in den Paketkarten, im Rechner und in der Leistungsmatrix – im Hero
  * waeren sie doppelt und wuerden die Pakete nach unten druecken.
  */
+import { Picture } from 'astro:assets';
 import Media from '@/components/Media.astro';
 import { site } from '@/data/site';
 import {
@@ -15,6 +16,24 @@ import {
 } from '@/data/website-pricing';
 
 const pages = websitePricing.length;
+
+/**
+ * Hero-Visual: das gelieferte Geraete-Motiv, sobald es im Projekt liegt.
+ * Ablage: src/assets/webdesign/hero-devices.<png|jpg|webp|avif>
+ * (Anleitung: src/assets/webdesign/README.md)
+ *
+ * Solange die Datei fehlt, bleibt die bisherige abstrakte Media-Surface
+ * stehen. Es wird nie ein Motiv nachgebaut.
+ *
+ * WICHTIG: Im Motiv stehen "Conversion-Struktur" und "Desktop & Mobile"
+ * bereits drin. Die beiden HTML-Badges wuerden die Beschriftung doppeln und
+ * entfallen deshalb automatisch, sobald das Bild vorhanden ist.
+ */
+const heroFiles = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/webdesign/hero-devices.{png,jpg,jpeg,webp,avif}',
+);
+const heroKey = Object.keys(heroFiles)[0];
+const heroImage = heroKey ? (await heroFiles[heroKey]()).default : undefined;
 ---
 <section class="wh wash" data-theme="dark" data-bg="dark" aria-labelledby="wh-title">
   <div class="container wh__grid">
@@ -66,18 +85,39 @@ const pages = websitePricing.length;
     </div>
 
     <div class="wh__visual">
-      <div class="mock">
+      <div class:list={['mock', heroImage && 'mock--photo']}>
         <div class="mock__frame">
-          <div class="mock__bar" aria-hidden="true"><span></span><span></span><span></span></div>
-          <Media
-            media={{ type: 'placeholder', alt: 'Beispiel einer von LAMOR AGENCY gebauten Website', label: '[WEBDESIGN] Website-Mockup' }}
-            ratio="wide"
-            sizes="(min-width: 1024px) 44vw, 100vw"
-            widths={[560, 900, 1280]}
-          />
+          {heroImage ? (
+            /* Unveraendert, unbeschnitten, ohne Overlay. Das Seitenverhaeltnis
+               kommt aus der Datei – nichts wird gestreckt oder gecroppt. */
+            <Picture
+              src={heroImage}
+              formats={['avif', 'webp']}
+              widths={[560, 900, 1280, 1600]}
+              sizes="(min-width: 1024px) 44vw, 100vw"
+              alt="Responsive Webdesign auf Desktop und Smartphone"
+              loading="eager"
+              decoding="async"
+              fetchpriority="high"
+            />
+          ) : (
+            <Fragment>
+              <div class="mock__bar" aria-hidden="true"><span></span><span></span><span></span></div>
+              <Media
+                media={{ type: 'placeholder', alt: 'Beispiel einer von LAMOR AGENCY gebauten Website', label: '[WEBDESIGN] Website-Mockup' }}
+                ratio="wide"
+                sizes="(min-width: 1024px) 44vw, 100vw"
+                widths={[560, 900, 1280]}
+              />
+            </Fragment>
+          )}
         </div>
-        <span class="mock__tag mock__tag--tl"><i aria-hidden="true"></i>Conversion-Struktur</span>
-        <span class="mock__tag mock__tag--br">Desktop &amp; Mobile</span>
+        {!heroImage && (
+          <Fragment>
+            <span class="mock__tag mock__tag--tl"><i aria-hidden="true"></i>Conversion-Struktur</span>
+            <span class="mock__tag mock__tag--br">Desktop &amp; Mobile</span>
+          </Fragment>
+        )}
       </div>
 
     </div>
@@ -85,6 +125,13 @@ const pages = websitePricing.length;
 </section>
 
 <style>
+  /* Liegt das echte Motiv vor, faellt der Fensterrahmen weg: das Bild fuellt
+     die Karte randlos aus und behaelt nur deren runde Ecken. Keine Verlaeufe,
+     keine Overlays, kein Zoom – nur das Motiv. */
+  .mock--photo .mock__frame { padding: 0; border-color: transparent; background: transparent; }
+  .mock--photo :global(img),
+  .mock--photo :global(picture) { display: block; width: 100%; height: auto; }
+
   .wh {
     /* Farben aus dem Theme, nicht fest verdrahtet – sonst laufen Chips und
        Buttons ins Leere, sobald die Section dunkel wird. */
