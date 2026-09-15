@@ -93,6 +93,10 @@ const heroImage = heroKey ? (await heroFiles[heroKey]()).default : undefined;
             <Picture
               src={heroImage}
               formats={['avif', 'webp']}
+              /* Fallback als JPEG statt PNG: die PNG-Variante des Motivs waere
+                 2,3 MB gross. AVIF und WebP bedienen praktisch alle Browser,
+                 der Rest bekommt ein schlankes JPEG statt eines Riesen-PNG. */
+              fallbackFormat="jpeg"
               widths={[560, 900, 1280, 1600]}
               sizes="(min-width: 1024px) 44vw, 100vw"
               alt="Responsive Webdesign auf Desktop und Smartphone"
