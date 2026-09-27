@@ -145,7 +145,13 @@
 | 10 | `04ec3db7-789e-482d-b95a-f49a25f3980d` / `b91c4b1b-d9d0-4496-89ea-882a68b17b5e` (freigegebene Fassung als Upload `bab9545f-6710-4069-9068-eea2f52642e6`) |
 | 11 | `548bea3e-88e3-4d35-b0f2-09affd60e2c6` |
 
-## Fertiger Film (v2, mit Sound)
+## Fertiger Film (v3, KI-Sounddesign)
+
+**Mit Musik & SFX (Gemini Omni):** [lamor-webdesign-hypermotion-30s-v3-sound.mp4](https://d2ol7oe51mr4n9.cloudfront.net/user_37fYL4bggs7IW7dvFbpi4QuQCgR/a8acff90-7121-4d0d-8265-981d6f4dc4dd.mp4) · 1080p · AAC 256 kbit/s · −14,8 LUFS
+
+Soundtrack mit Gemini Omni Flash 1.1 (Edit-Modus, native Audio) erzeugt, in drei 10-s-Teilen, die jeweils das Bild „sehen“ und passend vertonen (Jobs `ead27c42`, `d6591e33`, `8e8d60be`). Tonspuren nahtlos zusammengesetzt, gemastert und unter die 1080p-Fassung gelegt; das Bild bleibt unverändert.
+
+### Version v2 (per Code synthetisiert, verworfen)
 
 **Mit Musik & SFX:** [lamor-webdesign-hypermotion-30s-sound.mp4](https://d2ol7oe51mr4n9.cloudfront.net/user_37fYL4bggs7IW7dvFbpi4QuQCgR/b7692427-e95d-48db-a31f-784b1d47cea6.mp4) · AAC 256 kbit/s · −14 LUFS
 
