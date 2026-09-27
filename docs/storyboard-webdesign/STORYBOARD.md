@@ -144,3 +144,21 @@
 | 09 | `5fb6be50-3d97-433c-9588-fd074a5ec324` |
 | 10 | `04ec3db7-789e-482d-b95a-f49a25f3980d` / `b91c4b1b-d9d0-4496-89ea-882a68b17b5e` (freigegebene Fassung als Upload `bab9545f-6710-4069-9068-eea2f52642e6`) |
 | 11 | `548bea3e-88e3-4d35-b0f2-09affd60e2c6` |
+
+## Fertiger Film (v1)
+
+**Datei:** [lamor-webdesign-hypermotion-30s.mp4](https://d2ol7oe51mr4n9.cloudfront.net/user_37fYL4bggs7IW7dvFbpi4QuQCgR/193aee80-99d9-44fc-b20b-47770c971d47.mp4) · 30,16 s · 1920×1080 · 25 fps · H.264 · ohne Ton
+
+**Aufbau:** Ein durchgehender Film ohne harte Schnitte. Kling 3.0 (Pro) hat 10 Übergänge mit festem Start- und End-Frame erzeugt (01→02 … 10→11), jeder endet exakt auf dem Frame, mit dem der nächste beginnt.
+
+| Segment | Übergang | Länge im Schnitt |
+|---|---|---|
+| 1–4 | Signal → Grid → Wireframe → Typo Smash → Layers | je 2,5 s (auf 119 % beschleunigt) |
+| 5 | Layers → Click | 3,4 s (119 %) |
+| 6–8 | Click → Tunnel → Devices → Performance | je 2,5 s (119 %) |
+| 9 | Performance → Preis | 3,0 s (Echtzeit) |
+| Hold | **Preis „ab 124,17 € im Monat“**, Originalbild | 1,5 s |
+| 10 | Preis → End Card | 3,0 s (Echtzeit) |
+| Hold | End Card, Fade auf Schwarz | 1,6 s |
+
+**Higgsfield Job-IDs der Übergänge:** `7251e06a` · `23eed841` · `3f5c1677` · `9c80f058` · `b72d651c` · `c23639e8` · `8689e5eb` · `712aa636` · `cd7ef1a4` · `908d41a5`
