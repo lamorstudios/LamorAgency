@@ -7,9 +7,9 @@
  * darunter in den Paketkarten, im Rechner und in der Leistungsmatrix – im Hero
  * waeren sie doppelt und wuerden die Pakete nach unten druecken.
  */
-import { Picture } from 'astro:assets';
-import Media from '@/components/Media.astro';
+import PhoneMockup from '@/components/PhoneMockup.astro';
 import { site } from '@/data/site';
+import { videoSlot } from '@/lib/media-slots';
 import {
   websitePricing, websiteEntryPrice, euro, euroRate,
   lowestRate, longestTerm, hostingPlan,
@@ -18,22 +18,17 @@ import {
 const pages = websitePricing.length;
 
 /**
- * Hero-Visual: das gelieferte Geraete-Motiv, sobald es im Projekt liegt.
- * Ablage: src/assets/webdesign/hero-devices.<png|jpg|webp|avif>
- * (Anleitung: src/assets/webdesign/README.md)
+ * HERO-VISUAL: das Smartphone mit dem laufenden Hochformat-Video.
  *
- * Solange die Datei fehlt, bleibt die bisherige abstrakte Media-Surface
- * stehen. Es wird nie ein Motiv nachgebaut.
+ * Bewegung direkt im ersten Bildschirm. Es ist exakt dieselbe Komponente
+ * und exakt dieselbe Videodatei wie im orangen Abschnitt zuvor – es wurde
+ * kein zweites Video erzeugt. Das statische Geraete-Motiv (Laptop +
+ * Smartphone), das hier stand, steht jetzt unten im orangen Abschnitt.
  *
- * WICHTIG: Im Motiv stehen "Conversion-Struktur" und "Desktop & Mobile"
- * bereits drin. Die beiden HTML-Badges wuerden die Beschriftung doppeln und
- * entfallen deshalb automatisch, sobald das Bild vorhanden ist.
+ * Fehlt die Videodatei, rendert das Mockup nichts; der Hero bleibt dann
+ * ohne Visual stehen statt mit einer leeren Flaeche.
  */
-const heroFiles = import.meta.glob<{ default: ImageMetadata }>(
-  '/src/assets/webdesign/hero-devices.{png,jpg,jpeg,webp,avif}',
-);
-const heroKey = Object.keys(heroFiles)[0];
-const heroImage = heroKey ? (await heroFiles[heroKey]()).default : undefined;
+const heroVideo = videoSlot('mobile');
 ---
 <section class="wh wash" data-theme="dark" data-bg="dark" aria-labelledby="wh-title">
   <div class="container wh__grid">
@@ -85,57 +80,16 @@ const heroImage = heroKey ? (await heroFiles[heroKey]()).default : undefined;
     </div>
 
     <div class="wh__visual">
-      <div class:list={['mock', heroImage && 'mock--photo']}>
-        <div class="mock__frame">
-          {/* Motiv unveraendert, unbeschnitten, ohne Overlay – das
-              Seitenverhaeltnis kommt aus der Datei.
-              fallbackFormat JPEG statt PNG: die PNG-Variante waere in voller
-              Breite 2,3 MB gross. AVIF und WebP bedienen praktisch alle
-              Browser, der Rest bekommt ein schlankes JPEG. */}
-          {heroImage ? (
-            <Picture
-              src={heroImage}
-              formats={['avif', 'webp']}
-              fallbackFormat="jpeg"
-              widths={[560, 900, 1280, 1600]}
-              sizes="(min-width: 1024px) 44vw, 100vw"
-              alt="Responsive Webdesign auf Desktop und Smartphone"
-              loading="eager"
-              decoding="async"
-              fetchpriority="high"
-            />
-          ) : (
-            <Fragment>
-              <div class="mock__bar" aria-hidden="true"><span></span><span></span><span></span></div>
-              <Media
-                media={{ type: 'placeholder', alt: 'Beispiel einer von LAMOR AGENCY gebauten Website', label: '[WEBDESIGN] Website-Mockup' }}
-                ratio="wide"
-                sizes="(min-width: 1024px) 44vw, 100vw"
-                widths={[560, 900, 1280]}
-              />
-            </Fragment>
-          )}
-        </div>
-        {!heroImage && (
-          <Fragment>
-            <span class="mock__tag mock__tag--tl"><i aria-hidden="true"></i>Conversion-Struktur</span>
-            <span class="mock__tag mock__tag--br">Desktop &amp; Mobile</span>
-          </Fragment>
-        )}
-      </div>
-
+      <PhoneMockup
+        video={heroVideo}
+        alt="Kurzfilm zum Website-Angebot von LAMOR AGENCY, abgespielt auf einem Smartphone"
+        width="clamp(15rem, 13rem + 15vw, 25rem)"
+      />
     </div>
   </div>
 </section>
 
 <style>
-  /* Liegt das echte Motiv vor, faellt der Fensterrahmen weg: das Bild fuellt
-     die Karte randlos aus und behaelt nur deren runde Ecken. Keine Verlaeufe,
-     keine Overlays, kein Zoom – nur das Motiv. */
-  .mock--photo .mock__frame { padding: 0; border-color: transparent; background: transparent; }
-  .mock--photo :global(img),
-  .mock--photo :global(picture) { display: block; width: 100%; height: auto; }
-
   .wh {
     /* Farben aus dem Theme, nicht fest verdrahtet – sonst laufen Chips und
        Buttons ins Leere, sobald die Section dunkel wird. */
@@ -205,7 +159,7 @@ const heroImage = heroKey ? (await heroFiles[heroKey]()).default : undefined;
 
   .wh__vat { margin-top: var(--space-4); font-size: var(--fs-small); color: var(--fg-muted); }
 
-  .wh__visual { display: grid; gap: clamp(1.25rem, 3vw, 2rem); }
+  .wh__visual { display: grid; justify-items: center; gap: clamp(1.25rem, 3vw, 2rem); }
   .wh__steps {
     padding: clamp(1rem, 2.5vw, 1.5rem);
     border: 1px solid var(--line);

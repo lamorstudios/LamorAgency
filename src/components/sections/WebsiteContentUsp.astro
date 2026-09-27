@@ -3,21 +3,12 @@
  * Der stärkste Unterschied zu einer reinen Webdesign-Agentur:
  * LAMOR baut nicht nur die Seite, sondern produziert auch, was darauf zu sehen ist.
  */
-import PhoneMockup from '@/components/PhoneMockup.astro';
+import DeviceShot from '@/components/DeviceShot.astro';
 import Words from '@/components/Words.astro';
 import { websiteBundles } from '@/data/website-pricing';
-import { videoSlot } from '@/lib/media-slots';
 
 const bundle = websiteBundles.find((b) => b.id === 'website-content');
 const roles = ['Fotograf', 'Videograf', 'Webdesigner', 'Grafiker'];
-
-/**
- * Das Hochformat-Video fuer das Smartphone-Mockup. Liegt die Datei nicht in
- * /public/media, rendert das Mockup nichts – der Abschnitt bleibt dann ohne
- * Medienspalte stehen statt mit einer leeren Flaeche. Anleitung:
- * public/media/README.md
- */
-const mobil = videoSlot('mobile');
 ---
 <section class="wu section" data-theme="accent" data-bg="accent" aria-labelledby="wu-title">
   <div class="container">
@@ -51,11 +42,10 @@ const mobil = videoSlot('mobile');
         )}
       </div>
 
+      {/* Das Geraete-Motiv, das zuvor im Hero stand. Hier unten sorgt das
+          ruhige Standbild fuer Abwechslung zum bewegten Hero. */}
       <div class="wu__media" data-reveal="fade" style="--reveal-delay:280ms">
-        <PhoneMockup
-          video={mobil}
-          alt="Kurzfilm zum Website-Angebot von LAMOR AGENCY, abgespielt auf einem Smartphone"
-        />
+        <DeviceShot sizes="(min-width: 1024px) 40vw, 92vw" />
       </div>
     </div>
   </div>
@@ -69,9 +59,12 @@ const mobil = videoSlot('mobile');
   .wu__grid { display: grid; gap: var(--space-7); align-items: start; }
   @media (min-width: 1024px) { .wu__grid { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: var(--space-8); align-items: center; } }
 
-  /* Das Smartphone ist der Blickfang des Abschnitts: mittig gesetzt, mit
-     etwas Luft nach aussen, damit die leichte Drehung nirgends anstoesst. */
-  .wu__media { display: flex; align-items: flex-start; justify-content: center; padding-inline: 0.5rem; }
+  /* Das Geraete-Motiv ist im Querformat und soll die Spalte ausfuellen,
+     ohne sie zu sprengen. Auf schmalen Schirmen bleibt etwas Luft am Rand,
+     damit es nicht an der Sectionkante klebt. */
+  .wu__media { display: flex; justify-content: center; }
+  .wu__media > :global(.mock) { width: min(100%, 34rem); }
+  @media (max-width: 1023px) { .wu__media > :global(.mock) { width: min(92%, 30rem); } }
 
   .wu__lead { max-width: 40ch; }
   .wu__body { margin-top: var(--space-4); max-width: 54ch; color: rgba(255, 255, 255, 0.82); }
