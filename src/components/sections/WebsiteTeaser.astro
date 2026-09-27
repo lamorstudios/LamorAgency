@@ -1,0 +1,57 @@
+---
+/**
+ * Website-Teaser auf der Startseite.
+ * Führt direkt auf die eigenständige Landingpage /webdesign-muenchen/.
+ * Preis kommt aus src/data/website-pricing.ts.
+ */
+import Media from '@/components/Media.astro';
+import { websiteEntryPrice, websiteEntryMonthly, euro } from '@/data/website-pricing';
+---
+<section class="wt section" data-theme="light" data-bg="light" aria-labelledby="wt-title">
+  <div class="container wt__inner">
+    <div class="wt__text">
+      <p class="t-label wt__label" data-reveal="fade">Webdesign</p>
+      <h2 class="t-display wt__title" id="wt-title" data-reveal>
+        Webdesign<br />ab {euro(websiteEntryPrice)}
+      </h2>
+      <p class="t-lead t-muted wt__lead" data-reveal style="--reveal-delay:140ms">
+        Individuelle Websites für Unternehmen, Marken und Selbstständige.
+      </p>
+      <p class="t-small t-muted wt__note" data-reveal="fade" style="--reveal-delay:200ms">
+        Einmalige Projektkosten. Betreuung optional ab {euro(websiteEntryMonthly)} / Monat.
+      </p>
+      <div class="wt__cta" data-reveal style="--reveal-delay:260ms">
+        <a href="/webdesign-muenchen/" class="btn" data-magnetic>
+          <span>Website-Pakete ansehen</span>
+          <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="wt__media" data-reveal="fade" style="--reveal-delay:180ms">
+      <Media
+        media={{ type: 'placeholder', alt: 'Website von LAMOR AGENCY', label: '[WEBDESIGN] Website-Mockup' }}
+        ratio="wide"
+        hover
+        reveal
+        sizes="(min-width: 900px) 45vw, 100vw"
+      />
+    </div>
+  </div>
+</section>
+
+<style>
+  .wt__inner { display: grid; gap: var(--space-6); align-items: center; }
+  @media (min-width: 900px) {
+    .wt__inner { grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); gap: var(--space-8); }
+  }
+  .wt__label { color: var(--c-accent); margin-bottom: var(--space-4); }
+  .wt__title {
+    font-variant-numeric: tabular-nums;
+    max-width: 12ch;
+    /* Der Preis ist hier das Argument – er darf so groß sein wie die Headline. */
+  }
+  .wt__lead { margin-top: var(--space-5); max-width: 40ch; }
+  .wt__note { margin-top: var(--space-3); max-width: 44ch; }
+  .wt__cta { margin-top: var(--space-6); }
+</style>

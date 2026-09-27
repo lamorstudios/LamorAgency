@@ -1,0 +1,139 @@
+---
+/**
+ * Showreel – eine grosse Media-Card statt einer leeren Filmflaeche.
+ *
+ * Die Karte traegt Einordnung (Label), Arbeit (Video), Handlung (Play/CTA)
+ * und Aussage (eine Zeile) in einem Block. Kein langer Text: hier soll das
+ * Material sprechen, aber der Besucher muss trotzdem wissen, was er sieht.
+ *
+ * Bestehendes Showreel eintragen (kein Stock):
+ *   reel = { type: 'video', src: '/media/showreel.mp4',
+ *            poster: '/src/assets/brand/showreel-poster.jpg', alt: '…' }
+ */
+import Media from '@/components/Media.astro';
+
+const reel = { type: 'placeholder' as const, alt: 'LAMOR AGENCY Showreel 2026', label: '[SHOWREEL] Reel 2026' };
+const kinds = ['Commercial', 'Social', 'Music', 'Event', 'Real Estate'];
+---
+<section class="rl" data-theme="dark" data-bg="dark" aria-labelledby="rl-title">
+  <div class="container">
+    <div class="rl__card">
+      <div class="rl__head">
+        <p class="eyebrow rl__label">LAMOR AGENCY Showreel · 2026</p>
+        <p class="rl__kinds">{kinds.join(' · ')}</p>
+      </div>
+
+      <div class="rl__frame" data-hover-video>
+        <Media media={reel} ratio="cinema" sizes="(min-width: 1024px) 76vw, 100vw" widths={[768, 1280, 1920]} autoplay />
+        <span class="rl__shade" aria-hidden="true"></span>
+        <button class="rl__play" type="button" data-reel-play aria-label="Showreel abspielen">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
+        </button>
+        <span class="rl__stamp t-label" aria-hidden="true">02:14</span>
+      </div>
+
+      <div class="rl__foot">
+        <h2 class="rl__title" id="rl-title">Deine Marke. <span class="hl">Wie im Film.</span></h2>
+        <a href="/work/" class="rl__cta">
+          <span>Arbeiten ansehen</span>
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8H14M14 8L9 3M14 8L9 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .rl { padding-block: clamp(2rem, 5vw, 4rem) clamp(2.5rem, 6vw, 5rem); }
+
+  /* Helle Karte auf dunklem Grund – der Kontrast hebt das Material heraus. */
+  .rl__card {
+    background: var(--c-paper);
+    color: var(--c-ink);
+    border-radius: clamp(0.9rem, 2.2vw, 1.6rem);
+    padding: clamp(0.75rem, 2vw, 1.25rem);
+    display: grid;
+    gap: clamp(0.75rem, 2vw, 1.1rem);
+  }
+
+  .rl__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem 1rem; padding-inline: clamp(0.25rem, 1vw, 0.75rem); padding-top: clamp(0.25rem, 1vw, 0.5rem); }
+  .rl__label { color: var(--c-accent-text); }
+  .rl__kinds {
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--c-grey);
+  }
+
+  .rl__frame { position: relative; border-radius: clamp(0.6rem, 1.6vw, 1.1rem); overflow: hidden; }
+  .rl__shade { position: absolute; inset: 0; z-index: 1; background: linear-gradient(to top, rgba(11,10,9,0.5), transparent 55%); pointer-events: none; }
+
+  .rl__play {
+    position: absolute; z-index: 2; inset: 50% auto auto 50%; transform: translate(-50%, -50%);
+    width: clamp(3.5rem, 9vw, 5.5rem); height: clamp(3.5rem, 9vw, 5.5rem);
+    display: grid; place-items: center; border-radius: 50%;
+    background: var(--c-accent); color: #fff;
+    transition: transform var(--dur-base) var(--ease-out), background var(--dur-base) var(--ease-out);
+  }
+  .rl__play svg { width: 42%; height: 42%; margin-left: 6%; }
+  .rl__play:hover { transform: translate(-50%, -50%) scale(1.08); }
+  .rl__play:focus-visible { outline: 3px solid var(--c-paper); outline-offset: 3px; }
+  /* Ruhiger Puls, damit der Knopf als Handlung gelesen wird. */
+  @media (prefers-reduced-motion: no-preference) {
+    .rl__play::after {
+      content: ''; position: absolute; inset: -6px; border-radius: 50%;
+      border: 1px solid var(--c-accent); animation: rl-pulse 2.8s var(--ease-out) infinite;
+    }
+    @keyframes rl-pulse { 0% { transform: scale(1); opacity: 0.7; } 70%, 100% { transform: scale(1.35); opacity: 0; } }
+  }
+
+  .rl__stamp {
+    position: absolute; z-index: 2; right: clamp(0.6rem, 2vw, 1.1rem); top: clamp(0.6rem, 2vw, 1.1rem);
+    padding: 0.4em 0.7em; border-radius: var(--radius-pill);
+    background: rgba(11,10,9,0.6); color: var(--c-paper);
+    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .rl__foot {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: 0.75rem 1.5rem;
+    padding: clamp(0.25rem, 1vw, 0.5rem) clamp(0.25rem, 1vw, 0.75rem) clamp(0.4rem, 1.2vw, 0.75rem);
+  }
+  .rl__title {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 112%;
+    text-transform: uppercase;
+    font-size: clamp(1.4rem, 0.8rem + 2.6vw, 3rem);
+    line-height: 1; letter-spacing: -0.035em;
+  }
+  .rl__title .hl { color: var(--c-accent); }
+  .rl__cta {
+    display: inline-flex; align-items: center; gap: 0.6em; min-height: 44px;
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase;
+    border-bottom: 1px solid currentColor; padding-bottom: 0.25em;
+  }
+  .rl__cta svg { width: 1em; height: 1em; transition: transform var(--dur-base) var(--ease-out); }
+  .rl__cta:hover { color: var(--c-accent-text); }
+  .rl__cta:hover svg { transform: translateX(0.3em); }
+</style>
+
+<script>
+  // Der Play-Knopf startet das Video, sobald eines hinterlegt ist. Liegt nur
+  // eine Platzhalter-Flaeche vor, fuehrt er zu den Arbeiten.
+  function initReel() {
+    document.querySelectorAll<HTMLButtonElement>('[data-reel-play]').forEach((btn) => {
+      if ((btn as any).__init) return;
+      (btn as any).__init = true;
+      btn.addEventListener('click', () => {
+        const video = btn.closest('.rl__frame')?.querySelector('video');
+        if (video) {
+          video.muted = false;
+          video.play().catch(() => {});
+          btn.hidden = true;
+        } else {
+          location.href = '/work/';
+        }
+      });
+    });
+  }
+  document.addEventListener('astro:page-load', initReel);
+</script>

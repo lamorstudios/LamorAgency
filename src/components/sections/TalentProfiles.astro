@@ -1,0 +1,188 @@
+---
+/**
+ * Talent-Profile – bildgetrieben, nicht textgetrieben.
+ *
+ * Aufbau je Profil: grosses Editorial-Bild links, rechts nur Name, Groesse,
+ * Kategorien als Chips und die Anfrage. Kein beschreibender Absatz – Bild und
+ * Kategorien sagen dasselbe schneller.
+ *
+ * GALERIE: Ab dem zweiten Bild wird aus dem Hauptbild eine schiebbare Reihe.
+ * Die naechste Bildkante bleibt sichtbar, damit erkennbar ist, dass mehr da
+ * ist. Nativer Scroll mit Snap – funktioniert auch ohne JavaScript.
+ *
+ * ANFRAGE: Der Link traegt ?talent=<slug>, das Kontaktformular waehlt das
+ * Talent damit vor.
+ */
+import Media from '@/components/Media.astro';
+import Icon from '@/components/Icon.astro';
+import { publishedTalents } from '@/data/models';
+
+const images = import.meta.glob<{ default: ImageMetadata }>('/src/assets/talents/**/*.{jpg,jpeg,png,webp,avif}');
+
+/** Bilder aufloesen; fehlen sie, bleibt der Slot – das Profil bleibt gueltig. */
+const profiles = await Promise.all(
+  publishedTalents.map(async (t) => ({
+    ...t,
+    resolved: (
+      await Promise.all(
+        (t.images ?? []).map(async (src) => (images[src] ? (await images[src]()).default : undefined)),
+      )
+    ).filter(Boolean),
+  })),
+);
+---
+{profiles.length > 0 && (
+  <section class="tp" id="talents" data-theme="dark" data-bg="dark" aria-labelledby="tp-title">
+    <div class="container">
+      <div class="tp__head">
+        <p class="eyebrow tp__label" data-reveal="fade">Unsere Talents</p>
+        <h2 class="tp__title" id="tp-title">Gesichter für deine Kampagne.</h2>
+      </div>
+
+      <ul class="tp__list" role="list">
+        {profiles.map((t) => (
+          <li class="tp__card" id={t.slug} data-reveal>
+            <!-- Bildfläche: trägt rund drei Viertel der Karte. -->
+            <div class="tp__media">
+              {t.resolved.length > 1 ? (
+                <div class="tp__gallery" tabindex="0" role="group" aria-label={`Bilder von ${t.name}, seitlich scrollbar`}>
+                  {t.images!.map((src, i) => (
+                    <div class="tp__shot">
+                      <Media
+                        media={{ type: 'image', src, alt: `${t.name} – Bild ${i + 1}` }}
+                        ratio="portrait"
+                        sizes="(min-width: 900px) 34vw, 78vw"
+                        widths={[480, 768, 1080]}
+                        priority={i === 0}
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div class="tp__shot tp__shot--single">
+                  <Media
+                    media={t.resolved.length === 1
+                      ? { type: 'image', src: t.images![0], alt: `${t.name} – Editorial` }
+                      : { type: 'placeholder', alt: `${t.name} – Editorial`, label: `[TALENT] ${t.name} · src/assets/talents/${t.slug}/` }}
+                    ratio="portrait"
+                    sizes="(min-width: 900px) 46vw, 92vw"
+                    widths={[480, 768, 1080]}
+                  />
+                </div>
+              )}
+              {t.resolved.length > 1 && (
+                <span class="tp__swipe" aria-hidden="true">
+                  <Icon name="arrow" class="tp__swipe-icon" />{t.resolved.length} Bilder
+                </span>
+              )}
+            </div>
+
+            <!-- Angaben: bewusst knapp. -->
+            <div class="tp__info">
+              <p class="tp__name">{t.name}</p>
+              {t.heightCm && <p class="tp__height">{t.heightCm} cm</p>}
+
+              <ul class="tp__tags" role="list">
+                {t.categories.map((c) => <li class="tp__tag">{c}</li>)}
+              </ul>
+
+              <a class="tp__cta" href={`/contact/?talent=${t.slug}`}>
+                <span>Verfügbarkeit anfragen</span>
+                <Icon name="arrow" class="tp__cta-icon" />
+              </a>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+)}
+
+<style>
+  .tp { padding-block: clamp(2rem, 5vw, 4rem); }
+  .tp__head { display: grid; gap: var(--space-3); margin-bottom: clamp(1.25rem, 3vw, 2rem); }
+  .tp__label { color: var(--c-accent-on-dark); }
+  .tp__title {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 112%;
+    font-size: clamp(1.7rem, 0.9rem + 3.4vw, 3.4rem);
+    line-height: 1; letter-spacing: -0.04em; text-wrap: balance;
+  }
+
+  .tp__list { display: grid; gap: clamp(1.5rem, 4vw, 3rem); }
+
+  .tp__card {
+    display: grid; gap: clamp(0.85rem, 2.5vw, 1.75rem);
+    align-items: start;
+  }
+  /* Ab Tablet: grosses Bild links, schmale Angabenspalte rechts. */
+  @media (min-width: 900px) {
+    .tp__card { grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.85fr); gap: clamp(1.5rem, 3.5vw, 3rem); align-items: center; }
+    /* Ein Hochformat ueber die halbe Seitenbreite waere ueber 1.100 px hoch –
+       die Bildspalte bekommt deshalb eine Obergrenze. */
+    .tp__media { max-width: 34rem; }
+  }
+
+  .tp__media { position: relative; min-width: 0; }
+  .tp__shot { border-radius: var(--radius-card); overflow: hidden; }
+
+  /* Schiebbare Galerie: die naechste Bildkante bleibt sichtbar. */
+  .tp__gallery {
+    display: grid; grid-auto-flow: column;
+    grid-auto-columns: min(78%, 22rem);
+    gap: clamp(0.4rem, 1.2vw, 0.75rem);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline-start: 0;
+    scrollbar-width: none;
+    padding-bottom: 0.35rem;
+  }
+  .tp__gallery::-webkit-scrollbar { display: none; }
+  .tp__gallery > * { scroll-snap-align: start; }
+  .tp__gallery:focus-visible { outline: 2px solid var(--c-accent-on-dark); outline-offset: 4px; border-radius: var(--radius-card); }
+  @media (min-width: 900px) { .tp__gallery { grid-auto-columns: min(58%, 24rem); } }
+
+  .tp__swipe {
+    position: absolute; right: clamp(0.5rem, 1.5vw, 0.9rem); bottom: clamp(0.85rem, 2vw, 1.25rem);
+    display: inline-flex; align-items: center; gap: 0.4em;
+    padding: 0.4em 0.75em; border-radius: var(--radius-pill);
+    background: rgba(11, 10, 9, 0.7); border: 1px solid rgba(242, 237, 228, 0.22);
+    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase;
+  }
+  .tp__swipe-icon { width: 1em; height: 1em; }
+
+  /* ---------- Angaben ---------- */
+  .tp__info { display: grid; gap: 0.4rem; align-content: start; min-width: 0; }
+  .tp__name {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 112%;
+    font-size: clamp(1.6rem, 1rem + 3vw, 3.2rem);
+    line-height: 0.95; letter-spacing: -0.045em; text-transform: uppercase;
+  }
+  .tp__height {
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--c-accent-on-dark);
+    font-variant-numeric: tabular-nums;
+  }
+  .tp__tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: var(--space-3); }
+  .tp__tag {
+    padding: 0.4em 0.75em; border-radius: var(--radius-pill);
+    border: 1px solid var(--card-dark-line); background: var(--tile-dark-bg);
+    font-size: clamp(0.6rem, 1.5vw, 0.72rem); font-weight: var(--fw-semi);
+    font-stretch: var(--wd-tight); letter-spacing: var(--ls-wide); text-transform: uppercase;
+    color: var(--fg-muted);
+  }
+  .tp__cta {
+    display: inline-flex; align-items: center; justify-content: space-between; gap: 0.75rem;
+    justify-self: start; margin-top: var(--space-4);
+    padding: 0.8rem 1.2rem; border-radius: var(--radius-pill);
+    background: var(--card-accent-bg); color: #fff; text-decoration: none;
+    box-shadow: var(--card-accent-shadow);
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase;
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+  .tp__cta-icon { width: 1.1em; height: 1.1em; }
+  @media (hover: hover) and (pointer: fine) { .tp__cta:hover { transform: translateY(-2px); } }
+</style>

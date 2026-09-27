@@ -1,0 +1,143 @@
+---
+/**
+ * Die vier Website-Pakete – ganz oben, direkt nach dem Hero.
+ *
+ * Wer auf diese Seite kommt, will als Erstes wissen, was es kostet. Deshalb
+ * traegt jede Karte genau vier Dinge: Kategorie, Name, ein Satz, Preis.
+ * Alles Weitere steht in der Leistungsmatrix darunter.
+ *
+ * Preise kommen aus src/data/website-pricing.ts.
+ */
+import Icon from '@/components/Icon.astro';
+import Words from '@/components/Words.astro';
+import { websitePricing, longestTerm, euro, carePlans } from '@/data/website-pricing';
+
+/** Icon je Paket – Reihenfolge wie in der Preisdatei. */
+const icons: Record<string, string> = {
+  onepage: 'image',
+  business: 'bars',
+  premium: 'heart',
+  custom: 'cube',
+};
+const careFrom = Math.min(...carePlans.filter((c) => c.price > 0).map((c) => c.price));
+---
+<section class="pk wash" id="pakete" data-theme="dark" data-bg="dark" aria-labelledby="pk-title">
+  <div class="container">
+    <div class="pk__head">
+      <div>
+        <p class="eyebrow pk__label" data-reveal="fade">Website-Pakete</p>
+        <h2 class="pk__title" id="pk-title"><Words text="Was deine Website kostet." /></h2>
+      </div>
+      <p class="pk__note" data-reveal style="--reveal-delay:140ms">
+        Alle Pakete inklusive Design, Umsetzung und technischer Einrichtung.
+        Auf Wunsch in bis zu {longestTerm} Raten zahlbar. Betreuung optional ab {euro(careFrom)} / Monat.
+      </p>
+    </div>
+
+    <ul class="pk__grid" role="list">
+      {websitePricing.map((p) => (
+        <li class={`card pk__card ${p.highlighted ? 'card--dark pk__card--top' : 'card--dark'}`} data-reveal>
+          <a class="pk__link" href={`#rechner`} aria-label={`${p.name} ab ${euro(p.price as number)} – im Rechner ansehen`}>
+            {p.highlighted && <span class="pk__badge">Beliebtestes Paket</span>}
+            <span class="pk__top">
+              <span class="itile pk__icon"><Icon name={icons[p.id] ?? 'cube'} /></span>
+              <span class="pk__name">{p.name}</span>
+            </span>
+            <span class="pk__desc">{p.description}</span>
+            <span class="pk__foot">
+              <span class="pk__price">
+                <span class="pk__price-from">{p.priceFrom ? 'ab' : ''}</span>
+                <span class="pk__price-value">{euro(p.price as number)}</span>
+              </span>
+              <span class="pk__go" aria-hidden="true"><Icon name="arrow" /></span>
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .pk { padding-block: clamp(2rem, 5vw, 4rem); }
+
+  .pk__head { display: grid; gap: var(--space-3); margin-bottom: clamp(1.25rem, 3vw, 2rem); }
+  .pk__label { color: var(--c-accent-on-dark); }
+  .pk__title {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 112%;
+    font-size: clamp(1.7rem, 0.9rem + 3.4vw, 3.4rem);
+    line-height: 1; letter-spacing: -0.04em; text-wrap: balance;
+  }
+  .pk__note {
+    color: var(--fg-muted); font-size: var(--fs-small); line-height: 1.5; max-width: 42ch;
+    padding: 0.7rem 1rem; border-radius: var(--radius-pill);
+    border: 1px solid var(--card-dark-line); background: var(--tile-dark-bg);
+  }
+  @media (min-width: 1000px) {
+    .pk__head { grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: var(--space-7); }
+    .pk__note { border-radius: var(--radius-pill); }
+  }
+
+  /* 2x2 auf dem Telefon, vier nebeneinander ab Laptop. */
+  .pk__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(0.5rem, 1.5vw, 1.25rem);
+    align-items: stretch;
+  }
+  @media (min-width: 1000px) { .pk__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+  .pk__card { transition: transform var(--dur-base) var(--ease-out); }
+  @media (hover: hover) and (pointer: fine) { .pk__card:hover { transform: translateY(-4px); } }
+  .pk__card--top { border-color: rgba(229, 67, 43, 0.55); box-shadow: var(--card-dark-shadow), var(--card-dark-glow); }
+
+  .pk__link {
+    position: relative; display: grid; grid-template-rows: auto 1fr auto;
+    gap: clamp(0.45rem, 1.4vw, 0.85rem);
+    height: 100%;
+    padding: clamp(0.85rem, 2.2vw, 1.5rem);
+    text-decoration: none; color: inherit;
+  }
+  .pk__badge {
+    position: absolute; top: 0; left: clamp(0.85rem, 2.2vw, 1.5rem);
+    transform: translateY(-50%);
+    padding: 0.4em 0.7em; border-radius: var(--radius-pill);
+    background: var(--card-accent-bg); color: #fff; white-space: nowrap;
+    font-size: clamp(0.56rem, 1.5vw, 0.66rem); font-weight: var(--fw-semi);
+    font-stretch: var(--wd-tight); letter-spacing: var(--ls-wide); text-transform: uppercase;
+  }
+  .pk__top { display: flex; align-items: center; gap: 0.5rem; min-width: 0; flex-wrap: wrap; }
+  .pk__icon { color: var(--c-accent-on-dark); }
+  .pk__name {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 106%;
+    text-transform: uppercase; font-size: clamp(0.8rem, 2.1vw, 1.25rem);
+    line-height: 1.02; letter-spacing: -0.03em; min-width: 0; hyphens: auto;
+  }
+  .pk__desc {
+    font-size: clamp(0.72rem, 1.8vw, 0.9rem); line-height: 1.35; color: var(--fg-muted);
+  }
+  .pk__foot { display: flex; align-items: flex-end; justify-content: space-between; gap: 0.5rem; }
+  .pk__price { display: flex; align-items: baseline; gap: 0.3rem; flex-wrap: wrap; }
+  .pk__price-from {
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--fg-muted);
+  }
+  .pk__price-value {
+    font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: 118%;
+    font-size: clamp(1.25rem, 0.8rem + 2.2vw, 2.1rem);
+    line-height: 0.95; letter-spacing: -0.05em;
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+  .pk__go {
+    display: grid; place-items: center; flex: none;
+    width: clamp(1.7rem, 4.5vw, 2.4rem); aspect-ratio: 1; border-radius: 50%;
+    border: 1px solid var(--card-dark-line); color: var(--fg-muted);
+    font-size: clamp(0.7rem, 1.8vw, 0.9rem);
+    transition: background var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out);
+  }
+  .pk__card--top .pk__go { background: var(--card-accent-bg); border-color: transparent; color: #fff; }
+  @media (hover: hover) and (pointer: fine) {
+    .pk__card:hover .pk__go { background: var(--c-paper); border-color: var(--c-paper); color: var(--c-ink); }
+    .pk__card--top:hover .pk__go { background: #fff; color: var(--c-ink); }
+  }
+</style>

@@ -1,0 +1,211 @@
+---
+/**
+ * Leistungen als Bento – bewusst KEINE sechs gleichen Karten.
+ *
+ * Jede Kachel bekommt die Groesse, die ihrer Rolle entspricht: Video traegt
+ * als Flaggschiff das Medium, Models & Talents bekommt als USP die
+ * Akzentflaeche, Webdesign den Preis-Einstieg als Haken. Die drei uebrigen
+ * sind ruhig gesetzt. So entsteht ein Bildschirm, auf dem etwas zu entdecken
+ * ist, statt einer Reihe identischer Bloecke.
+ */
+import Media from '@/components/Media.astro';
+import Words from '@/components/Words.astro';
+import ArrowLink from '@/components/ArrowLink.astro';
+import { services } from '@/data/services';
+import { websiteEntryPrice, euro } from '@/data/website-pricing';
+
+interface Props { showAll?: boolean; heading?: string }
+const { showAll = false } = Astro.props;
+
+/** Rolle je Disziplin – bestimmt Groesse und Behandlung der Kachel. */
+const roles: Record<string, { span: string; kind: 'media' | 'accent' | 'plain'; hook?: string; href?: string }> = {
+  'video-production': { span: 'a', kind: 'media' },
+  photography:        { span: 'b', kind: 'plain' },
+  'social-media':     { span: 'b', kind: 'plain' },
+  'web-design':       { span: 'a', kind: 'plain', hook: `ab ${euro(websiteEntryPrice)}`, href: '/webdesign-muenchen/' },
+  branding:           { span: 'c', kind: 'plain' },
+  'models-talents':   { span: 'd', kind: 'accent' },
+};
+---
+<section class="bn" data-theme="dark" data-bg="dark" aria-labelledby="svc-title">
+  <div class="container">
+    <div class="bn__head">
+      <div>
+        <p class="eyebrow">Leistungen</p>
+        <h2 class="bn__title" id="svc-title">
+          <Words text="Sechs Disziplinen," />
+          <span class="bn__title-em t-serif-i">ein Studio.</span>
+        </h2>
+      </div>
+      <p class="bn__lead">
+        Alles, was eine Marke sichtbar macht – in einem Look.
+      </p>
+    </div>
+
+    <ul class="bn__grid" role="list">
+      {services.map((s) => {
+        const r = roles[s.slug] ?? { span: 'b', kind: 'plain' as const };
+        return (
+          <li class={`bn__tile bn__tile--${r.span} bn__tile--${r.kind}`}>
+            {r.kind === 'media' && (
+              <span class="bn__bg" aria-hidden="true">
+                <Media media={s.media} ratio="wide" sizes="(min-width: 900px) 58vw, 100vw" widths={[560, 900, 1440]} />
+                <span class="bn__veil"></span>
+              </span>
+            )}
+            <a class="bn__link" href={r.href ?? `/services/#${s.slug}`}>
+              <span class="bn__top">
+                <span class="bn__idx">{s.index}</span>
+                {r.hook && <span class="bn__hook">{r.hook}</span>}
+              </span>
+
+              <span class="bn__body">
+                <span class="bn__name">{s.title}</span>
+                <span class="bn__short">{s.short}</span>
+              </span>
+
+              <span class="bn__foot">
+                <span class="bn__tags">
+                  {s.items.slice(0, r.span === 'a' || r.span === 'd' ? 4 : 3).map((t) => <span class="bn__tag">{t}</span>)}
+                </span>
+                <span class="bn__go" aria-hidden="true">
+                  <svg viewBox="0 0 16 16" fill="none"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"/></svg>
+                </span>
+              </span>
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+
+    {!showAll && (
+      <div class="bn__more">
+        <ArrowLink href="/services/" label="Alle Leistungen im Detail" />
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .bn { padding-block: clamp(2.5rem, 6vw, 5rem); overflow: clip; }
+
+  .bn__head { display: grid; gap: var(--space-4); margin-bottom: clamp(1.75rem, 4vw, 3rem); }
+  .bn__title {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 118%;
+    text-transform: uppercase;
+    font-size: clamp(1.8rem, 0.7rem + 4.4vw, 4.5rem);
+    line-height: 0.94; letter-spacing: -0.04em; max-width: 14ch;
+  }
+  .bn__title-em { display: block; color: var(--c-accent-on-dark); }
+  .bn__lead { max-width: 46ch; color: var(--fg-muted); }
+  @media (min-width: 1024px) {
+    .bn__head { grid-template-columns: minmax(0, 1fr) minmax(0, 0.7fr); align-items: end; gap: var(--space-8); }
+  }
+
+  /* ---------- Bento ---------- */
+  .bn__grid { display: grid; gap: var(--grid-gap); }
+
+  .bn__tile {
+    position: relative;
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    background: var(--card-dark-bg);
+    border: 1px solid var(--card-dark-line);
+    box-shadow: var(--card-dark-shadow);
+    transition: border-color var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out);
+    min-height: clamp(10rem, 26vw, 14rem);
+  }
+  .bn__link {
+    position: relative; z-index: 2;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: var(--space-4);
+    height: 100%;
+    padding: clamp(1.1rem, 2.6vw, 1.75rem);
+  }
+
+  /* Flaggschiff: das Medium liegt unter dem Text. */
+  .bn__bg { position: absolute; inset: 0; z-index: 0; }
+  .bn__bg :global(.media) { position: absolute; inset: 0; height: 100%; aspect-ratio: auto; }
+  .bn__veil {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(11,10,9,0.92) 18%, rgba(11,10,9,0.55) 60%, rgba(11,10,9,0.3));
+  }
+  .bn__tile--media { background: var(--c-ink); }
+  .bn__tile--media .bn__name { font-size: clamp(1.6rem, 1rem + 2.4vw, 3rem); }
+  /* Ueber dem Bild braucht die Typo mehr Gewicht als auf ruhiger Flaeche. */
+  .bn__tile--media .bn__short { color: rgba(242, 237, 228, 0.88); }
+  .bn__tile--media .bn__idx { color: rgba(242, 237, 228, 0.7); }
+  .bn__tile--media .bn__tag { border-color: rgba(242, 237, 228, 0.32); color: rgba(242, 237, 228, 0.88); }
+  .bn__tile--media .bn__go { color: rgba(242, 237, 228, 0.8); }
+
+  /* USP: eigene Flaeche statt Rahmen. */
+  .bn__tile--accent { background: var(--card-accent-bg); border-color: var(--card-accent-line); color: #fff; box-shadow: var(--card-accent-shadow); }
+  .bn__tile--accent .bn__idx, .bn__tile--accent .bn__short { color: rgba(255, 255, 255, 0.82); }
+  .bn__tile--accent .bn__tag { border-color: rgba(255, 255, 255, 0.45); color: #fff; }
+  .bn__tile--accent .bn__go { color: #fff; }
+
+  .bn__top { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); }
+  .bn__idx {
+    font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: 118%;
+    font-size: 0.85rem; letter-spacing: var(--ls-wide); color: var(--fg-muted);
+  }
+  /* Preis-Haken auf der Webdesign-Kachel. */
+  .bn__hook {
+    padding: 0.4em 0.8em; border-radius: var(--radius-pill);
+    background: var(--c-accent); color: #fff;
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .bn__body { display: grid; gap: var(--space-2); align-content: end; }
+  .bn__name {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 112%;
+    text-transform: uppercase;
+    font-size: clamp(1.3rem, 0.9rem + 1.8vw, 2.1rem);
+    line-height: 0.98; letter-spacing: -0.035em;
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+  .bn__short { font-size: var(--fs-small); line-height: 1.5; color: var(--fg-muted); max-width: 46ch; }
+
+  .bn__foot { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-4); }
+  .bn__tags { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+  .bn__tag {
+    padding: 0.35em 0.7em; border: 1px solid var(--card-dark-line); border-radius: var(--radius-pill);
+    font-size: 0.68rem; font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: 0.04em; text-transform: uppercase; color: var(--fg-muted); white-space: nowrap;
+  }
+  .bn__go { width: 1.35rem; flex: none; color: var(--fg-muted); transition: transform var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out); }
+  .bn__go svg { width: 100%; height: auto; }
+
+  @media (hover: hover) and (pointer: fine) {
+    .bn__tile:hover { border-color: rgba(242, 237, 228, 0.3); box-shadow: var(--card-dark-shadow), var(--card-dark-glow); }
+    .bn__tile--accent:hover { border-color: #fff; }
+    .bn__tile:hover .bn__name { transform: translateX(0.2em); }
+    .bn__tile:hover .bn__go { transform: translate(0.25em, -0.25em); color: var(--c-accent-on-dark); }
+    .bn__tile--accent:hover .bn__go { color: #fff; }
+  }
+
+  /* Auf kleinen Schirmen kosten vier Tags zu viele Zeilen. */
+  @media (max-width: 759px) {
+    .bn__tag:nth-child(n + 4) { display: none; }
+  }
+
+  /* Ab Tablet unterschiedliche Breiten – das ist der Kern des Bentos. */
+  @media (min-width: 760px) {
+    .bn__grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+    .bn__tile--a { grid-column: span 7; }
+    .bn__tile--b { grid-column: span 5; }
+    .bn__tile--c { grid-column: span 5; }
+    .bn__tile--d { grid-column: span 7; }
+    /* Das Flaggschiff bekommt mehr Hoehe als die ruhigen Kacheln. */
+    .bn__tile--media { min-height: clamp(17rem, 30vw, 23rem); }
+  }
+  @media (min-width: 1100px) {
+    .bn__tile--c { grid-column: span 4; }
+    .bn__tile--d { grid-column: span 8; }
+  }
+
+  .bn__more { margin-top: clamp(1.75rem, 4vw, 2.75rem); }
+</style>

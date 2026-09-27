@@ -1,0 +1,70 @@
+---
+/**
+ * Einzelleistungen ohne Retainer.
+ * Preise bewusst nur dort, wo in src/data/pricing.ts echte Werte hinterlegt
+ * sind – es werden keine Fantasiepreise ergänzt.
+ */
+import Words from '@/components/Words.astro';
+import ArrowLink from '@/components/ArrowLink.astro';
+import { singleServices, priceLine } from '@/data/pricing';
+---
+<section class="sgl section" data-theme="light" data-bg="light" aria-labelledby="sgl-title">
+  <div class="container">
+    <div class="sgl__head">
+      <p class="t-label sgl__label" data-reveal="fade">Einzelleistungen</p>
+      <h2 class="t-sec sgl__title" id="sgl-title"><Words text="Nicht jedes Projekt braucht einen Retainer." /></h2>
+      <p class="t-body t-muted sgl__lead" data-reveal style="--reveal-delay:140ms">
+        Ein Spot, ein Shooting, eine Landingpage – auch einzeln buchbar.
+        Sag uns, was ansteht, und du bekommst ein konkretes Angebot dafür.
+      </p>
+    </div>
+
+    <ul class="sgl__list" role="list">
+      {singleServices.map((s, i) => (
+        <li class="sgl__item" data-reveal style={`--reveal-delay:${Math.min(i * 45, 320)}ms`}>
+          <span class="sgl__name">{s.name}</span>
+          <span class="sgl__note t-small t-muted">{s.note}</span>
+          <span class="sgl__price t-label">{s.price ? priceLine(s.price) : 'Auf Anfrage'}</span>
+        </li>
+      ))}
+    </ul>
+
+    <div class="sgl__cta" data-reveal>
+      <ArrowLink href="/contact/" label="Einzelleistung anfragen" />
+    </div>
+  </div>
+</section>
+
+<style>
+  .sgl__head { display: grid; gap: var(--space-4); margin-bottom: var(--space-7); }
+  .sgl__label { color: var(--c-accent); }
+  .sgl__title { max-width: 20ch; }
+  .sgl__lead { max-width: 52ch; }
+
+  .sgl__list { display: grid; border-top: 1px solid var(--line); }
+  .sgl__item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: 'name price' 'note price';
+    align-items: center;
+    gap: 0.2rem var(--space-4);
+    padding-block: var(--space-4);
+    border-bottom: 1px solid var(--line);
+  }
+  .sgl__name {
+    grid-area: name;
+    font-family: var(--font-display);
+    font-weight: var(--fw-semi);
+    font-stretch: var(--wd-wide);
+    font-size: var(--fs-h3);
+    line-height: 1.1;
+    letter-spacing: var(--ls-snug);
+  }
+  .sgl__note { grid-area: note; }
+  .sgl__price { grid-area: price; color: var(--fg-muted); white-space: nowrap; justify-self: end; }
+
+  @media (min-width: 768px) {
+    .sgl__item { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr) auto; grid-template-areas: 'name note price'; }
+  }
+  .sgl__cta { margin-top: var(--space-7); }
+</style>

@@ -1,0 +1,91 @@
+---
+/**
+ * "Was du bei uns nicht bekommst" – kompakter dunkler Abschluss des
+ * Vergleichsteils.
+ *
+ * REGEL: Jede Zeile ist eine Aussage ueber UNS, nicht ueber andere. Sie
+ * stuetzt sich jeweils auf etwas, das an anderer Stelle zugesagt ist:
+ *   - Template-Massenware      -> "Individuelles Webdesign" in jedem Paket
+ *   - wechselnde Ansprechpartner -> "Fester Ansprechpartner"
+ *   - versteckte Ratenaufschlaege -> die Rate ist Preis / Laufzeit
+ *   - Preise auf Anfrage        -> alle Paketpreise stehen auf der Seite
+ */
+import Icon from '@/components/Icon.astro';
+import { websiteEntryPrice, euro } from '@/data/website-pricing';
+
+const not = [
+  'Template-Massenware',
+  'Wechselnde Ansprechpartner',
+  'Versteckte Ratenaufschläge',
+  'Preise erst auf Anfrage',
+  'Bindung nach der letzten Rate',
+];
+---
+<section class="nt" data-theme="dark" data-bg="dark" aria-labelledby="nt-title">
+  <div class="container">
+    <div class="card card--dark nt__card">
+      <div class="nt__copy">
+        <h2 class="nt__title" id="nt-title">Was du bei uns <span class="nt__title-em">nicht</span> bekommst.</h2>
+        <ul class="nt__list" role="list">
+          {not.map((n) => (
+            <li class="nt__item">
+              <span class="nt__x" aria-hidden="true"><Icon name="close" /></span>
+              {n}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <p class="nt__claim">
+        Eine Website. Ein klarer Preis ab {euro(websiteEntryPrice)}.
+        <span class="nt__claim-em">Ein direkter Ansprechpartner.</span>
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .nt { padding-block: clamp(1.5rem, 4vw, 3rem); }
+  .nt__card {
+    display: grid; gap: clamp(1rem, 2.5vw, 2rem);
+    padding: clamp(1rem, 2.8vw, 2rem);
+  }
+  @media (min-width: 900px) {
+    .nt__card { grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr); align-items: center; gap: clamp(1.75rem, 4vw, 3.5rem); }
+  }
+
+  .nt__copy { display: grid; gap: clamp(0.75rem, 2vw, 1.25rem); }
+  .nt__title {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 112%;
+    font-size: clamp(1.4rem, 0.9rem + 2.4vw, 2.6rem);
+    line-height: 1.02; letter-spacing: -0.04em; text-transform: uppercase; max-width: 20ch;
+  }
+  .nt__title-em { color: var(--c-accent-on-dark); }
+
+  /* Chips statt Liste: fuenf kurze Aussagen lesen sich schneller nebeneinander. */
+  .nt__list { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .nt__item {
+    display: inline-flex; align-items: center; gap: 0.45em;
+    padding: 0.5em 0.85em; border-radius: var(--radius-pill);
+    border: 1px solid var(--card-dark-line); background: var(--tile-dark-bg);
+    font-size: clamp(0.68rem, 1.7vw, 0.82rem); font-weight: var(--fw-semi);
+    line-height: 1.2; color: var(--fg-muted);
+  }
+  .nt__x {
+    display: grid; place-items: center; flex: none;
+    width: 1.05rem; aspect-ratio: 1; border-radius: 50%;
+    background: rgba(242, 237, 228, 0.1); color: var(--c-grey-dark);
+    font-size: 0.66rem;
+  }
+
+  .nt__claim {
+    padding: clamp(0.85rem, 2.2vw, 1.4rem);
+    border-radius: calc(var(--radius-card) * 0.6);
+    background: var(--card-accent-bg); border: 1px solid var(--card-accent-line);
+    color: #fff;
+    font-family: var(--font-display); font-weight: 900; font-stretch: 106%;
+    font-size: clamp(0.95rem, 0.8rem + 1vw, 1.5rem);
+    line-height: 1.15; letter-spacing: -0.03em; text-transform: uppercase;
+  }
+  .nt__claim-em { display: block; color: rgba(255, 255, 255, 0.82); }
+</style>

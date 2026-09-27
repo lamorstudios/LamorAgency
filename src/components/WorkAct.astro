@@ -2,151 +2,148 @@
 import type { CollectionEntry } from 'astro:content';
 import Media from '@/components/Media.astro';
 /**
- * WorkAct – ein Projekt als Kampagnen-Auftritt statt als Karte.
+ * Ein Projekt als Auftritt, nicht als Karte.
+ *
  * variant:
- *  takeover  – Medium öffnet sich beim Scrollen bis über die volle Breite, Titel überlagert
- *  offset    – Portrait rechts, Titel läuft links dahinter durch
- *  accent    – blaue Vollfläche, Titel groß, Portrait eingesetzt
- *  wide      – breites Medium, Titel darüber angeschnitten
- *  portrait  – schmales Hochformat für Paare
+ *  feature – randlos über die volle Breite, Titel im Bild, Verlaufsschleier
+ *  wide    – breites Medium, Titel schneidet die Oberkante an
+ *  tall    – Hochformat, Beschriftung darunter
+ *  square  – Quadrat, Beschriftung darunter
+ *
+ * Beschriftung bewusst knapp: laufende Nummer, Titel, Kategorie. Mehr braucht
+ * ein Projekt an dieser Stelle nicht – das Bild soll arbeiten.
  */
-interface Props { project: CollectionEntry<'projects'>; index: number; variant: 'takeover' | 'offset' | 'accent' | 'wide' | 'portrait'; priority?: boolean }
+interface Props {
+  project: CollectionEntry<'projects'>;
+  index: number;
+  variant: 'feature' | 'wide' | 'tall' | 'square';
+  priority?: boolean;
+}
 const { project, index, variant, priority = false } = Astro.props;
 const d = project.data;
 const href = `/work/${project.id}/`;
 const hasHoverVideo = d.preview?.type === 'video' && d.preview.src;
 const surface = (index % 8) + 1;
-const credit = [d.client, d.category].filter(Boolean).join(' · ');
+const num = String(index + 1).padStart(2, '0');
+const ratio = variant === 'feature' ? 'cinema' : variant === 'wide' ? 'wide' : variant === 'tall' ? 'portrait' : 'square';
+const sizes =
+  variant === 'feature' || variant === 'wide' ? '100vw' : '(min-width: 900px) 46vw, 100vw';
 ---
-<article class={`act act--${variant}`} data-act>
-  <a href={href} class="act__link" data-cursor="View" data-hover-video={hasHoverVideo ? '' : undefined} aria-label={`${d.title} – ${d.client}, ${d.category}`}>
+<article class={`pc pc--${variant}`}>
+  <a
+    href={href}
+    class="pc__link"
+    data-cursor="View"
+    data-hover-video={hasHoverVideo ? '' : undefined}
+    aria-label={`${d.title} – ${d.client}, ${d.category}`}
+  >
+    <div class="pc__frame">
+      <Media
+        media={d.hero}
+        surface={surface}
+        ratio={ratio}
+        hover
+        reveal={variant !== 'feature'}
+        priority={priority}
+        sizes={sizes}
+        widths={[560, 900, 1440, 1920]}
+      />
+      {hasHoverVideo && (
+        <video class="pc__preview" src={d.preview!.src} muted loop playsinline preload="none" aria-hidden="true"></video>
+      )}
+      {variant === 'feature' && <span class="pc__scrim" aria-hidden="true"></span>}
 
-    {variant === 'takeover' && (
-      <div class="act__stage">
-        <div class="act__clip" data-takeover>
-          <Media media={d.hero} surface={surface} priority={priority} ratio="wide" sizes="100vw" widths={[768, 1280, 1920, 2560]} />
-          {hasHoverVideo && <video class="act__preview" src={d.preview!.src} muted loop playsinline preload="none" aria-hidden="true"></video>}
-          <div class="act__scrim" aria-hidden="true"></div>
-          <div class="act__over container">
-            <p class="act__credit t-label">{credit}</p>
-            <h3 class="act__title t-hero">{d.title}</h3>
-          </div>
+      {variant === 'feature' && (
+        <div class="pc__over container">
+          <p class="pc__meta t-label"><span class="pc__num">{num}</span><span>{d.category}</span></p>
+          <h3 class="pc__title pc__title--big">{d.title}</h3>
         </div>
-      </div>
-    )}
+      )}
+    </div>
 
-    {variant === 'offset' && (
-      <div class="act__row container">
-        <h3 class="act__title t-hero act__title--behind" data-drift="-3">{d.title}</h3>
-        <div class="act__media" data-reveal="fade">
-          <Media media={d.hero} surface={surface} ratio="portrait" hover reveal sizes="(min-width: 900px) 46vw, 100vw" />
-          {hasHoverVideo && <video class="act__preview" src={d.preview!.src} muted loop playsinline preload="none" aria-hidden="true"></video>}
-        </div>
-        <p class="act__credit t-label">{credit}</p>
-      </div>
-    )}
-
-    {variant === 'accent' && (
-      <div class="act__accent" data-theme="accent">
-        <div class="container act__accent-inner">
-          <h3 class="act__title t-hero">{d.title}</h3>
-          <div class="act__media" data-reveal="fade">
-            <Media media={d.hero} surface={surface} ratio="portrait" hover reveal sizes="(min-width: 900px) 34vw, 100vw" />
-          </div>
-          <p class="act__credit t-label">{credit}</p>
-          <p class="act__accent-note t-lead">{d.summary}</p>
-        </div>
-      </div>
-    )}
-
-    {variant === 'wide' && (
-      <div class="act__row container">
-        <h3 class="act__title t-display act__title--over" data-drift="3">{d.title}</h3>
-        <div class="act__media" data-reveal="fade">
-          <Media media={d.hero} surface={surface} ratio="cinema" hover reveal parallax sizes="100vw" />
-          {hasHoverVideo && <video class="act__preview" src={d.preview!.src} muted loop playsinline preload="none" aria-hidden="true"></video>}
-        </div>
-        <p class="act__credit t-label">{credit}</p>
-      </div>
-    )}
-
-    {variant === 'portrait' && (
-      <div class="act__portrait">
-        <div class="act__media" data-reveal="fade">
-          <Media media={d.hero} surface={surface} ratio="portrait" hover reveal sizes="(min-width: 900px) 40vw, 82vw" />
-          {hasHoverVideo && <video class="act__preview" src={d.preview!.src} muted loop playsinline preload="none" aria-hidden="true"></video>}
-        </div>
-        <h3 class="act__title t-h2">{d.title}</h3>
-        <p class="act__credit t-label">{credit}</p>
+    {variant !== 'feature' && (
+      <div class="pc__cap">
+        <h3 class="pc__title">{d.title}</h3>
+        <p class="pc__meta t-label"><span class="pc__num">{num}</span><span>{d.category}</span></p>
       </div>
     )}
   </a>
 </article>
 
 <style>
-  .act__link { display: block; }
-  .act__title { transition: transform var(--dur-slow) var(--ease-out); }
-  .act__credit { color: var(--fg-muted); }
-  .act__preview { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity var(--dur-base) var(--ease-out); z-index: 1; }
-  @media (hover: hover) { .act__link:hover .act__preview { opacity: 1; } }
+  .pc__link { display: block; }
+  .pc__frame { position: relative; overflow: hidden; }
 
-  /* ---- takeover: öffnet sich beim Scrollen auf volle Breite */
-  .act--takeover { padding-block: var(--space-7); }
-  .act__stage { width: 100vw; margin-left: 50%; transform: translateX(-50%); }
-  .act__clip { position: relative; clip-path: inset(0 8vw); will-change: clip-path; }
-  .act__clip :global(.media) { --ratio: 4 / 5; }
-  .act__scrim { position: absolute; inset: 0; z-index: 2; background: linear-gradient(to top, rgba(5,5,5,0.7) 0%, rgba(5,5,5,0.1) 42%, transparent 70%); }
-  .act__over { position: absolute; inset: auto 0 0 0; z-index: 3; padding-bottom: clamp(1.25rem, 3vw, 3rem); color: #fff; display: grid; gap: var(--space-2); }
-  .act--takeover .act__title { color: #fff; }
-  .act--takeover .act__credit { color: rgba(255,255,255,0.72); order: -1; }
+  .pc__preview {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: cover; opacity: 0; z-index: 1;
+    transition: opacity var(--dur-base) var(--ease-out);
+  }
+  @media (hover: hover) { .pc__link:hover .pc__preview { opacity: 1; } }
 
-  /* ---- offset: Titel läuft hinter dem Hochformat durch */
-  .act--offset { padding-block: var(--space-9); }
-  .act--offset .act__row { display: grid; gap: var(--space-4); }
-  .act--offset .act__title { position: relative; z-index: 0; }
-  .act--offset .act__media { position: relative; z-index: 2; }
+  /* ---------- Beschriftung ---------- */
+  .pc__cap {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--line);
+    margin-top: var(--space-4);
+  }
+  .pc__title {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-stretch: 110%;
+    text-transform: uppercase;
+    font-size: clamp(1.25rem, 0.8rem + 1.8vw, 2.4rem);
+    line-height: 1;
+    letter-spacing: -0.035em;
+    transition: transform var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out);
+  }
+  .pc__meta { display: inline-flex; align-items: baseline; gap: 0.8em; color: var(--fg-muted); white-space: nowrap; }
+  .pc__num { color: var(--c-accent); }
 
-  /* ---- accent: blaue Vollfläche */
-  .act--accent { padding-block: 0; }
-  .act__accent { background: var(--c-accent); color: #fff; padding-block: var(--space-9); width: 100vw; margin-left: 50%; transform: translateX(-50%); }
-  .act__accent-inner { display: grid; gap: var(--space-5); }
-  .act--accent .act__title { color: #fff; }
-  .act--accent .act__credit { color: rgba(255,255,255,0.78); }
-  .act__accent-note { max-width: 30ch; color: rgba(255,255,255,0.9); }
+  @media (hover: hover) and (pointer: fine) {
+    .pc__link:hover .pc__title { transform: translateX(0.22em); }
+    .pc__link:hover .pc__cap { border-color: var(--fg); }
+  }
 
-  /* ---- wide */
-  .act--wide { padding-block: var(--space-8); }
-  .act--wide .act__row { display: grid; gap: var(--space-4); }
-  .act--wide .act__title { position: relative; z-index: 2; }
+  /* ---------- feature: randlos, Titel im Bild ---------- */
+  .pc--feature .pc__frame :global(.media) { --ratio: 4 / 5; }
+  .pc__scrim {
+    position: absolute; inset: 0; z-index: 2;
+    background: linear-gradient(to top, rgba(11,10,9,0.85) 0%, rgba(11,10,9,0.25) 45%, transparent 72%);
+  }
+  .pc__over {
+    position: absolute; inset: auto 0 0 0; z-index: 3;
+    padding-bottom: clamp(1.25rem, 3.5vw, 3rem);
+    color: var(--c-paper);
+    display: grid;
+    gap: var(--space-2);
+  }
+  .pc__over .pc__meta { color: rgba(242, 237, 228, 0.75); order: -1; }
+  .pc__title--big {
+    font-size: clamp(2rem, 0.8rem + 6.5vw, 7rem);
+    font-stretch: 120%;
+    line-height: 0.9;
+    letter-spacing: -0.045em;
+  }
 
-  /* ---- portrait */
-  .act--portrait { padding-block: var(--space-6); }
-  .act--portrait .act__title { margin-top: var(--space-4); }
-  .act--portrait .act__credit { margin-top: var(--space-1); }
-  .act--portrait .act__media { position: relative; }
-
-  @media (hover: hover) {
-    .act--offset .act__link:hover .act__title, .act--wide .act__link:hover .act__title { transform: translateX(0.2em); }
+  /* ---------- wide: Titel schneidet die Oberkante an ---------- */
+  .pc--wide .pc__cap {
+    border-top: 0;
+    border-bottom: 1px solid var(--line);
+    margin-top: 0;
+    margin-bottom: var(--space-4);
+    padding-top: 0;
+    padding-bottom: var(--space-4);
   }
 
   @media (min-width: 900px) {
-    .act--takeover { padding-block: var(--space-8); }
-    .act__clip { clip-path: inset(4svh 12vw); }
-    .act__clip :global(.media) { --ratio: 16 / 9; }
-
-    .act--offset .act__row { grid-template-columns: repeat(12, minmax(0, 1fr)); align-items: center; row-gap: var(--space-5); }
-    .act--offset .act__title { grid-column: 1 / 10; grid-row: 1; margin-left: -0.04em; }
-    .act--offset .act__media { grid-column: 6 / -1; grid-row: 1 / 3; align-self: start; margin-top: var(--space-7); }
-    .act--offset .act__credit { grid-column: 1 / 5; grid-row: 2; align-self: start; }
-
-    .act__accent-inner { grid-template-columns: repeat(12, minmax(0, 1fr)); align-items: end; row-gap: var(--space-6); }
-    .act--accent .act__title { grid-column: 1 / 9; grid-row: 1; }
-    .act--accent .act__media { grid-column: 9 / -1; grid-row: 1 / 3; }
-    .act--accent .act__credit { grid-column: 1 / 5; grid-row: 2; }
-    .act__accent-note { grid-column: 5 / 9; grid-row: 2; }
-
-    .act--wide .act__row { display: grid; }
-    .act--wide .act__title { margin-left: 2vw; margin-bottom: -0.36em; }
-    .act--wide .act__credit { justify-self: end; }
+    .pc--feature .pc__frame :global(.media) { --ratio: var(--ratio-cinema); }
+    /* Der Titel der breiten Variante ragt bewusst in das Bild hinein. */
+    .pc--wide .pc__cap { position: relative; z-index: 3; margin-bottom: -0.5em; border: 0; padding-bottom: 0; }
+    .pc--wide .pc__title { font-size: clamp(2.5rem, 1rem + 5vw, 5.5rem); font-stretch: 120%; letter-spacing: -0.045em; }
   }
 </style>

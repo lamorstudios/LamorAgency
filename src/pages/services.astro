@@ -1,24 +1,40 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PageHeader from '@/components/PageHeader.astro';
-import ServicesList from '@/components/ServicesList.astro';
+import Services from '@/components/sections/Services.astro';
+import Process from '@/components/sections/Process.astro';
+import Industries from '@/components/sections/Industries.astro';
+import Pricing from '@/components/sections/Pricing.astro';
+import SingleServices from '@/components/sections/SingleServices.astro';
 import ContactCta from '@/components/ContactCta.astro';
 import Words from '@/components/Words.astro';
 import { site } from '@/data/site';
 import { services } from '@/data/services';
-import { breadcrumb } from '@/lib/schema';
+import { breadcrumb, offerCatalog } from '@/lib/schema';
 ---
-<BaseLayout title="Leistungen – Social Media, Film, Branding, Design" description={`Leistungen von LAMOR AGENCY ${site.address.city}: ${services.map((s) => s.title).join(', ')}.`} jsonLd={[breadcrumb([{ name: 'Services', path: '/services/' }])]}>
-  <PageHeader kicker="Leistungen" title="Services" titleLines={['What we', 'do.']} lead="Neun Disziplinen, ein Studio. Von der Idee über die Produktion bis zur Veröffentlichung." />
+<BaseLayout
+  title="Leistungen – Video, Foto, Social Media, Web & Branding München"
+  description={`Leistungen von LAMOR AGENCY ${site.address.city}: ${services.map((s) => s.title).join(', ')}. Konzept, Produktion und Ausspielung aus einer Hand.`}
+  jsonLd={[breadcrumb([{ name: 'Services', path: '/services/' }]), offerCatalog()]}
+>
+  <PageHeader
+    kicker="Leistungen"
+    title="Services"
+    titleLines={['Alles, was eine Marke', 'sichtbar macht.']}
+    lead="Sechs Disziplinen, ein Studio. Von der ersten Idee über die Produktion bis zur Veröffentlichung."
+    meta={site.claim}
+  />
 
-  <section class="container section section--flush-top" data-bg="light" aria-label="Leistungen im Detail">
-    <ServicesList mode="full" headingLevel="h2" />
-  </section>
+  <Services showAll heading="Was wir für dich produzieren." />
+  <Process />
+  <Industries />
+  <SingleServices />
+  <Pricing compact />
 
-  <section class="services-claim section" data-theme="dark" data-bg="dark" aria-label="Markenclaim">
+  <section class="svc-claim section" data-theme="dark" data-bg="dark" aria-label="Markenclaim">
     <div class="container">
       <p class="t-label t-muted" data-reveal="fade">{site.name} — {site.address.city}</p>
-      <p class="t-display services-claim__text"><Words lines={site.claimLines as unknown as string[]} /></p>
+      <p class="t-display svc-claim__text"><Words lines={site.claimLines as unknown as string[]} /></p>
     </div>
   </section>
 
@@ -26,7 +42,7 @@ import { breadcrumb } from '@/lib/schema';
 </BaseLayout>
 
 <style>
-  .services-claim { background: var(--c-ink); color: var(--c-paper); }
-  .services-claim .t-label { margin-bottom: var(--space-6); }
-  @media (min-width: 768px) { .services-claim__text :global(.line:nth-child(2)) { padding-left: 14vw; } }
+  .svc-claim { background: var(--c-ink); color: var(--c-paper); }
+  .svc-claim .t-label { margin-bottom: var(--space-6); }
+  @media (min-width: 768px) { .svc-claim__text :global(.line:nth-child(2)) { padding-left: 14vw; } }
 </style>

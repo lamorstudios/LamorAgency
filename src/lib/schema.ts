@@ -1,4 +1,9 @@
 import { site } from '@/data/site';
+import { faqs, type FaqItem } from '@/data/faq';
+import { resolveText } from '@/lib/faq';
+import { packages as pricingPackages, priceLine } from '@/data/pricing';
+import { services as allServices } from '@/data/services';
+import { websitePricing as websitePackages } from '@/data/website-pricing';
 const abs = (path: string) => `${site.url}${path.replace(/\/?$/, '/')}`;
 export const breadcrumb = (items: { name: string; path: string }[]) => ({
   '@context': 'https://schema.org',
@@ -28,4 +33,77 @@ export const creativeWork = (w: { title: string; description: string; path: stri
   ...(w.year ? { dateCreated: String(w.year) } : {}),
   sourceOrganization: { '@type': 'Organization', name: w.client },
   creator: { '@id': `${site.url}/#organization` },
+});
+
+/** FAQPage – Preis-Platzhalter werden zentral aufgelöst (src/lib/faq.ts). */
+export const faqPage = (items: FaqItem[] = faqs) => ({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: items
+    .filter((f) => f.schema)
+    .map((f) => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: resolveText(f.a) },
+    })),
+});
+
+/** Angebotskatalog: Leistungen und Pakete mit echten Preisen. */
+export const offerCatalog = () => ({
+  '@context': 'https://schema.org',
+  '@type': 'OfferCatalog',
+  name: `Leistungen und Pakete – ${site.name}`,
+  provider: { '@id': `${site.url}/#organization` },
+  itemListElement: [
+    ...allServices.map((s) => ({
+      '@type': 'Offer',
+      itemOffered: { '@type': 'Service', name: s.title, description: s.short, serviceType: s.label },
+    })),
+    ...pricingPackages.map((p) => ({
+      '@type': 'Offer',
+      name: p.name,
+      description: p.for,
+      ...(p.monthly.amount !== null
+        ? {
+            priceSpecification: {
+              '@type': 'UnitPriceSpecification',
+              price: p.monthly.amount,
+              priceCurrency: 'EUR',
+              valueAddedTaxIncluded: false,
+              unitCode: 'MON',
+            },
+          }
+        : {}),
+    })),
+  ],
+});
+
+/** Service-Schema für das Website-Produkt (/webdesign-muenchen/). */
+export const websiteServiceSchema = () => ({
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  '@id': `${site.url}/webdesign-muenchen/#service`,
+  name: 'Webdesign & Website-Erstellung',
+  serviceType: 'Webdesign',
+  description:
+    'Individuelle Websites für Unternehmen, Marken und Selbstständige: Konzept, Design, Entwicklung, SEO-Basics und Deployment – auf Wunsch inklusive Foto- und Videoproduktion.',
+  provider: { '@id': `${site.url}/#organization` },
+  areaServed: { '@type': 'City', name: site.geoArea },
+  offers: websitePackages.map((p) => ({
+    '@type': 'Offer',
+    name: p.name,
+    description: p.description,
+    ...(p.price !== null
+      ? {
+          priceSpecification: {
+            '@type': 'PriceSpecification',
+            price: p.price,
+            priceCurrency: 'EUR',
+            valueAddedTaxIncluded: false,
+            // "ab"-Preis: der genannte Betrag ist die Untergrenze.
+            minPrice: p.price,
+          },
+        }
+      : {}),
+  })),
 });

@@ -1,52 +1,54 @@
 ---
+/**
+ * Startseite – die Dramaturgie:
+ * Video-Hero → Featured on → Showreel → Arbeit (Video/Talents) → Leistungen
+ * → Projekte → Problem/Lösung → Webdesign → Prozess → Models → Kunden
+ * → Branchen → Stimmen → Preise → FAQ → Kontakt.
+ *
+ * Wer visuelle Dienstleistungen verkauft, muss sie zeigen, bevor er sie
+ * erklärt: Die ersten vier Bereiche sind Bild und Bewegtbild, erst danach
+ * kommt Text.
+ */
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import Hero from '@/components/home/Hero.astro';
-import AgencyStatement from '@/components/home/AgencyStatement.astro';
+import HeroVideo from '@/components/sections/HeroVideo.astro';
+import FeaturedOn from '@/components/sections/FeaturedOn.astro';
+import EditorialWork from '@/components/sections/EditorialWork.astro';
+import Clients from '@/components/sections/Clients.astro';
+import Comparison from '@/components/sections/Comparison.astro';
+import Services from '@/components/sections/Services.astro';
+import Showreel from '@/components/sections/Showreel.astro';
+import WebsiteTeaser from '@/components/sections/WebsiteTeaser.astro';
 import SelectedWork from '@/components/home/SelectedWork.astro';
-import FeaturedProject from '@/components/home/FeaturedProject.astro';
-import Statement from '@/components/home/Statement.astro';
-import ServicesList from '@/components/ServicesList.astro';
-import SectionLabel from '@/components/SectionLabel.astro';
-import Clients from '@/components/Clients.astro';
+import Process from '@/components/sections/Process.astro';
+import ModelsTeaser from '@/components/sections/ModelsTeaser.astro';
+import Industries from '@/components/sections/Industries.astro';
+import Testimonials from '@/components/sections/Testimonials.astro';
+import Pricing from '@/components/sections/Pricing.astro';
+import Faq from '@/components/sections/Faq.astro';
 import ContactCta from '@/components/ContactCta.astro';
-import ArrowLink from '@/components/ArrowLink.astro';
 import { site } from '@/data/site';
+import { offerCatalog } from '@/lib/schema';
 ---
 <BaseLayout
-  title={`${site.name} | Social Media, Film & Branding Agentur München`}
-  description={site.description}
+  title={`Werbeagentur München | Video, Social Media & Branding – ${site.name}`}
+  description="LAMOR AGENCY aus München: Videoproduktion, Fotografie, Social Media, Webdesign, Branding und eigene Models. Über 500 Mio. Aufrufe auf unsere Arbeit. Jetzt Projekt anfragen."
   theme="dark"
-  bodyClass="has-bg-transitions"
+  jsonLd={[offerCatalog()]}
 >
-  <Hero />
-  <AgencyStatement />
+  <HeroVideo />
+  <FeaturedOn />
+  <Showreel />
+  <EditorialWork />
+  <Services />
   <SelectedWork />
-  <FeaturedProject />
-  <Statement />
-
-  <section class="home-services section" data-theme="light" data-bg="light" aria-labelledby="services-title">
-    <div class="container">
-      <div class="home-services__head">
-        <SectionLabel label="Leistungen" />
-        <h2 class="t-say home-services__title" id="services-title" data-reveal>Neun Disziplinen,<br />ein Studio.</h2>
-      </div>
-      <ServicesList mode="compact" />
-      <div class="home-services__more" data-reveal>
-        <ArrowLink href="/services/" label="Alle Leistungen im Detail" />
-      </div>
-    </div>
-  </section>
-
-  <div data-theme="light" data-bg="light">
-    <Clients />
-  </div>
-
+  <Comparison />
+  <WebsiteTeaser />
+  <Process />
+  <ModelsTeaser />
+  <Clients figures={false} />
+  <Industries />
+  <Testimonials />
+  <Pricing compact />
+  <Faq />
   <ContactCta />
 </BaseLayout>
-
-<style>
-  .home-services { color: var(--c-ink); padding-block: var(--space-10) var(--space-9); }
-  .home-services__head { margin-bottom: var(--space-8); }
-  .home-services__title { max-width: 14ch; }
-  .home-services__more { margin-top: var(--space-8); }
-</style>

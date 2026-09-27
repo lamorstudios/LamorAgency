@@ -1,0 +1,62 @@
+---
+/**
+ * Social Proof.
+ * Es werden ausschließlich belegte Kundenstimmen ausgespielt
+ * (src/data/testimonials.ts, `verified: true`). Liegt keine belegte Stimme
+ * vor, rendert diese Section nichts – statt eine Stimme zu erfinden.
+ */
+import Words from '@/components/Words.astro';
+import { publishedTestimonials } from '@/data/testimonials';
+
+const items = publishedTestimonials;
+---
+{items.length > 0 && (
+  <section class="tst section" data-theme="dark" data-bg="dark" aria-labelledby="tst-title">
+    <div class="container">
+      <p class="t-label tst__label" id="tst-title" data-reveal="fade">Kundenstimmen</p>
+
+      <ul class="tst__list" role="list">
+        {items.map((t, i) => (
+          <li class="tst__item" data-reveal style={`--reveal-delay:${i * 120}ms`}>
+            <figure class="tst__figure">
+              <span class="tst__mark" aria-hidden="true">&ldquo;</span>
+              <blockquote class="tst__quote">
+                <Words text={t.quote} />
+              </blockquote>
+              <figcaption class="tst__by">
+                <span class="tst__name">{t.name}</span>
+                <span class="tst__role t-label t-muted">{t.role} · {t.company}</span>
+              </figcaption>
+            </figure>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+)}
+
+<style>
+  .tst__label { color: var(--c-accent); margin-bottom: var(--space-7); }
+  .tst__list { display: grid; gap: var(--space-8); }
+  @media (min-width: 1024px) {
+    .tst__list:has(> :nth-child(2)) { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-7); }
+  }
+  .tst__figure { display: grid; gap: var(--space-5); margin: 0; }
+  .tst__mark {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 6vw, 5rem);
+    line-height: 0.6;
+    color: var(--c-accent);
+  }
+  .tst__quote {
+    font-family: var(--font-display);
+    font-weight: var(--fw-medium);
+    font-size: clamp(1.35rem, 1rem + 2.2vw, 2.6rem);
+    line-height: 1.12;
+    letter-spacing: var(--ls-snug);
+    text-wrap: balance;
+    max-width: 24ch;
+  }
+  .tst__by { display: grid; gap: 0.3rem; padding-top: var(--space-4); border-top: 1px solid var(--line); }
+  .tst__name { font-family: var(--font-display); font-weight: var(--fw-semi); font-size: var(--fs-h4); letter-spacing: var(--ls-snug); }
+</style>

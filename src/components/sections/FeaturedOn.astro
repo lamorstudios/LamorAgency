@@ -1,0 +1,78 @@
+---
+/**
+ * "Featured on" – kompakte Vertrauensleiste direkt unter dem Hero.
+ *
+ * Bewusst KEINE Logowand: eine ruhige Leiste, die in einem Blick erfassbar
+ * ist. Sobald in src/data/clients.ts ein `logo` hinterlegt ist, ersetzt das
+ * Bild den Schriftzug; ohne Logo steht der Name typografisch – gestaltet,
+ * nicht kaputt. Es werden ausschliesslich Marken gezeigt, die dort stehen.
+ */
+import { Picture } from 'astro:assets';
+import { clients } from '@/data/clients';
+
+interface Props { label?: string; limit?: number }
+const { label = 'Featured on', limit = 10 } = Astro.props;
+
+const logos = import.meta.glob<{ default: ImageMetadata }>('/src/assets/brand/clients/*.{svg,png,jpg,webp,avif}');
+const resolved = await Promise.all(
+  clients.slice(0, limit).map(async (c) => ({
+    ...c,
+    img: c.logo && logos[c.logo] ? (await logos[c.logo]()).default : undefined,
+  })),
+);
+---
+<section class="fo" data-theme="dark" data-bg="dark" aria-label={label}>
+  <div class="container fo__inner">
+    <p class="fo__label">{label}</p>
+    <ul class="fo__row" role="list">
+      {resolved.map((c) => (
+        <li class="fo__item">
+          {c.img
+            ? <Picture src={c.img} formats={['webp']} widths={[160, 320]} sizes="140px" alt={c.name} class="fo__logo" loading="lazy" />
+            : <span class="fo__name">{c.name}</span>}
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .fo { padding-block: clamp(1rem, 2.5vw, 1.75rem); border-block: 1px solid var(--line); }
+  .fo__inner { display: grid; gap: var(--space-4); align-items: center; }
+  @media (min-width: 900px) { .fo__inner { grid-template-columns: auto minmax(0, 1fr); gap: var(--space-7); } }
+
+  .fo__label {
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wider); text-transform: uppercase; color: var(--c-accent-on-dark);
+    white-space: nowrap;
+  }
+
+  /* Auf dem Telefon eine schiebbare Reihe statt eines Rasters aus Bruchstuecken. */
+  .fo__row {
+    display: flex; align-items: center;
+    gap: clamp(1.1rem, 4vw, 2.75rem);
+    overflow-x: auto;
+    scrollbar-width: none;
+    scroll-padding-inline-start: var(--gutter);
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+  }
+  .fo__row::-webkit-scrollbar { display: none; }
+  @media (min-width: 900px) {
+    .fo__row { flex-wrap: wrap; overflow: visible; margin-inline: 0; padding-inline: 0; row-gap: var(--space-3); }
+  }
+
+  .fo__item { flex: none; }
+  .fo__name {
+    font-family: var(--font-display); font-weight: 800; font-stretch: 104%;
+    font-size: clamp(0.78rem, 0.7rem + 0.5vw, 1rem);
+    letter-spacing: -0.01em; text-transform: uppercase; white-space: nowrap;
+    color: var(--fg-muted);
+    transition: color var(--dur-base) var(--ease-out);
+  }
+  .fo__logo { width: auto; height: clamp(1.1rem, 2.4vw, 1.6rem); object-fit: contain; filter: grayscale(1); opacity: 0.7; }
+  @media (hover: hover) and (pointer: fine) {
+    .fo__item:hover .fo__name { color: var(--c-paper); }
+    .fo__item:hover .fo__logo { filter: none; opacity: 1; }
+  }
+</style>

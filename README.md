@@ -1,7 +1,7 @@
 # LAMOR AGENCY – Website 2026
 
 Eigenständiges Code-Projekt für [www.lamoragency.de](https://www.lamoragency.de). Ersetzt die bisherige Wix-Website.
-Stack: **Astro 7** (statisch), **GSAP + ScrollTrigger** (nur für Parallax, Statement, Hero-Scroll, Magnetic CTA), CSS Design Tokens, Netlify.
+Stack: **Astro 7** (statisch), CSS Design Tokens, **GSAP + ScrollTrigger** (nachgeladen, nur Desktop), Netlify.
 
 ```bash
 npm install
@@ -9,89 +9,220 @@ npm run dev       # http://localhost:4321
 npm run build     # → dist/
 npm run preview   # dist lokal prüfen
 npm run check     # Typprüfung
+
+npm run build:standalone   # TEMPORÄR: nur die Webdesign-Landingpage
 ```
 
-## Struktur
+---
 
+## Temporärer Standalone-Modus (Webdesign-Landingpage)
+
+Die öffentliche Hauptwebsite läuft noch über Wix. Bis der Relaunch komplett
+ist, wird **nur** die Webdesign-Seite vorab als eigene Landingpage
+(webdesign.lamoragency.de) ausgespielt – als Zielseite für Meta Ads.
+
+Das ist **kein Fork**. Es gibt weiterhin genau eine Quelle
+(`src/pages/webdesign-muenchen.astro`) mit denselben Komponenten, Preisdaten
+und demselben Rechner. Der Standalone-Modus ist nur ein zweiter Build-Modus:
+
+| Befehl | Ergebnis |
+| --- | --- |
+| `npm run build` | vollständiger Relaunch, Webdesign als normale Unterseite |
+| `npm run build:standalone` | nur die Landingpage, ausgeliefert unter `/` |
+
+Im Standalone-Build entfallen Navigation, Burger-Menü und alle Links in den
+noch unfertigen Relaunch; das Logo führt zum Seitenanfang. Impressum und
+Datenschutz bleiben erhalten (Pflichtangaben). Alles Weitere – warum, was
+genau passiert und wie der Modus wieder verschwindet – steht in
+**`src/lib/standalone.ts`**; der Build-Teil in `astro.config.mjs`
+(`standaloneBuild()`).
+
+**Wenn der Relaunch fertig ist:** einfach wieder `npm run build` verwenden.
+Es ist keine Code-Änderung nötig.
+
+DNS, Subdomain und Deployment sind bewusst **nicht** Teil dieses Codes.
+
+---
+
+## Seitenstruktur
+
+| Seite | Zweck |
+| --- | --- |
+| `/` | Startseite mit voller Conversion-Dramaturgie |
+| `/work/`, `/work/<slug>/` | Portfolio |
+| `/services/` | Alle Leistungen im Detail |
+| `/agency/` | Studio, Haltung, Zahlen, Prozess, Team |
+| `/pricing/` | Pakete und Einzelleistungen |
+| `/models/` | Models & Talents |
+| **`/webdesign-muenchen/`** | **Eigenständige Sales-Landingpage für das Website-Produkt** |
+| `/contact/` | Anfrage-Formular |
+| `/blog/`, `/blog/<slug>/` | Blog |
+| `/impressum/`, `/datenschutz/` | Rechtliches |
+
+Die Startseite folgt dieser Abfolge:
+Hero → Clients → Problem/Lösung → Leistungen → Webdesign-Teaser → Showreel →
+Arbeiten → Prozess → Models → Branchen → Zahlen → Stimmen → Preise → FAQ → Kontakt.
+
+---
+
+## Inhalte ändern – alles an einer Stelle
+
+Alle Texte, Preise und Listen liegen in `src/data/`. Im Code steht **kein einziger Preis**.
+
+| Datei | Inhalt |
+| --- | --- |
+| `site.ts` | Name, Claim, E-Mail, Telefon, WhatsApp, Adresse, Social |
+| `navigation.ts` | Haupt-, Footer- und Legal-Navigation, Header-CTA |
+| `services.ts` | Sechs Disziplinen mit Einzelleistungen |
+| `clients.ts` | Referenzmarken (+ optionale Logos) |
+| **`pricing.ts`** | **Retainer-Pakete + Einzelleistungen** |
+| **`website-pricing.ts`** | **Website-Pakete, Bundles, Prozess, Problem/Lösung** |
+| `faq.ts` | Allgemeine FAQ (`faqs`) + Website-FAQ (`websiteFaqs`) |
+| `stats.ts` | LAMOR in Zahlen (Count-up) |
+| `industries.ts` | Branchen-Slider |
+| `process.ts` | Strategie → … → Website |
+| `team.ts` | Team (nur echte Personen) |
+| `models.ts` | Talent-Kategorien, Buchungsablauf, Profile |
+| `comparison.ts` | Vorher/Nachher |
+| `testimonials.ts` | Kundenstimmen |
+
+### Preise ändern
+
+**Retainer** (`src/data/pricing.ts`):
+```ts
+monthly: { amount: 495, from: true, per: 'Monat' },   // monatlich
+setup:   { amount: 1950, from: true, note: '…' },     // einmaliger Projektstart
 ```
-src/
-  data/            zentrale Inhalte: site.ts (Kontakt, Claim), navigation.ts, services.ts, clients.ts
-  content/         Collections: projects/*.md (Portfolio), posts/*.md (Blog)
-  content.config.ts  Schemas der Collections
-  styles/          tokens.css (Farben, Typo, Spacing, Motion), fonts.css (@font-face), global.css
-  layouts/         BaseLayout (Head, SEO, JSON-LD, Header, Footer, Intro, Cursor), LegalLayout
-  components/      Media, Words (Text-Reveal), ProjectCard, WorkGrid, ServicesList, Clients, ContactForm …
-  pages/           /, /work/, /work/[slug]/, /about/, /services/, /blog/, /blog/[slug]/, /contact/, /impressum/, /datenschutz/, 404
-  scripts/motion.ts  Reveal-Observer, Header-State, Video-Autoplay, Parallax, Magnetic
-  assets/          optimierte Bilder (AVIF/WebP via astro:assets): work/, brand/, about/, blog/
-public/
-  fonts/           LAMOR-Fonts (woff2)
-  media/           Videos (mp4/webm) + Poster
+
+**Website-Produkt** (`src/data/website-pricing.ts`):
+```ts
+price: 1490,                        // EINMALIGE Erstellungskosten
+monthlyPrice: { min: 39, max: 59 }, // OPTIONALE Betreuung – finanziert NICHT die Website
+highlighted: true,                  // genau ein Paket hervorheben
 ```
+Eine Änderung wirkt gleichzeitig auf Landingpage, Startseiten-Teaser, FAQ-Text,
+Meta-Description und Schema.org. `amount`/`price` auf `null` = „Auf Anfrage".
 
-## Brand Tokens
+FAQ-Texte enthalten Platzhalter statt Zahlen – aufgelöst in `src/lib/faq.ts`:
+`{{PREIS_START}}`, `{{WEB_PREIS}}`, `{{WEB_MONAT}}`.
 
-`src/styles/tokens.css`: Schwarz `--c-ink`, Off-White `--c-paper`, Akzent **Electric Blue** `--c-accent: #3157ff` (+ `--c-accent-deep`). Der Akzent wird an genau einer Stelle geändert und wirkt überall (Cursor, Hover, Band, Statement-Wash, Nummern).
+---
+
+## Motion: Progressive Enhancement (wichtig)
+
+Frühere Reveal-Animationen ließen Inhalt auf Mobile unsichtbar. Das kann jetzt
+strukturell nicht mehr passieren – **drei unabhängige Ebenen**:
+
+1. **CSS versteckt nur unter `html.js`.** Ohne JavaScript ist alles sofort sichtbar.
+2. **Watchdog im `<head>`** (`BaseLayout.astro`): Setzt `motion.ts` nicht innerhalb
+   von 2,5 s `data-motion="ready"`, wird `.js` entfernt und alles wird sichtbar.
+   Deckt JS-Fehler, blockierte Bundles und sehr langsame Geräte ab.
+3. **`safetyNet()`** in `motion.ts`: Feuert der IntersectionObserver nicht
+   (falsche Viewport-Höhe durch die Adressleiste, Layout-Shift), werden nach
+   1,4 s sichtbare und nach 8 s alle verbliebenen Elemente freigeschaltet.
+
+Zusätzlich: GSAP-Tweens, die etwas ausblenden, laufen mit `immediateRender: false`.
+`prefers-reduced-motion` schaltet jede Animation ab.
+
+Geprüft mit Playwright: JS aus, JS blockiert und Reduced Motion – jeweils
+**0 unsichtbare Elemente** auf allen Hauptseiten.
+
+### Performance-Aufteilung
+
+- `src/scripts/motion.ts` – Kern **ohne Bibliothek** (~5,8 KB / 2,4 KB gzip):
+  Reveal, Header, Zähler, Video-Autoplay, Section-Hintergründe, Anker.
+- `src/scripts/scroll-fx.ts` – GSAP + ScrollTrigger (~113 KB), **dynamisch
+  nachgeladen** und nur bei feinem Zeiger, ohne Reduced Motion und oberhalb 767 px.
+
+Gemessen: Mobile lädt **16 KB** JavaScript, Desktop 135 KB, Reduced Motion 16 KB.
+
+---
 
 ## Platzhalter ersetzen
 
-Fehlende Medien werden als **neutrale Media-Surfaces** gerendert (Klasse `.ph`, Varianten `ph--1 … ph--8`), damit das Design beurteilbar ist. Jede Surface ist im Markup über `data-placeholder="…"` gekennzeichnet.
-Platzhalter-Texte sind im Code mit `PLACEHOLDER` bzw. `TODO_VERIFY` markiert:
-`grep -rn "PLACEHOLDER\|TODO_VERIFY\|data-placeholder" src` listet alle offenen Stellen.
+Fehlende Medien werden als neutrale Media-Surfaces gerendert (`.ph`), im Markup
+über `data-placeholder="…"` gekennzeichnet. Offene Stellen finden:
 
-### 1. Fonts (bestehende LAMOR-Fonts)
-1. `.woff2`-Dateien nach `public/fonts/` legen.
-2. `src/styles/fonts.css`: `@font-face`-Blöcke aktivieren, Dateinamen anpassen.
-3. `src/styles/tokens.css`: `--font-display` / `--font-body` auf die Font-Namen setzen (System-Fallback bleibt).
-
-### 2. Farben
-`src/styles/tokens.css` → `--c-ink`, `--c-paper`, `--c-accent` usw. Alle Komponenten nutzen ausschließlich diese Tokens.
-
-### 3. Showreel / Hero-Video
-`src/components/home/Hero.astro` → `showreel` auf `{ type: 'video', src: '/media/showreel.mp4', poster: '/src/assets/brand/showreel-poster.jpg', alt: '…' }` setzen.
-Videos: H.264 MP4 (+ optional WebM), stumm, ≤ 8–10 MB, Mobile-Version idealerweise ≤ 1080p.
-
-### 4. Portfolio-Projekte
-Je Projekt eine Datei `src/content/projects/<slug>.md` (Slug = URL). Felder siehe `src/content.config.ts`:
-```yaml
-title, client, category, services[], year, summary
-hero:     { type: image|video, src: '/src/assets/work/<slug>/hero.jpg', alt: '…', ratio: wide|cinema|square|portrait }
-preview:  { type: video, src: '/media/work/<slug>/preview.mp4' }   # Hover-Video (Desktop)
-gallery:  [ { type: image, src: '…', ratio: portrait, caption: '…' }, … ]
-size:     full|large|medium|small   # Größe im Editorial Grid
-order, featured (Startseite), placeholder: false
+```bash
+grep -rn "PLACEHOLDER\|TODO_VERIFY\|TODO_QUOTE\|TODO_CONTENT\|data-placeholder" src
 ```
-Bilder unter `src/assets/work/<slug>/` ablegen → automatisch AVIF/WebP + srcset. Videos unter `public/media/`.
-Die 6 Placeholder-Projekte (`placeholder-0x.md`) danach löschen. `placeholder: true` bewirkt `noindex` und Ausschluss aus der Sitemap.
 
-### 5. Leistungen, Kunden, Team
-- `src/data/services.ts`: Texte (`short`), Tags, `media` (Bild/Video für Hover-Vorschau).
-- `src/data/clients.ts`: `{ name, logo: '/src/assets/brand/clients/<name>.svg' }` – monochrome Logos bevorzugt.
-- `src/pages/about.astro`: `team`-Array (Name, Rolle, Foto) und `[EXISTING TEXT]`-Absätze.
+### 1. Bilder und Videos
+- Bilder nach `src/assets/…` → automatisch AVIF/WebP + srcset über `<Media>`.
+- Videos nach `public/media/…` (H.264 MP4, stumm, ≤ 8–10 MB, mit Poster).
+- Showreel: `src/components/sections/Hero.astro` und `Showreel.astro`, jeweils
+  `showreel` / `reel` auf `{ type: 'video', src: '/media/showreel.mp4', poster: '…' }`.
 
-### 6. Blog
-Je Artikel `src/content/posts/<slug>.md` mit `title, description, date, category, cover, updated`. Bestehende Wix-Artikel 1:1 übernehmen (Slug idealerweise wie bisher, sonst Redirect). Placeholder-Artikel danach löschen.
+### 2. Kundenlogos
+Monochromes SVG nach `src/assets/brand/clients/` und in `clients.ts` eintragen:
+`{ name: 'ZAM München', logo: '/src/assets/brand/clients/zam.svg' }`.
+Ohne Logo wird der Name typografisch gesetzt – bewusst gestaltet, nicht kaputt.
 
-### 7. Impressum / Datenschutz
-`src/pages/impressum.astro`, `src/pages/datenschutz.astro`: bestehende Texte 1:1 einsetzen. Markierte `TODO_VERIFY`-Stellen prüfen (Rechtsform, Hosting Wix → Netlify, Netlify Forms).
+### 3. Website-Referenzen („So sehen unsere Websites aus.")
+Echte Projekte, gepflegt in `src/data/website-showcase.ts`. Pro Projekt:
+Kundenname, `Branche · Leistung`, Live-URL und echte Screenshots unter
+`src/assets/work/<id>/`. Astro optimiert sie beim Build zu AVIF/WebP.
+Regeln: keine Paketbezeichnungen in der Beschriftung, keine nachgebauten
+Screens, keine Geräte-Mockups. Fehlt eine Bilddatei, rendert
+`WebsiteShowcase.astro` einen sichtbaren Slot statt eines erfundenen Visuals.
 
-### 8. Kontaktdaten
-`src/data/site.ts` (E-Mail, Telefon, Adresse, Social). Adresse/Telefon stammen aus öffentlichen Quellen zur bisherigen Website → `TODO_VERIFY`.
+### 4. Projekte
+Je Projekt `src/content/projects/<slug>.md` (Felder siehe `src/content.config.ts`).
+Angelegt sind die echten Referenzen aus dem bestehenden Portfolio; Texte und
+Medien sind mit `TODO_CONTENT` markiert.
+
+### 5. Kundenstimmen
+`src/data/testimonials.ts`. **Es wird nichts erfunden:** Einträge mit
+`verified: false` werden nicht ausgespielt. Originalwortlaut einsetzen und
+`verified: true` setzen – dann erscheint die Section automatisch.
+
+### 6. Team, Models, Fonts
+- `team.ts` / `models.ts`: nur belegte Personen und freigegebene Profile.
+- Hausschrift: `.woff2` nach `public/fonts/`, `@font-face` in `src/styles/fonts.css`,
+  `--font-display` / `--font-body` in `src/styles/tokens.css` voranstellen.
+
+### 7. Rechtliches
+`src/pages/impressum.astro` und `datenschutz.astro`: bestehende Texte 1:1 einsetzen,
+`TODO_VERIFY`-Stellen prüfen (Rechtsform, Hosting Wix → Netlify, Netlify Forms).
+
+---
+
+## Design-System
+
+- Tokens: `src/styles/tokens.css` – Schwarz `--c-ink`, Off-White `--c-paper`,
+  Akzent `--c-accent` (Electric Blue). Der Akzent wird an **einer** Stelle geändert.
+- Typo: fluid via `clamp()`, Klassen `.t-hero .t-display .t-h1 … .t-label`.
+- Flächen: `data-theme="dark|light|accent"` plus `data-bg` für den Body-Wechsel.
+- Formulare: global in `global.css` (zwei Formulare teilen sich die Darstellung).
+
+---
 
 ## Netlify
 
-- Build: `npm run build`, Publish: `dist` (siehe `netlify.toml`, Node 22).
-- Formular: Netlify Forms (`name="contact"`, Honeypot). Nach dem ersten Deploy im Netlify-Dashboard unter *Forms* aktivieren/Benachrichtigung setzen.
-- Redirects alter Wix-URLs: in `netlify.toml` unter `[[redirects]]` ergänzen (Beispiel `/contact-1 → /contact/` ist angelegt). Alle URLs enden mit Trailing Slash.
-- Sitemap: `/sitemap-index.xml`, robots: `public/robots.txt`.
+- Build `npm run build`, Publish `dist`, Node 22 (`netlify.toml`).
+- **Zwei Formulare**: `contact` (Vollformular) und `website` (kurze Lead-Form).
+  Nach dem ersten Deploy unter *Forms* Benachrichtigungen einrichten.
+- **Bot-Schutz**: WordPress-Scanner-Pfade (`/wp-login.php`, `/xmlrpc.php`,
+  `/wp-admin/*`, `/?page_id=` …) werden mit `410` auf `blocked.html` (~40 Bytes)
+  geleitet, statt die vollständige 404-Seite auszuliefern.
+- **robots.txt**: Suchmaschinen frei, aggressive SEO-Scraper geblockt
+  (Ahrefs, Semrush, MJ12, Bytespider …). KI-Crawler bewusst erlaubt – die Zeilen
+  zum Blocken stehen auskommentiert bereit.
+- **Redirects**: `/about → /agency/`, `/models-talents → /models/`,
+  `/webdesign → /webdesign-muenchen/`. Weitere alte Wix-URLs dort ergänzen.
 
-## Design-System (Kurzfassung)
-
-- Typo: fluid via `clamp()` (`--fs-hero` … `--fs-label`), Klassen `.t-hero .t-display .t-h1 … .t-label`.
-- Spacing: `--space-1 … --space-10`, Section-Padding `--section-y`, Gutter `--gutter`, 12-Spalten-Grid `.grid`.
-- Motion: `--dur-*`, `--ease-*`; Reveal über `data-reveal`, `<Words>` (Text-Mask), `.media--reveal` (Clip). Alles respektiert `prefers-reduced-motion`.
-- Themes: `data-theme="dark|light"` auf Sections/Seiten schaltet die semantischen Tokens.
+---
 
 ## QA-Stand
 
-Getestet (Chromium): 320 / 375 / 390 / 430 / 768 / 1024 / 1280 / 1440 / 1920 – kein horizontales Scrollen, keine Console-Fehler, Mobile-Navigation (Fokus, Scroll-Lock, Escape), Formular-Validierung, Reduced Motion, SEO-Head (Canonical, OG, JSON-LD: Organization/ProfessionalService, WebSite, BreadcrumbList; BlogPosting/CreativeWork sobald `placeholder: false`).
+Playwright, Chromium, Breiten 320 / 375 / 390 / 430 / 768 / 1024 / 1280 / 1440 / 1920:
+
+- kein horizontales Scrollen auf keiner Seite
+- keine Konsolen- oder Laufzeitfehler
+- Mobile-Navigation (Fokusfalle, Scroll-Lock, Escape), FAQ-Accordion,
+  Branchen-Slider, Formular-Validierung, Zähler – alle geprüft
+- keine Touch-Fläche unter 40 px
+- JS aus / JS blockiert / Reduced Motion: 0 unsichtbare Elemente
+- SEO: ein `<h1>` je Seite, Canonical, OG, Twitter Cards, JSON-LD
+  (Organization/ProfessionalService, WebSite, BreadcrumbList, OfferCatalog,
+  Service, FAQPage – FAQPage bewusst nur auf `/pricing/` und `/webdesign-muenchen/`)
