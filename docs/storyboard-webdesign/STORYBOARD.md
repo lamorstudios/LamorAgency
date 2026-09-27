@@ -20,7 +20,7 @@
 ## Shots
 
 ### 01 · Signal — 0:00–0:02 (2,0 s)
-![Shot 01](https://d8j0ntlcm91z4.cloudfront.net/user_37fYL4bggs7IW7dvFbpi4QuQCgR/hf_20260927_114425_2d4dc9d0-ade7-41d4-8a6a-85c9a230049e.png)
+![Shot 01](frames/shot-01-signal.jpg)
 - **Bild:** Schwarzes Void, ein rot-oranger Text-Cursor blinkt im Zentrum.
 - **Motion:** 2× Blink auf Beat 1 + 3, auf Beat 4 schießt eine Laserlinie nach links und rechts bis an den Bildrand (Ease: expo-out, 8 Frames).
 - **Kamera:** Statisch, minimaler Push-in 100 → 104 %.
@@ -29,7 +29,7 @@
 - **Video-Prompt:** *Tiny glowing red-orange cursor blinks twice in a black void, then fires a thin laser line that stretches to both frame edges at high speed, subtle haze, slow push-in, minimal premium motion design.*
 
 ### 02 · Grid — 0:02–0:05 (3,0 s)
-![Shot 02](https://d8j0ntlcm91z4.cloudfront.net/user_37fYL4bggs7IW7dvFbpi4QuQCgR/hf_20260927_114425_e7daff4e-1728-46c6-95f2-1bbd16dbbedf.png)
+![Shot 02](frames/shot-02-grid.jpg)
 - **Bild:** 12-Spalten-Raster zeichnet sich in Perspektive, Wireframe-Boxen für Header, Hero, Cards.
 - **Motion:** Linien schreiben sich stroke-by-stroke (Stagger 2 Frames pro Linie), Maßketten und Koordinaten-Labels ploppen auf jedem 1/8-Beat.
 - **Kamera:** Schneller Dolly-back + 15° Tilt, das Raster kippt in die Tiefe.
@@ -38,7 +38,7 @@
 - **Video-Prompt:** *Glowing red-orange vector lines rapidly draw a 12-column website wireframe grid in perspective on black, measurement ticks and labels popping in, camera dollies back and tilts, speed trails, technical and precise.*
 
 ### 03 · Wireframe → Design — 0:05–0:08 (3,0 s)
-![Shot 03](https://d8j0ntlcm91z4.cloudfront.net/user_37fYL4bggs7IW7dvFbpi4QuQCgR/hf_20260927_114425_88c52880-c41a-4bcf-bcd8-ff1736246862.png)
+![Shot 03](frames/shot-03-wireframe-design.jpg)
 - **Bild:** Schwebendes Browserfenster; links noch Wireframe, rechts fertige LAMOR-Seite (Paper, riesiges „LAMOR“, rot-oranger Akzentblock).
 - **Motion:** Eine glühende Naht wandert von links nach rechts und „rendert“ das Design, Partikel lösen sich an der Kante.
 - **Kamera:** Orbit 20° um das Fenster, leichter Parallax.
@@ -47,7 +47,7 @@
 - **Video-Prompt:** *A floating tilted browser window; a glowing red-orange seam sweeps across it, transforming red-orange wireframe lines into a finished editorial website with a huge wide black headline on off-white, particles at the seam, slow orbit camera.*
 
 ### 04 · Typo Smash — 0:08–0:10 (2,0 s)
-![Shot 04](https://d8j0ntlcm91z4.cloudfront.net/user_37fYL4bggs7IW7dvFbpi4QuQCgR/hf_20260927_114425_35caad5f-2704-4fa5-a035-6c236c73b81c.png)
+![Shot 04](frames/shot-04-typo-smash.jpg)
 - **Bild:** „WEBDESIGN“ in Archivo 118 % Breite, auf Rot-Orange, in Streifen geschnitten.
 - **Motion:** Drop auf Beat 17: Wort rast diagonal durchs Bild, Streifen versetzen sich (Slice-Offset), ein Streifen invertiert schwarz. Hard Stop + 2 Frames Hold, dann Weiterfahrt.
 - **Kamera:** 2D, Camera-Shake 3 Frames auf dem Drop.
@@ -56,7 +56,7 @@
 - **Video-Prompt:** *Giant ultra-wide bold word WEBDESIGN slices diagonally across a hot red-orange frame at high speed, letters split into horizontal strips that offset and snap back, one strip inverted black, heavy motion blur, kinetic typography.*
 
 ### 05 · Exploded Layers — 0:10–0:14 (4,0 s)
-![Shot 05](https://d8j0ntlcm91z4.cloudfront.net/user_37fYL4bggs7IW7dvFbpi4QuQCgR/hf_20260927_114425_0e5187c8-77c8-469a-9c05-c09ee94f7c69.png)
+![Shot 05](frames/shot-05-exploded-layers.jpg)
 - **Bild:** Axonometrische Explosionsansicht: Nav, Hero, Cards, Buttons, Footer als Glasebenen.
 - **Motion:** Ebenen fahren aus einer flachen Seite auseinander (Stagger 3 Frames), rot-orange Verbindungslinien pulsieren auf jedem Beat.
 - **Kamera:** Langsamer Crane-Up + Orbit 30°, Tiefenschärfe wandert von Nav bis Footer.
@@ -65,7 +65,7 @@
 - **Video-Prompt:** *Exploded axonometric view of a website, translucent glass layers (navigation, hero, card grid, footer) separating in depth with glowing red-orange edges, camera cranes up and orbits, rack focus through the layers, volumetric light.*
 
 ### 06 · The Click — 0:14–0:16 (2,0 s)
-![Shot 06](https://d8j0ntlcm91z4.cloudfront.net/user_37fYL4bggs7IW7dvFbpi4QuQCgR/hf_20260927_114425_cce735cd-245a-4214-bbf8-1c12a1b4a644.png)
+![Shot 06](frames/shot-06-click.jpg)
 - **Bild:** Makro: 3D-Pointer klickt Button „START PROJECT“, rot-orange Schockwelle.
 - **Motion:** Speed-Ramp: Pointer rast heran (100 %) → Klick in Zeitlupe (20 %) → Schockwelle zurück auf 100 %.
 - **Kamera:** Extreme Macro, Rack Focus vom Pointer auf den Button.
@@ -74,7 +74,7 @@
 - **Video-Prompt:** *Extreme macro of a glossy white 3D mouse pointer clicking a red-orange pill button labeled START PROJECT, speed ramp into slow motion on the click, circular red-orange shockwave and particles burst outward, rack focus, black background.*
 
 ### 07 · Infinite Scroll — 0:16–0:19 (3,0 s)
-![Shot 07](https://d8j0ntlcm91z4.cloudfront.net/user_37fYL4bggs7IW7dvFbpi4QuQCgR/hf_20260927_114424_36d442bb-9a59-4436-b71d-6a2df037c8e7.png)
+![Shot 07](frames/shot-07-infinite-scroll.jpg)
 - **Bild:** Tunnel aus Website-Sektionen (Portfolio, Typo-Blöcke, Grids) mit rot-orangem Fluchtpunkt.
 - **Motion:** Hyperspeed nach vorne, Radial-Blur, Sektionen rotieren leicht um die Achse.
 - **Kamera:** FPV-Flug, leichter Barrel-Roll 10°.
@@ -83,7 +83,7 @@
 - **Video-Prompt:** *First-person hyper-speed flight through a tunnel made of website sections, portfolio images and bold typography streaking past with radial motion blur toward a bright red-orange vanishing point, slight barrel roll.*
 
 ### 08 · Every Screen — 0:19–0:22 (3,0 s)
-![Shot 08](https://d8j0ntlcm91z4.cloudfront.net/user_37fYL4bggs7IW7dvFbpi4QuQCgR/hf_20260927_114425_2c0c471b-7712-4fec-b2c0-b94137e8c276.png)
+![Shot 08](frames/shot-08-every-screen.jpg)
 - **Bild:** Phone, Tablet, Laptop im Orbit, alle zeigen dieselbe LAMOR-Seite.
 - **Motion:** Devices drehen sich im Orbit, das Layout reflowt live von Desktop auf Mobile.
 - **Kamera:** Ruhiger 360°-Orbit (Kontrast zum Tempo davor), weiche Schatten.
@@ -92,7 +92,7 @@
 - **Video-Prompt:** *Matte black smartphone, tablet and laptop floating in slow orbit in a seamless off-white studio, all screens showing the same minimalist editorial website with a wide black headline, layouts reflowing responsively, soft shadows.*
 
 ### 09 · Performance — 0:22–0:24 (2,0 s)
-![Shot 09](https://d8j0ntlcm91z4.cloudfront.net/user_37fYL4bggs7IW7dvFbpi4QuQCgR/hf_20260927_114427_5fb6be50-3d97-433c-9588-fd074a5ec324.png)
+![Shot 09](frames/shot-09-performance.jpg)
 - **Bild:** Rot-oranger Gauge-Ring, „100“ im Zentrum, Orbit-Labels PERFORMANCE · SEO · ACCESSIBILITY.
 - **Motion:** Ring füllt sich in 1,0 s, Zahl zählt 0 → 100 (tabular nums), Datenpartikel fliegen ins Zentrum. Auf Beat 48 Flash.
 - **Kamera:** Frontal, langsamer Push-in.
@@ -101,13 +101,7 @@
 - **Video-Prompt:** *A glowing red-orange circular gauge ring fills up while a big number counts up to 100 in the center, thin orbiting rings with labels PERFORMANCE, SEO, ACCESSIBILITY, data particles streaming inward, black background, slow push-in.*
 
 ### 10 · Preis — 0:24–0:27 (3,0 s)
-![Shot 10 – Variante A](https://d8j0ntlcm91z4.cloudfront.net/user_37fYL4bggs7IW7dvFbpi4QuQCgR/hf_20260927_114712_04ec3db7-789e-482d-b95a-f49a25f3980d.png)
-
-<details><summary>Variante B</summary>
-
-![Shot 10 – Variante B](https://d8j0ntlcm91z4.cloudfront.net/user_37fYL4bggs7IW7dvFbpi4QuQCgR/hf_20260927_114713_b91c4b1b-d9d0-4496-89ea-882a68b17b5e.png)
-
-</details>
+![Shot 10](frames/shot-10-preis.jpg)
 
 - **Bild:** Vollfläche Rot-Orange. Off-White, Archivo 118 %: klein „ab“, riesig „124,17 €“, darunter „im Monat“. Schwarze Linie unter dem Preis, unten links „LAMOR AGENCY — WEBDESIGN“.
 - **Motion:** Beat 49: Fläche flutet, „124,17 €“ slammt in Streifen geschnitten rein (Slice-Offset wie Shot 04) und rastet auf Beat 50 ein. Ziffern rollen kurz als Slot-Counter durch (tabular nums) und stoppen exakt auf 124,17. „ab“ und „im Monat“ per Text-Mask auf Beat 51. Danach 1,5 s ruhiger Hold, damit der Preis gelesen wird.
@@ -118,7 +112,7 @@
 - **Video-Prompt:** *A solid hot red-orange frame floods the screen, a giant ultra-wide bold off-white price 124,17 € slams in as horizontal slice strips that snap into place, digits briefly roll like a slot counter, small words ab and im Monat mask-reveal, micro camera shake then slow push-in, Swiss poster motion design.*
 
 ### 11 · End Card — 0:27–0:30 (3,0 s)
-![Shot 11](https://d8j0ntlcm91z4.cloudfront.net/user_37fYL4bggs7IW7dvFbpi4QuQCgR/hf_20260927_114425_548bea3e-88e3-4d35-b0f2-09affd60e2c6.png)
+![Shot 11](frames/shot-11-end-card.jpg)
 - **Bild:** Schwarz. „Feel the brand, / not the ad.“ – darunter „LAMOR AGENCY — WEBDESIGN“, rot-orange Linie.
 - **Motion:** Zeilen-Reveal per Text-Mask von unten (wie `<Words>` auf der Website), Stagger 4 Frames; die Linie zeichnet sich von links. Danach 1,5 s Hold.
 - **Kamera:** Statisch.
@@ -140,13 +134,13 @@
 | Shot | Higgsfield Job-ID |
 |---|---|
 | 01 | `2d4dc9d0-ade7-41d4-8a6a-85c9a230049e` |
-| 02 | `e7daff4e-1728-46c6-95f2-1bbd16dbbedf` |
+| 02 | `e7daff4e-1728-46c6-95f2-1bbd16dbbedf` (ohne Label: `f1b10be6-3c56-4626-863d-d16942b349bd`) |
 | 03 | `88c52880-c41a-4bcf-bcd8-ff1736246862` |
-| 04 | `35caad5f-2704-4fa5-a035-6c236c73b81c` |
+| 04 | `35caad5f-2704-4fa5-a035-6c236c73b81c` (ohne Label: `cae5b124-0ec3-4c67-8280-46349dfd645d`) |
 | 05 | `0e5187c8-77c8-469a-9c05-c09ee94f7c69` |
 | 06 | `cce735cd-245a-4214-bbf8-1c12a1b4a644` |
-| 07 | `36d442bb-9a59-4436-b71d-6a2df037c8e7` |
+| 07 | `36d442bb-9a59-4436-b71d-6a2df037c8e7` (ohne Overlays: `b314c675-c177-4fe9-8eb0-761272c3d9ac`) |
 | 08 | `2c0c471b-7712-4fec-b2c0-b94137e8c276` |
 | 09 | `5fb6be50-3d97-433c-9588-fd074a5ec324` |
-| 10 | A: `04ec3db7-789e-482d-b95a-f49a25f3980d` · B: `b91c4b1b-d9d0-4496-89ea-882a68b17b5e` |
+| 10 | `04ec3db7-789e-482d-b95a-f49a25f3980d` / `b91c4b1b-d9d0-4496-89ea-882a68b17b5e` (freigegebene Fassung als Upload `bab9545f-6710-4069-9068-eea2f52642e6`) |
 | 11 | `548bea3e-88e3-4d35-b0f2-09affd60e2c6` |
