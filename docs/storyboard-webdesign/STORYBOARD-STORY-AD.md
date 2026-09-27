@@ -18,3 +18,16 @@ Durchgehender Flug durch alle Frames (Kling 3.0, Start-/End-Frame-Übergänge wi
 ## Vor Schaltung prüfen
 - Vergleich „Andere“ (v. a. Variante 2B mit konkreten Behauptungen) werberechtlich prüfen oder neutraler beschriften.
 - „In 7 Tagen online“ und „Die Website gehört dir“ müssen belegbar sein. Laufzeit der Ratenzahlung bewusst nicht genannt.
+
+## Fertige Ad (v1)
+
+- **Mit Sound (Meta-Ad):** [lamor-storyad-9x16-10s-sound.mp4](https://d2ol7oe51mr4n9.cloudfront.net/user_37fYL4bggs7IW7dvFbpi4QuQCgR/bae04954-b827-4e2d-99ae-1ef2b0e7819c.mp4) · 1080×1920 · 10,0 s · 5,6 MB · −13,9 LUFS
+- **Ohne Ton:** [lamor-storyad-9x16-10s-silent.mp4](https://d2ol7oe51mr4n9.cloudfront.net/user_37fYL4bggs7IW7dvFbpi4QuQCgR/c98b30bf-2d06-46b7-a449-675ab617f9df.mp4) · 1080×1920 · 5,5 MB
+
+**Verwendete Frames:** 1B Preis → 2A Vergleich → 3B Raten (ohne Monatsangaben, Job `451942d0`) → 4B Deine Wahl → 5A Full Service → 6B Geräte + CTA.
+
+**Timeline:** Preis 0,0–0,8 s · Vergleich 1,8–2,9 s · Raten 3,9–4,7 s · Wahl 5,7–6,4 s · Full Service 7,4–8,2 s · Geräte + CTA 9,2–10,0 s; dazwischen je 1,0 s Kling-3.0-Übergang (3 s generiert, 3× beschleunigt).
+
+**Sound:** Ein einziger Gemini-Omni-Durchgang über die vollen 10 s (Limit des Modells; 15 s und 30 s schlagen fehl) → durchgehende Musik, keine Nahtstellen. Kurzzeit-Lautheit pro Sekunde zwischen −9,6 und −14,7 LUFS.
+
+**Kling-Übergänge:** `4c680eba` · `81e21635` · `d7abd8dc` · `00e31feb` · `a9c96a4b` · Sound-Job: `dedf9879`
