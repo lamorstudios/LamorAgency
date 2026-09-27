@@ -145,7 +145,13 @@
 | 10 | `04ec3db7-789e-482d-b95a-f49a25f3980d` / `b91c4b1b-d9d0-4496-89ea-882a68b17b5e` (freigegebene Fassung als Upload `bab9545f-6710-4069-9068-eea2f52642e6`) |
 | 11 | `548bea3e-88e3-4d35-b0f2-09affd60e2c6` |
 
-## Fertiger Film (v1)
+## Fertiger Film (v2, mit Sound)
+
+**Mit Musik & SFX:** [lamor-webdesign-hypermotion-30s-sound.mp4](https://d2ol7oe51mr4n9.cloudfront.net/user_37fYL4bggs7IW7dvFbpi4QuQCgR/b7692427-e95d-48db-a31f-784b1d47cea6.mp4) · AAC 256 kbit/s · −14 LUFS
+
+**Sound:** Per Code synthetisiert (numpy + sox in der Higgsfield-Sandbox), 120 BPM, A-Moll (Am–Am–F–G). SFX auf die gemessenen Bewegungsspitzen des Films gelegt: Cursor-Ticks + Laser-Zap (0–1,5 s), Whoosh Grid→Browser (3,3 s), Riser → Impact beim WEBDESIGN-Slam (6,3 s), Whooshes 8,5 / 12 s, Klick mit Vakuum-Moment (13 s), Doppler-Whooshes im Tunnel + Impact (14–16,1 s), ruhiger Teil mit Chimes und Pluck-Melodie (17,5–21 s), Counter-Ticks + Riser (20–22 s), Impact + „Ka-ching“ auf dem Preis (24,0 s), Schluss-Hit mit Hall (28,6 s).
+
+### Stumme Version (v1)
 
 **Datei:** [lamor-webdesign-hypermotion-30s.mp4](https://d2ol7oe51mr4n9.cloudfront.net/user_37fYL4bggs7IW7dvFbpi4QuQCgR/193aee80-99d9-44fc-b20b-47770c971d47.mp4) · 30,16 s · 1920×1080 · 25 fps · H.264 · ohne Ton
 
