@@ -42,6 +42,23 @@ const logoExternal = standalone.enabled && logoHref.startsWith('http');
     )}
 
     <div class="header__actions">
+      {standalone.enabled && (
+        /* Nur im Landingpage-Build: ruhiger Weg zurueck zur Hauptwebsite.
+           Bewusst als Textlink, nicht als Button – der primaere CTA daneben
+           bleibt das einzige hervorgehobene Element im Header. Oeffnet in
+           einem neuen Tab, damit die Anfrage auf dieser Seite nicht
+           verloren geht. */
+        <a
+          class="header__home"
+          href={standalone.mainSite}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span>{site.shortName}</span>
+          <svg class="header__home-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+          <span class="visually-hidden">(Hauptwebsite, öffnet in neuem Tab)</span>
+        </a>
+      )}
       <a href={cta.href} class="header__cta btn btn--ghost" data-magnetic>{cta.label}</a>
       {!standalone.enabled && (
       <button class="header__burger" type="button" aria-expanded="false" aria-controls="nav-overlay" data-nav-toggle>
@@ -161,6 +178,27 @@ const logoExternal = standalone.enabled && logoHref.startsWith('http');
   .header__cta { display: none; --btn-fg: currentColor; border-color: currentColor; min-height: 2.75rem; padding: 0.7em 1.3em; }
   .header__cta::before { background: var(--c-accent); }
   .header__cta:hover, .header__cta:focus-visible { color: #fff; border-color: var(--c-accent); }
+
+  /* STANDALONE: Verweis auf die Hauptwebsite. Leiser als der CTA – kein
+     Rahmen, keine Flaeche, kleinere Schrift, gedaempfte Farbe. Der Header
+     nutzt mix-blend-mode, deshalb currentColor statt fester Farbwerte. */
+  .header__home {
+    display: inline-flex; align-items: center; gap: 0.45em;
+    min-height: 44px; padding-inline: 0.15em;
+    font-family: var(--font-body); font-size: var(--fs-eyebrow);
+    font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase;
+    color: currentColor; opacity: 0.62; white-space: nowrap;
+    transition: opacity var(--dur-fast, 0.25s) var(--ease-out, ease);
+  }
+  .header__home:hover, .header__home:focus-visible { opacity: 1; }
+  .header__home-arrow { width: 0.75em; height: 0.75em; flex: none; transition: transform var(--dur-fast, 0.25s) var(--ease-out, ease); }
+  .header__home:hover .header__home-arrow { transform: translate(1.5px, -1.5px); }
+  /* Sehr schmale Geraete: nur das Kuerzel, damit neben der Wortmarke nichts
+     umbricht. Der vollstaendige Name steht fuer Screenreader weiterhin da. */
+  @media (max-width: 400px) {
+    .header__home { font-size: 0.62rem; gap: 0.35em; letter-spacing: 0.06em; }
+  }
 
   .header__burger { position: relative; width: 44px; height: 44px; display: grid; place-items: center; gap: 6px; align-content: center; }
   .header__burger-line { display: block; width: 26px; height: 1.5px; background: currentColor; transition: transform var(--dur-base) var(--ease-out); transform-origin: center; }
