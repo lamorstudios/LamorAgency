@@ -1,6 +1,6 @@
 # LAMOR AGENCY – Webdesign · Hyper Motion Storyboard
 
-**Format:** 30 s · 16:9 (1920×1080, 25 fps) · Cutdown 9:16 für Reels/TikTok
+**Format:** 30 s · 11 Shots · 16:9 (1920×1080, 25 fps) · Cutdown 9:16 für Reels/TikTok
 **Musik:** Dark Electronic / Hybrid Trailer, **120 BPM** → 1 Beat = 0,5 s, 1 Takt = 2 s. Alle Cuts liegen auf dem Beat.
 **Look:** Ink `#0a0a0a`, Paper `#f3f2ee`, Akzent **Rot-Orange `#ff4a1c`** (+ Deep Red `#d42a0a` für Verläufe/Schatten). Für dieses Video bewusst Rot-Orange statt dem Blau der Website – kein Blau im Bild. Typo: Archivo Variable, Headlines mit Breite 118 % (`--wd-mega`), Tracking −0.045em.
 **Claim:** *Feel the brand, not the ad.*
@@ -12,8 +12,8 @@
 |---|---|---|---|
 | I · Signal | 0:00–0:05 | 1–10 | Aus dem Nichts: ein Cursor, eine Linie, ein Raster. Webdesign beginnt mit Struktur. |
 | II · Build | 0:05–0:15 | 11–30 | Wireframe wird Design, Typo explodiert, die Website zerlegt sich in ihre Ebenen. |
-| III · Experience | 0:15–0:25 | 31–50 | Klick, Scroll, jedes Device. Die Seite fühlt sich an, statt nur auszusehen. |
-| IV · Payoff | 0:25–0:30 | 51–60 | Performance-Score, dann Stille und der Claim. |
+| III · Experience | 0:15–0:24 | 31–48 | Klick, Scroll, jedes Device, Performance. Die Seite fühlt sich an, statt nur auszusehen. |
+| IV · Payoff | 0:24–0:30 | 49–60 | Der Preis knallt rein, dann Stille und der Claim. |
 
 ---
 
@@ -91,19 +91,36 @@
 - **Übergang:** Hard Cut zurück auf Schwarz.
 - **Video-Prompt:** *Matte black smartphone, tablet and laptop floating in slow orbit in a seamless off-white studio, all screens showing the same minimalist editorial website with a wide black headline, layouts reflowing responsively, soft shadows.*
 
-### 09 · Performance — 0:22–0:25 (3,0 s)
+### 09 · Performance — 0:22–0:24 (2,0 s)
 ![Shot 09](https://d8j0ntlcm91z4.cloudfront.net/user_37fYL4bggs7IW7dvFbpi4QuQCgR/hf_20260927_114427_5fb6be50-3d97-433c-9588-fd074a5ec324.png)
 - **Bild:** Rot-oranger Gauge-Ring, „100“ im Zentrum, Orbit-Labels PERFORMANCE · SEO · ACCESSIBILITY.
-- **Motion:** Ring füllt sich in 1,5 s, Zahl zählt 0 → 100 (tabular nums), Datenpartikel fliegen ins Zentrum. Auf Beat 50 Flash.
+- **Motion:** Ring füllt sich in 1,0 s, Zahl zählt 0 → 100 (tabular nums), Datenpartikel fliegen ins Zentrum. Auf Beat 48 Flash.
 - **Kamera:** Frontal, langsamer Push-in.
-- **Sound:** Counter-Ticks, finaler Riser, Stille direkt nach dem Flash.
-- **Übergang:** Ring kollabiert zu einer Linie → wird zur Unterstreichung im End Card (Callback an Shot 01).
+- **Sound:** Counter-Ticks, finaler Riser.
+- **Übergang:** Ring kollabiert zu einer Linie, die auf Beat 49 aufreißt und die Fläche rot-orange flutet → Preis-Frame.
 - **Video-Prompt:** *A glowing red-orange circular gauge ring fills up while a big number counts up to 100 in the center, thin orbiting rings with labels PERFORMANCE, SEO, ACCESSIBILITY, data particles streaming inward, black background, slow push-in.*
 
-### 10 · End Card — 0:25–0:30 (5,0 s)
-![Shot 10](https://d8j0ntlcm91z4.cloudfront.net/user_37fYL4bggs7IW7dvFbpi4QuQCgR/hf_20260927_114425_548bea3e-88e3-4d35-b0f2-09affd60e2c6.png)
+### 10 · Preis — 0:24–0:27 (3,0 s)
+![Shot 10 – Variante A](https://d8j0ntlcm91z4.cloudfront.net/user_37fYL4bggs7IW7dvFbpi4QuQCgR/hf_20260927_114712_04ec3db7-789e-482d-b95a-f49a25f3980d.png)
+
+<details><summary>Variante B</summary>
+
+![Shot 10 – Variante B](https://d8j0ntlcm91z4.cloudfront.net/user_37fYL4bggs7IW7dvFbpi4QuQCgR/hf_20260927_114713_b91c4b1b-d9d0-4496-89ea-882a68b17b5e.png)
+
+</details>
+
+- **Bild:** Vollfläche Rot-Orange. Off-White, Archivo 118 %: klein „ab“, riesig „124,17 €“, darunter „im Monat“. Schwarze Linie unter dem Preis, unten links „LAMOR AGENCY — WEBDESIGN“.
+- **Motion:** Beat 49: Fläche flutet, „124,17 €“ slammt in Streifen geschnitten rein (Slice-Offset wie Shot 04) und rastet auf Beat 50 ein. Ziffern rollen kurz als Slot-Counter durch (tabular nums) und stoppen exakt auf 124,17. „ab“ und „im Monat“ per Text-Mask auf Beat 51. Danach 1,5 s ruhiger Hold, damit der Preis gelesen wird.
+- **Kamera:** 2D, Micro-Shake 2 Frames beim Einrasten, dann langsamer Push-in 100 → 103 %.
+- **Sound:** Impact + Kassen-/Slot-Tick beim Einrasten, Musik fällt danach auf Pad zurück.
+- **Übergang:** Die schwarze Linie unter dem Preis wandert zur Bildmitte, die Fläche wischt auf Schwarz → wird zur Linie im End Card.
+- **Text final:** Preis zwingend im Schnittprogramm mit echter Archivo setzen, Schreibweise „ab 124,17 € im Monat“ (Keyframe ist nur Layout-Referenz). Ggf. Fußnote „zzgl. MwSt.“ bzw. Laufzeit klein unten rechts ergänzen, falls rechtlich nötig.
+- **Video-Prompt:** *A solid hot red-orange frame floods the screen, a giant ultra-wide bold off-white price 124,17 € slams in as horizontal slice strips that snap into place, digits briefly roll like a slot counter, small words ab and im Monat mask-reveal, micro camera shake then slow push-in, Swiss poster motion design.*
+
+### 11 · End Card — 0:27–0:30 (3,0 s)
+![Shot 11](https://d8j0ntlcm91z4.cloudfront.net/user_37fYL4bggs7IW7dvFbpi4QuQCgR/hf_20260927_114425_548bea3e-88e3-4d35-b0f2-09affd60e2c6.png)
 - **Bild:** Schwarz. „Feel the brand, / not the ad.“ – darunter „LAMOR AGENCY — WEBDESIGN“, rot-orange Linie.
-- **Motion:** Zeilen-Reveal per Text-Mask von unten (wie `<Words>` auf der Website), Stagger 4 Frames; die Linie zeichnet sich von links. Danach 2 s Hold.
+- **Motion:** Zeilen-Reveal per Text-Mask von unten (wie `<Words>` auf der Website), Stagger 4 Frames; die Linie zeichnet sich von links. Danach 1,5 s Hold.
 - **Kamera:** Statisch.
 - **Sound:** Ein einzelner tiefer Hit, Hall-Ausklang, Stille.
 - **Text final:** Im Schnittprogramm mit echter Archivo setzen (die KI-Typo im Keyframe ist nur Layout-Referenz). URL `lamoragency.de` klein unten rechts.
@@ -116,7 +133,7 @@
 2. **Typo nachbauen:** Shots 04 und 10 zusätzlich als echte Motion-Typo (After Effects / Higgsedit) mit Archivo, damit Schriftbild und Schreibweise exakt stimmen.
 3. **Schnitt auf 120 BPM:** Marker alle 0,5 s, Cuts wie oben. Speed-Ramps in 06 und 04.
 4. **Grade:** Schwarz nicht unter `#0a0a0a` crushen, Akzent auf `#ff4a1c` kalibrieren, keine Blautöne, feines Filmkorn über alles.
-5. **9:16-Cutdown (15 s):** Shots 01 → 04 → 06 → 07 → 09 → 10, Typo zentriert, Safe Zones für UI oben/unten beachten.
+5. **9:16-Cutdown (15 s):** Shots 01 → 04 → 06 → 07 → 10 (Preis, voll 3 s) → 11, Typo zentriert, Safe Zones für UI oben/unten beachten.
 
 ## Keyframe-Quellen
 
@@ -131,4 +148,5 @@
 | 07 | `36d442bb-9a59-4436-b71d-6a2df037c8e7` |
 | 08 | `2c0c471b-7712-4fec-b2c0-b94137e8c276` |
 | 09 | `5fb6be50-3d97-433c-9588-fd074a5ec324` |
-| 10 | `548bea3e-88e3-4d35-b0f2-09affd60e2c6` |
+| 10 | A: `04ec3db7-789e-482d-b95a-f49a25f3980d` · B: `b91c4b1b-d9d0-4496-89ea-882a68b17b5e` |
+| 11 | `548bea3e-88e3-4d35-b0f2-09affd60e2c6` |
