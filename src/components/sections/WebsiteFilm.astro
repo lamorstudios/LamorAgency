@@ -78,7 +78,7 @@ if (film.available && !gleicheZahl(rateLautDaten, RATE_IM_FILM)) {
       disablepictureinpicture
       aria-hidden="true"
       tabindex="-1"
-      data-cinematic
+      data-loop-video
     >
       {film.webm && <source src={film.webm} type="video/webm" />}
       {film.mp4 && <source src={film.mp4} type="video/mp4" />}
@@ -116,33 +116,9 @@ if (film.available && !gleicheZahl(rateLautDaten, RATE_IM_FILM)) {
 </style>
 
 <script>
-  /**
-   * Der Film laeuft auch ohne diese Datei: autoplay, muted, loop und
-   * playsinline stehen im HTML. Was hier passiert, ist reine Zugabe.
-   *
-   * 1. play() nachfassen. Einige Browser lehnen den ersten Versuch ab
-   *    (iOS im Stromsparmodus, restriktive Einstellungen). Dann bleibt das
-   *    Posterbild stehen – kein Fehler, nur kein Film.
-   * 2. Ausserhalb des Sichtfelds pausieren. Ein 30-Sekunden-Video, das im
-   *    Hintergrund weiterlaeuft, kostet Akku und Daten ohne jeden Nutzen.
-   *    Sichtbar wird immer weitergespielt, niemand muss etwas anklicken.
-   */
-  function initCinematic() {
-    const video = document.querySelector<HTMLVideoElement>('[data-cinematic]');
-    if (!video || (video as any).__init) return;
-    (video as any).__init = true;
-
-    const spielen = () => video.play?.().catch(() => { /* Poster bleibt. */ });
-    spielen();
-
-    if (!('IntersectionObserver' in window)) return;
-    const io = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) spielen(); else video.pause(); },
-      { threshold: 0.01 },
-    );
-    io.observe(video);
-  }
-
-  initCinematic();
-  document.addEventListener('astro:page-load', initCinematic);
+  // Autoplay, Schleife und playsinline stehen im HTML – das hier pausiert
+  // den Film nur ausserhalb des Sichtfelds und fasst play() nach.
+  // Gemeinsam mit dem Video im Smartphone-Mockup, siehe scripts/loop-video.ts
+  import { watchLoopVideos } from '@/scripts/loop-video';
+  watchLoopVideos();
 </script>

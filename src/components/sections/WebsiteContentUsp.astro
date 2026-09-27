@@ -3,12 +3,21 @@
  * Der stärkste Unterschied zu einer reinen Webdesign-Agentur:
  * LAMOR baut nicht nur die Seite, sondern produziert auch, was darauf zu sehen ist.
  */
-import Media from '@/components/Media.astro';
+import PhoneMockup from '@/components/PhoneMockup.astro';
 import Words from '@/components/Words.astro';
 import { websiteBundles } from '@/data/website-pricing';
+import { videoSlot } from '@/lib/media-slots';
 
 const bundle = websiteBundles.find((b) => b.id === 'website-content');
 const roles = ['Fotograf', 'Videograf', 'Webdesigner', 'Grafiker'];
+
+/**
+ * Das Hochformat-Video fuer das Smartphone-Mockup. Liegt die Datei nicht in
+ * /public/media, rendert das Mockup nichts – der Abschnitt bleibt dann ohne
+ * Medienspalte stehen statt mit einer leeren Flaeche. Anleitung:
+ * public/media/README.md
+ */
+const mobil = videoSlot('mobile');
 ---
 <section class="wu section" data-theme="accent" data-bg="accent" aria-labelledby="wu-title">
   <div class="container">
@@ -43,11 +52,9 @@ const roles = ['Fotograf', 'Videograf', 'Webdesigner', 'Grafiker'];
       </div>
 
       <div class="wu__media" data-reveal="fade" style="--reveal-delay:280ms">
-        <Media
-          media={{ type: 'placeholder', alt: 'Foto- und Videoproduktion für eine Website', label: '[WEBDESIGN] Content-Produktion' }}
-          ratio="square"
-          reveal
-          sizes="(min-width: 1024px) 40vw, 100vw"
+        <PhoneMockup
+          video={mobil}
+          alt="Kurzfilm zum Website-Angebot von LAMOR AGENCY, abgespielt auf einem Smartphone"
         />
       </div>
     </div>
@@ -60,7 +67,11 @@ const roles = ['Fotograf', 'Videograf', 'Webdesigner', 'Grafiker'];
   .wu__title { margin-bottom: var(--space-8); max-width: 14ch; }
 
   .wu__grid { display: grid; gap: var(--space-7); align-items: start; }
-  @media (min-width: 1024px) { .wu__grid { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--space-8); } }
+  @media (min-width: 1024px) { .wu__grid { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: var(--space-8); align-items: center; } }
+
+  /* Das Smartphone ist der Blickfang des Abschnitts: mittig gesetzt, mit
+     etwas Luft nach aussen, damit die leichte Drehung nirgends anstoesst. */
+  .wu__media { display: flex; align-items: flex-start; justify-content: center; padding-inline: 0.5rem; }
 
   .wu__lead { max-width: 40ch; }
   .wu__body { margin-top: var(--space-4); max-width: 54ch; color: rgba(255, 255, 255, 0.82); }

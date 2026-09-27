@@ -68,3 +68,34 @@ Text. Ändert sich der Einstiegspreis oder die längste Laufzeit in
 `src/data/website-pricing.ts`, stimmt der Film nicht mehr und muss neu
 gerendert werden. Der Build meldet das: `WebsiteFilm.astro` vergleicht die
 Zahl beim Bauen und schreibt eine Warnung ins Log, sobald sie abweicht.
+
+## Mobile-Showcase im orangen Abschnitt („Website + Content")
+
+    mobile.mp4          das Hochformat-Video (Pflicht)
+    mobile.webm         optional, VP9 – wird bevorzugt, wenn vorhanden
+    mobile-poster.jpg   Standbild
+
+Läuft im CSS-Smartphone-Mockup (`src/components/PhoneMockup.astro`). Liegt
+keine Videodatei hier, rendert das Mockup nichts – der Abschnitt bleibt
+stehen, nur ohne Medienspalte.
+
+Aktuell: 1080×1920 (9:16), H.264, 30 fps, 10 s, 5,3 MB. Der Bildstrom wurde
+**nicht neu kodiert** (MD5 der Videospur vor und nach der Bearbeitung
+identisch); entfernt wurde nur die AAC-Tonspur, und das moov-Atom liegt
+jetzt vorne.
+
+### Seitenverhältnis: 9:16, nicht 19,5:9
+
+Die Displayfläche des Mockups hat exakt das Verhältnis des Videos. Ein
+modernes iPhone ist schmaler (19,5:9); bei diesem Verhältnis würde
+`object-fit: cover` links und rechts je rund 11 % wegschneiden – und genau
+dort stehen im Video die Überschriften und die Vergleichstabelle. Deshalb
+folgt die Aussparung dem Material, nicht dem Gerät. Wer ein Video mit
+anderem Verhältnis einsetzt, gibt es dem Mockup über `ratio` mit.
+
+### Warum zwei Videodateien
+
+`cinematic.mp4` (Querformat, 30 s) und `mobile.mp4` (Hochformat, 10 s) sind
+unterschiedliche Filme mit unterschiedlichem Inhalt – keine zwei Fassungen
+desselben Materials. Jede Datei wird auf der Seite genau einmal eingebunden
+und nur geladen, wenn ihr Abschnitt ins Sichtfeld kommt.
