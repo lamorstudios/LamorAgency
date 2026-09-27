@@ -5,7 +5,7 @@
  * muss nichts über die übrigen Leistungen wissen, um anfragen zu können.
  *
  * Aufbau: Hero → Pakete → Rechner → Zahlungsfortschritt → nach der Zahlung →
- * Leistungen → Problem/Lösung → Referenzen → Vorteile → Prozess →
+ * Leistungen → Problem/Lösung → Referenzen → Film → Vorteile → Prozess →
  * Kombinationen → Website+Content → FAQ → Formular → finaler CTA.
  */
 import BaseLayout from '@/layouts/BaseLayout.astro';
@@ -22,6 +22,7 @@ import WebsiteAfter from '@/components/sections/WebsiteAfter.astro';
 import WebsiteNot from '@/components/sections/WebsiteNot.astro';
 import WebsiteBundles from '@/components/sections/WebsiteBundles.astro';
 import WebsiteShowcase from '@/components/sections/WebsiteShowcase.astro';
+import WebsiteFilm from '@/components/sections/WebsiteFilm.astro';
 import WebsiteContentUsp from '@/components/sections/WebsiteContentUsp.astro';
 import WebsiteLeadForm from '@/components/sections/WebsiteLeadForm.astro';
 import Testimonials from '@/components/sections/Testimonials.astro';
@@ -59,6 +60,10 @@ const description = `Webdesign aus ${site.address.city}: individuelle Websites a
       Der Schalter liegt zentral in src/data/website-showcase.ts. Nichts an
       der Komponente oder den Daten ist entfernt. */}
   {showWebsiteShowcase && <WebsiteShowcase />}
+
+  {/* Produktfilm als eigener Cinematic-Band ueber die volle Breite.
+      Rendert nur, wenn /public/media/cinematic.mp4 vorliegt. */}
+  <WebsiteFilm />
 
   <WebsiteValue />
   <WebsiteProcess />

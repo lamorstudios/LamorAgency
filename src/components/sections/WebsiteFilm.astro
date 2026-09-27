@@ -1,0 +1,148 @@
+---
+/**
+ * CINEMATIC FILM – der Produktfilm als eigener Abschnitt der Landingpage.
+ *
+ * WAS DIESER ABSCHNITT IST
+ * Ein fester Band ueber die volle Breite, in dem der Film laeuft. Keine Card,
+ * keine Overlays, keine Scroll- oder Hover-Effekte, keine Bedienelemente. Der
+ * Film ist der Inhalt – die Flaeche drumherum macht nichts weiter, als ihn
+ * nicht zu stoeren.
+ *
+ * SEITENVERHAELTNIS
+ * Die Flaeche ist fest 16:9 – exakt das Verhaeltnis der Datei (1920x1080).
+ * Dadurch wird nichts beschnitten, auch auf dem Handy nicht, und es entsteht
+ * kein Layoutsprung beim Laden: der Platz steht, bevor das erste Byte da ist.
+ *
+ * AUTOPLAY UND SCHLEIFE
+ * autoplay + muted + playsinline + loop. Ohne Ton, weil Browser Autoplay nur
+ * dann zuverlaessig erlauben; die Datei hat ohnehin keine Tonspur. Es gibt
+ * bewusst keinen Play-Knopf: niemand soll etwas druecken muessen.
+ *
+ * ASSET-SLOT: Die Dateien werden zur Build-Zeit in /public/media gesucht
+ * (cinematic.mp4 / cinematic.webm / cinematic-poster.jpg). Liegt keine davon
+ * dort, rendert der Abschnitt gar nichts – die Seite bleibt vollstaendig und
+ * es entsteht keine leere schwarze Flaeche. Anleitung: public/media/README.md
+ *
+ * PERFORMANCE
+ * preload="metadata" statt "auto": der Browser holt zuerst nur den Kopf der
+ * Datei. Die eigentlichen Bilddaten laedt er erst, wenn der Abschnitt in die
+ * Naehe des Sichtfelds kommt – wer nie so weit scrollt, laedt den Film nie.
+ * Das Posterbild (erstes Frame, ~20 KB) steht solange. Zusaetzlich pausiert
+ * das Video ausserhalb des Sichtfelds, das spart Akku und Datenvolumen.
+ */
+import { lowestRate, euroRate } from '@/data/website-pricing';
+import { videoSlot } from '@/lib/media-slots';
+
+const film = videoSlot('cinematic');
+
+/**
+ * PREIS-WAECHTER
+ *
+ * Im Film ist "ab 124,17 € im Monat" fest eingebrannt – als Bild, nicht als
+ * Text. Aendert sich der Einstiegspreis oder die laengste Laufzeit in
+ * website-pricing.ts, zieht die Website automatisch nach, der Film aber
+ * nicht: dann wirbt die Seite sichtbar mit einer Zahl, die nicht mehr
+ * stimmt. Das faellt beim Bauen sonst niemandem auf.
+ *
+ * Deshalb diese Pruefung. Sie aendert nichts und bricht nichts ab, sie
+ * meldet sich nur im Build-Log, sobald die beiden Zahlen auseinanderlaufen.
+ * Dann muss der Film neu gerendert werden – im Code laesst sich das nicht
+ * reparieren.
+ */
+const RATE_IM_FILM = '124,17 €';
+/** Intl setzt ein geschuetztes Leerzeichen vor das Euro-Zeichen – hier egal. */
+const gleicheZahl = (a: string, b: string) => a.replace(/\s/g, ' ') === b.replace(/\s/g, ' ');
+const rateLautDaten = euroRate(lowestRate);
+if (film.available && !gleicheZahl(rateLautDaten, RATE_IM_FILM)) {
+  console.warn(
+    `[WebsiteFilm] Der Film zeigt "${RATE_IM_FILM}", die Preisdaten ergeben `
+    + `aber "${rateLautDaten}". Der Film muss neu gerendert werden – `
+    + 'oder dieser Abschnitt bleibt vorerst draussen.',
+  );
+}
+---
+{film.available && (
+  <section class="cf" data-theme="dark" data-bg="dark" aria-labelledby="cf-title">
+    {/* Ueberschrift nur fuer Screenreader und die Dokumentstruktur: sichtbar
+        soll hier nichts ueber dem Film liegen. */}
+    <h2 class="visually-hidden" id="cf-title">Produktfilm: Webdesign von LAMOR AGENCY</h2>
+
+    <video
+      class="cf__video"
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="metadata"
+      poster={film.poster}
+      disablepictureinpicture
+      aria-hidden="true"
+      tabindex="-1"
+      data-cinematic
+    >
+      {film.webm && <source src={film.webm} type="video/webm" />}
+      {film.mp4 && <source src={film.mp4} type="video/mp4" />}
+    </video>
+  </section>
+)}
+
+<style>
+  /* Voller Bildschirmbreite: die Section ist selbst kein Container, also
+     liegt hier bewusst kein .container und kein Innenabstand. */
+  .cf {
+    position: relative;
+    width: 100%;
+    /* Fester Platz fuer 16:9 – reserviert die Hoehe vor dem Laden. */
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    /* Der Film beginnt und endet fast schwarz. Der gleiche Grund darunter
+       laesst Anfang und Schleifensprung nahtlos wirken. */
+    background: var(--c-ink);
+    /* Kein line-height-Rest unter dem Video. */
+    line-height: 0;
+  }
+
+  .cf__video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    /* Flaeche und Datei haben dasselbe Verhaeltnis – cover schneidet hier
+       nichts ab, verhindert aber Haarlinien durch Rundungsreste. */
+    object-fit: cover;
+  }
+
+  /* Ausdruecklich kein Hover-, Fokus- oder Scroll-Verhalten: der Film soll
+     sich nicht veraendern, wenn die Maus darueberfaehrt. */
+</style>
+
+<script>
+  /**
+   * Der Film laeuft auch ohne diese Datei: autoplay, muted, loop und
+   * playsinline stehen im HTML. Was hier passiert, ist reine Zugabe.
+   *
+   * 1. play() nachfassen. Einige Browser lehnen den ersten Versuch ab
+   *    (iOS im Stromsparmodus, restriktive Einstellungen). Dann bleibt das
+   *    Posterbild stehen – kein Fehler, nur kein Film.
+   * 2. Ausserhalb des Sichtfelds pausieren. Ein 30-Sekunden-Video, das im
+   *    Hintergrund weiterlaeuft, kostet Akku und Daten ohne jeden Nutzen.
+   *    Sichtbar wird immer weitergespielt, niemand muss etwas anklicken.
+   */
+  function initCinematic() {
+    const video = document.querySelector<HTMLVideoElement>('[data-cinematic]');
+    if (!video || (video as any).__init) return;
+    (video as any).__init = true;
+
+    const spielen = () => video.play?.().catch(() => { /* Poster bleibt. */ });
+    spielen();
+
+    if (!('IntersectionObserver' in window)) return;
+    const io = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) spielen(); else video.pause(); },
+      { threshold: 0.01 },
+    );
+    io.observe(video);
+  }
+
+  initCinematic();
+  document.addEventListener('astro:page-load', initCinematic);
+</script>
