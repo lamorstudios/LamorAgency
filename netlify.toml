@@ -39,3 +39,30 @@
   from = "/contact-1"
   to = "/contact/"
   status = 301
+
+# Wix-Blog: Artikel lagen unter /post/<slug>, Kategorien/Seiten unter /blog/…
+# Bis die Artikel migriert sind, auf die Blog-Übersicht leiten. Sobald ein Artikel
+# mit gleichem Slug existiert, gezielt davor eintragen, z. B.:
+# [[redirects]]
+#   from = "/post/professionelle-fotografie-für-ihre-marke-moderne-fotografie-dienstleistungen"
+#   to = "/blog/<neuer-slug>/"
+#   status = 301
+[[redirects]]
+  from = "/post/*"
+  to = "/blog/"
+  status = 301
+
+[[redirects]]
+  from = "/blog/categories/*"
+  to = "/blog/"
+  status = 301
+
+[[redirects]]
+  from = "/blog/page/*"
+  to = "/blog/"
+  status = 301
+
+[[redirects]]
+  from = "/blog/hashtags/*"
+  to = "/blog/"
+  status = 301
