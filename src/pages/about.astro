@@ -15,7 +15,7 @@ import { breadcrumb } from '@/lib/schema';
 const team = [1, 2, 3].map((n) => ({ name: `Teammitglied 0${n}`, role: 'Rolle folgt', media: { type: 'placeholder' as const, label: 'TEAM PHOTO', alt: '', ratio: 'portrait' as const } }));
 const ph = (label: string, ratio: 'wide' | 'portrait' | 'square' | 'cinema' = 'wide') => ({ type: 'placeholder' as const, label, alt: '', ratio });
 ---
-<BaseLayout title="About – Creative Studio München" description={`LAMOR AGENCY ist ein Creative Studio aus ${site.address.city} für Social Media, Content Creation, Film, Fotografie, Branding, Grafikdesign und Webdesign.`} jsonLd={[breadcrumb([{ name: 'About', path: '/about/' }])]}>
+<BaseLayout title="Über uns – Kreativagentur München" description={`LAMOR AGENCY ist ein Creative Studio aus ${site.address.city} für Social Media, Content Creation, Film, Fotografie, Branding, Grafikdesign und Webdesign.`} jsonLd={[breadcrumb([{ name: 'About', path: '/about/' }])]}>
   <PageHeader kicker="Über uns" title="About" titleLines={['Creative Studio', `aus ${site.address.city}.`]} lead="Social Media, Film, Branding und Design – aus einem Studio, mit einer Haltung." meta={site.claim} />
 
   <section class="about-intro container" aria-label="Einführung">
