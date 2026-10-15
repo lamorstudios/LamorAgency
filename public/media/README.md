@@ -99,3 +99,53 @@ anderem Verhältnis einsetzt, gibt es dem Mockup über `ratio` mit.
 unterschiedliche Filme mit unterschiedlichem Inhalt – keine zwei Fassungen
 desselben Materials. Jede Datei wird auf der Seite genau einmal eingebunden
 und nur geladen, wenn ihr Abschnitt ins Sichtfeld kommt.
+
+## Erklärfilme der Startseite
+
+Die vier Schwerpunkte auf der Startseite zeigen je einen Erklärfilm. Der
+Dateiname folgt dem Slug aus `src/data/services.ts`:
+
+    erklaerfilm-video-production.mp4    Videografie
+    erklaerfilm-motion-graphics.mp4     Motion Graphics
+    erklaerfilm-branding.mp4            Branding & Design
+    erklaerfilm-web-design.mp4          Webdesign
+
+Optional je Film zusätzlich:
+
+    erklaerfilm-<slug>.webm             VP9, wird bevorzugt
+    erklaerfilm-<slug>-poster.jpg       Standbild, erstes Frame
+
+Nichts umschalten: Datei ablegen, neu bauen, der Film läuft. Fehlt ein
+Film, zeigt der Block an seiner Stelle eine ruhige dunkle Fläche mit der
+Ordnungszahl der Disziplin – kein Hinweistext, kein „Video folgt", nichts,
+was nach fehlendem Inhalt aussieht.
+
+### Richtwerte
+
+| | |
+|---|---|
+| Format | 16:9, 1920×1080 |
+| Länge | 20–60 s, möglichst sauber loopend |
+| Ton | wird nicht abgespielt, Tonspur kann entfallen |
+| Größe | 4–8 MB je Film |
+| Codec | H.264, moov-Atom vorne (`-movflags +faststart`) |
+
+Die Filme laden erst, wenn ihr Block ins Sichtfeld kommt (`preload="none"`),
+und pausieren außerhalb. Vier Filme auf der Startseite kosten deshalb keinen
+einzigen Byte beim ersten Seitenaufruf.
+
+## Hero-Video der Startseite
+
+    hero.mp4 / hero.webm / hero-poster.jpg
+
+Liegt aktuell **nicht** im Projekt. Solange die Datei fehlt, zeigt der Hero
+seine Platzhalter-Fläche. Richtwerte stehen oben im Abschnitt „Hero-Video".
+
+## Showreel
+
+    showreel.mp4 / showreel.webm / showreel-poster.jpg
+
+Liegt die Datei nicht vor, wird der Showreel-Abschnitt auf der Startseite
+**komplett ausgelassen** – lieber eine Section weniger als eine leere
+Fläche mit `[SHOWREEL]` darauf. Datei ablegen, neu bauen, der Abschnitt
+ist zurück.

@@ -6,15 +6,21 @@
  * und Aussage (eine Zeile) in einem Block. Kein langer Text: hier soll das
  * Material sprechen, aber der Besucher muss trotzdem wissen, was er sieht.
  *
- * Bestehendes Showreel eintragen (kein Stock):
- *   reel = { type: 'video', src: '/media/showreel.mp4',
- *            poster: '/src/assets/brand/showreel-poster.jpg', alt: '…' }
+ * ASSET-SLOT: Der Reel wird zur Build-Zeit in /public/media gesucht
+ * (showreel.mp4 / showreel.webm / showreel-poster.jpg). Liegt keine Datei
+ * dort, rendert dieser Abschnitt GAR NICHTS – lieber eine Section weniger
+ * als eine Platzhalterflaeche mit "[SHOWREEL]" auf einer Kundenseite.
+ * Datei ablegen, neu bauen, der Abschnitt ist zurueck.
+ * Anleitung: public/media/README.md
  */
 import Media from '@/components/Media.astro';
+import { videoSlot } from '@/lib/media-slots';
 
-const reel = { type: 'placeholder' as const, alt: 'LAMOR AGENCY Showreel 2026', label: '[SHOWREEL] Reel 2026' };
+const slot = videoSlot('showreel');
+const reel = { type: 'video' as const, src: slot.mp4, poster: slot.poster, alt: 'LAMOR AGENCY Showreel' };
 const kinds = ['Commercial', 'Social', 'Music', 'Event', 'Real Estate'];
 ---
+{slot.available && (
 <section class="rl" data-theme="dark" data-bg="dark" aria-labelledby="rl-title">
   <div class="container">
     <div class="rl__card">
@@ -42,6 +48,7 @@ const kinds = ['Commercial', 'Social', 'Music', 'Event', 'Real Estate'];
     </div>
   </div>
 </section>
+)}
 
 <style>
   .rl { padding-block: clamp(2rem, 5vw, 4rem) clamp(2.5rem, 6vw, 5rem); }

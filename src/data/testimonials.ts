@@ -25,14 +25,21 @@ export interface Testimonial {
 
 export const testimonials: Testimonial[] = [
   {
-    // TODO_QUOTE: Originalwortlaut von der bestehenden Website einsetzen,
-    // danach verified auf true setzen. Bis dahin wird dieser Eintrag
-    // bewusst nicht ausgespielt.
-    quote: '',
+    /**
+     * Wortlaut im Original von der bestehenden Website lamoragency.de
+     * uebernommen (Stand Oktober 2026). Inhaltlich unveraendert; lediglich
+     * zwei Leerzeichen vor Kommata wurden entfernt, die dort offensichtlich
+     * Tippfehler sind. Keine Glaettung, keine Kuerzung, keine Umformulierung.
+     */
+    quote:
+      'Ich muss sagen, es wird in allen Richtungen abgeliefert. Sei es Grafiken, '
+      + 'Print Medien oder Strategy Planung, es wird einem immer geholfen. Habe bis '
+      + 'jetzt nur positive Erfahrungen gemacht und wir haben mit Lamor Agency schon '
+      + 'viele Lösungen für verschiedenste Probleme gefunden.',
     name: 'Georg Tengelidis',
     role: 'CEO',
-    company: 'Pitsburger München',
-    verified: false,
+    company: "Pit's Burger München",
+    verified: true,
   },
 ];
 
