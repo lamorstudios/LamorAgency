@@ -4,59 +4,43 @@
  * STARTSEITE
  * ============================================================================
  *
- * ZIEL DIESER REIHENFOLGE: Der Besucher soll nach zwei Bildschirmen wissen,
- * was er hier bekommt, und nach vier, warum ausgerechnet hier. Jeder Block
- * beantwortet genau eine Frage – und zwar in der Reihenfolge, in der sie im
- * Kopf des Besuchers auftaucht:
+ * SHOW, DON'T TELL. Acht Abschnitte, und sieben davon zeigen etwas, statt es
+ * zu beschreiben. Der Text auf dieser Seite hat genau eine Aufgabe: sagen,
+ * was man gerade sieht, und wo es weitergeht.
  *
- *   01 Hero            Wer seid ihr, und was macht ihr? Film, Botschaft, CTA.
- *   02 Featured on     Habt ihr das schon fuer jemanden gemacht, den ich kenne?
- *   03 Leistungen      Was genau bekomme ich – und was bringt mir das?
- *                      Der wichtigste Abschnitt: vier Disziplinen, jede mit
- *                      Erklaerfilm, Nutzenversprechen, drei Ergebnissen und
- *                      einem Satz Technik.
- *   04 Arbeiten        Zeigt her. Echte Projekte, keine Behauptungen.
- *   05 Showreel        Bewegtbild am Stueck (nur, wenn die Datei vorliegt).
- *   06 Technik         Koennt ihr das handwerklich? Werkzeug statt Adjektive.
- *   07 Ablauf          Wie laeuft das ab, wenn ich jetzt anfrage?
- *   08 Vergleich       Warum ihr und nicht drei einzelne Dienstleister?
- *   09 Stimmen         Sagt das auch jemand anderes als ihr selbst?
- *   10 Webdesign       Eigener Trichter fuer das Website-Produkt.
- *   11 Models          Eigener Trichter fuer Models & Talents.
- *   12 Preise          Woran bin ich preislich?
- *   13 FAQ             Die letzten Zweifel.
- *   14 Kontakt         Jetzt anfragen.
+ *   01 Hero         Film, vier Woerter, ein Knopf.
+ *   02 Kundenlogos  Eine ruhige Leiste. Wer schon mit uns gearbeitet hat.
+ *   03 Leistungen   Vier Disziplinen, je eine grosse Filmflaeche, je ein
+ *                   Satz. Der Film macht die Arbeit, nicht der Absatz.
+ *   04 Arbeiten     Horizontale Swipe-Galerie. Weitere Projekte liegen
+ *                   ausserhalb des Bildes und werden erwischt, nicht
+ *                   weggescrollt.
+ *   05 Technik      Logos. Keine Erklaerzeilen.
+ *   06 Ablauf       Drei Schritte.
+ *   07 Stimme       Eine echte Bewertung.
+ *   08 Kontakt      Der Abschluss.
  *
- * BEWUSST NICHT MEHR AUF DER STARTSEITE
- *   EditorialWork  – zeigte zwei leere Medienflaechen; die Erklaerfilme in
- *                    Block 03 machen dasselbe, nur mit echtem Inhalt.
- *   Clients        – doppelte sich mit "Featured on" direkt darueber.
- *   Industries     – Branchenliste bremst den Weg zur Anfrage; der Inhalt
- *                    bleibt als Komponente erhalten und ist nicht geloescht.
- * Alle drei Komponenten liegen unveraendert im Projekt und sind mit einer
- * Zeile wieder eingehaengt.
+ * AUF UNTERSEITEN VERLAGERT, Komponenten bleiben unveraendert im Projekt:
+ *   Showreel, Comparison, WebsiteTeaser, ModelsTeaser, Pricing, Faq,
+ *   EditorialWork, Clients, Industries, SelectedWork (ersetzt durch
+ *   WorkSwipe), Process (Langfassung, ersetzt durch ProcessShort).
+ * Models & Talents bleibt ein eigener Bereich und steht in der Navigation.
  */
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import MainHero from '@/components/home/MainHero.astro';
 import FeaturedOn from '@/components/sections/FeaturedOn.astro';
 import ServiceFilms from '@/components/sections/ServiceFilms.astro';
-import SelectedWork from '@/components/home/SelectedWork.astro';
-import Showreel from '@/components/sections/Showreel.astro';
+import WorkSwipe from '@/components/home/WorkSwipe.astro';
 import Toolkit from '@/components/sections/Toolkit.astro';
-import Process from '@/components/sections/Process.astro';
-import Comparison from '@/components/sections/Comparison.astro';
+import ProcessShort from '@/components/home/ProcessShort.astro';
 import Testimonials from '@/components/sections/Testimonials.astro';
-import WebsiteTeaser from '@/components/sections/WebsiteTeaser.astro';
-import ModelsTeaser from '@/components/sections/ModelsTeaser.astro';
-import Pricing from '@/components/sections/Pricing.astro';
-import Faq from '@/components/sections/Faq.astro';
 import ContactCta from '@/components/ContactCta.astro';
 import { site } from '@/data/site';
 import { offerCatalog } from '@/lib/schema';
 ---
 <BaseLayout
   title={`Werbeagentur München | Video, Motion Graphics & Branding – ${site.name}`}
-  description="LAMOR AGENCY aus München: Videografie, Motion Graphics, Branding und Webdesign aus einem Studio. Jede Leistung im Erklärfilm gezeigt. Jetzt Projekt anfragen."
+  description="LAMOR AGENCY aus München: Videografie, Motion Graphics, Branding und Webdesign aus einem Studio. Jetzt Projekt anfragen."
   theme="dark"
   palette="mono"
   jsonLd={[offerCatalog()]}
@@ -64,15 +48,9 @@ import { offerCatalog } from '@/lib/schema';
   <MainHero />
   <FeaturedOn />
   <ServiceFilms />
-  <SelectedWork />
-  <Showreel />
+  <WorkSwipe />
   <Toolkit />
-  <Process />
-  <Comparison />
+  <ProcessShort />
   <Testimonials />
-  <WebsiteTeaser />
-  <ModelsTeaser />
-  <Pricing compact />
-  <Faq />
   <ContactCta />
 </BaseLayout>

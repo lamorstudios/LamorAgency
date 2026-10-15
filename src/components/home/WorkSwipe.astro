@@ -1,0 +1,271 @@
+---
+/**
+ * ============================================================================
+ * SELECTED WORK – HORIZONTALE SWIPE-GALERIE
+ * ============================================================================
+ *
+ * Die Arbeiten liegen in einer Reihe, die ueber den Bildschirmrand
+ * hinauslaeuft. Weitere Projekte entdeckt man durch Wischen, nicht durch
+ * Scrollen nach unten – das spart der Startseite mehrere Bildschirmhoehen
+ * und fuehlt sich auf dem Telefon richtig an.
+ *
+ * NATIVES CSS, KEINE LIBRARY
+ * overflow-x: auto + scroll-snap-type: x mandatory. Das bringt Touch,
+ * Trackpad, Shift+Mausrad und Tastatur ohne eine einzige Zeile Fremdcode
+ * mit. Die beiden Pfeile sind reine Zugabe: sie scrollen per
+ * scrollBy({behavior:'smooth'}) und blenden sich am jeweiligen Ende aus.
+ * Ohne JavaScript bleibt alles bedienbar, nur die Pfeile fehlen.
+ *
+ * KEIN GLEICHZEITIGES AUTOPLAY
+ * Das ist die wichtigste Regel hier. Acht gleichzeitig laufende Videos
+ * ruinieren Akku, Datenvolumen und Bildrate. Deshalb:
+ *   - preload="none", kein autoplay-Attribut
+ *   - Desktop mit echter Maus: Vorschau startet beim Hover, stoppt beim
+ *     Verlassen. Es kann naturgemaess nur eine gleichzeitig laufen.
+ *   - Touch: nichts laeuft von allein. Die Karte ist ein Link; wo ein Film
+ *     vorliegt, startet ihn der Abspielknopf.
+ *
+ * ASSET-SLOT
+ * Pro Projekt wird public/media/work-<slug>.mp4 gesucht (optional .webm,
+ * -poster.jpg). Fehlt der Film, bleibt die Karte vollstaendig und zeigt
+ * ihre Typografie auf ruhiger Flaeche – kein Platzhaltertext.
+ */
+import { getCollection } from 'astro:content';
+import { videoSlot } from '@/lib/media-slots';
+import Icon from '@/components/Icon.astro';
+
+const projekte = (await getCollection('projects'))
+  .filter((p) => p.data.featured && !p.data.placeholder)
+  .sort((a, b) => a.data.order - b.data.order);
+
+const karten = projekte.map((p) => ({
+  slug: p.id,
+  titel: p.data.title,
+  kategorie: p.data.category,
+  film: videoSlot(`work-${p.id}`),
+}));
+---
+{karten.length > 0 && (
+  <section class="sw" data-theme="dark" data-bg="dark" aria-labelledby="sw-title">
+    <div class="container sw__head">
+      <h2 class="sw__title" id="sw-title" data-reveal>Selected Work</h2>
+      <div class="sw__nav" data-reveal="fade">
+        <button class="sw__arrow" type="button" data-sw-prev aria-label="Vorherige Arbeiten" disabled>
+          <Icon name="arrow" class="sw__arrow-icon sw__arrow-icon--back" />
+        </button>
+        <button class="sw__arrow" type="button" data-sw-next aria-label="Weitere Arbeiten">
+          <Icon name="arrow" class="sw__arrow-icon" />
+        </button>
+      </div>
+    </div>
+
+    <ul class="sw__rail" role="list" data-sw-rail tabindex="0" aria-label="Arbeiten, horizontal scrollbar">
+      {karten.map((k) => (
+        <li class="sw__item">
+          <a class="sw__card" href={`/work/${k.slug}/`} data-sw-card>
+            <div class="sw__media">
+              {k.film.available ? (
+                <video
+                  class="sw__video"
+                  muted
+                  loop
+                  playsinline
+                  preload="none"
+                  poster={k.film.poster}
+                  disablepictureinpicture
+                  aria-hidden="true"
+                  tabindex="-1"
+                  data-sw-video
+                >
+                  {k.film.webm && <source src={k.film.webm} type="video/webm" />}
+                  {k.film.mp4 && <source src={k.film.mp4} type="video/mp4" />}
+                </video>
+              ) : (
+                <span class="sw__quiet" aria-hidden="true">{k.titel}</span>
+              )}
+            </div>
+            <div class="sw__caption">
+              <span class="sw__name">{k.titel}</span>
+              <span class="sw__kind">{k.kategorie}</span>
+            </div>
+          </a>
+        </li>
+      ))}
+      {/* Abschlusskarte: der Weg zu allen Arbeiten, am Ende der Reihe. */}
+      <li class="sw__item sw__item--end">
+        <a class="sw__all" href="/work/">
+          <span>Alle Arbeiten</span>
+          <Icon name="arrow" />
+        </a>
+      </li>
+    </ul>
+  </section>
+)}
+
+<style>
+  .sw { padding-block: clamp(2.5rem, 7vw, 5.5rem); }
+
+  .sw__head {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    gap: var(--space-5); margin-bottom: clamp(1.25rem, 3vw, 2rem);
+  }
+  .sw__title {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 110%;
+    font-size: clamp(1.8rem, 1rem + 3.4vw, 3.6rem);
+    line-height: 1; letter-spacing: -0.04em; text-transform: uppercase; color: #fff;
+  }
+
+  /* ---------- Pfeile ---------- */
+  .sw__nav { display: none; gap: 0.5rem; flex: none; }
+  /* Nur dort, wo wirklich eine Maus im Spiel ist. Auf dem Telefon wischt man. */
+  @media (hover: hover) and (pointer: fine) { .sw__nav { display: flex; } }
+
+  .sw__arrow {
+    width: 2.75rem; height: 2.75rem; display: grid; place-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 50%;
+    color: #fff; background: transparent;
+    transition: border-color var(--dur-base) var(--ease-out), background var(--dur-base) var(--ease-out), opacity var(--dur-base) var(--ease-out);
+  }
+  .sw__arrow:hover:not(:disabled) { border-color: #fff; background: rgba(255, 255, 255, 0.08); }
+  .sw__arrow:disabled { opacity: 0.25; cursor: default; }
+  .sw__arrow:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
+  .sw__arrow-icon { width: 1.1rem; height: 1.1rem; }
+  .sw__arrow-icon--back { transform: rotate(180deg); }
+
+  /* ---------- Die Reihe ---------- */
+  .sw__rail {
+    display: flex;
+    gap: clamp(0.75rem, 2vw, 1.5rem);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    /* Erste und letzte Karte sollen am Gutter stehen, nicht am Glasrand. */
+    padding-inline: var(--gutter);
+    padding-block: 0.25rem;
+    scroll-padding-inline: var(--gutter);
+    /* Der Trick gegen abgeschnittene Fokusringe am Rand der Scrollflaeche. */
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+  }
+  .sw__rail::-webkit-scrollbar { display: none; }
+  .sw__rail:focus-visible { outline: 2px solid var(--c-accent); outline-offset: -2px; }
+
+  .sw__item { flex: none; scroll-snap-align: start; }
+
+  /* Kartenbreite: auf dem Telefon sieht man bewusst ein Stueck der naechsten
+     Karte – das ist das Signal, dass hier gewischt werden kann. */
+  .sw__card, .sw__all { width: clamp(16rem, 78vw, 20rem); display: block; }
+  @media (min-width: 48rem) { .sw__card, .sw__all { width: clamp(22rem, 42vw, 30rem); } }
+  @media (min-width: 80rem) { .sw__card, .sw__all { width: 34rem; } }
+
+  /* ---------- Karte ---------- */
+  .sw__media {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: clamp(0.4rem, 1vw, 0.75rem);
+    background: #0b0b0b;
+    line-height: 0;
+  }
+  .sw__video { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+  .sw__quiet {
+    position: absolute; inset: 0;
+    display: grid; place-items: center; padding: 1rem;
+    font-family: var(--font-display); font-weight: 900; font-stretch: 112%;
+    font-size: clamp(1.1rem, 3.2vw, 2rem); line-height: 1.05;
+    letter-spacing: -0.03em; text-transform: uppercase; text-align: center;
+    color: rgba(255, 255, 255, 0.14);
+  }
+
+  /* Beide Zeilen linksbuendig untereinander. Nebeneinander mit
+     space-between landete die Kategorie am rechten Kartenrand und sah dort
+     aus, als gehoere sie zur naechsten Karte. */
+  .sw__caption {
+    display: grid; gap: 0.15rem; padding-top: 0.75rem;
+  }
+  .sw__name {
+    font-size: clamp(0.95rem, 0.9rem + 0.35vw, 1.15rem);
+    font-weight: var(--fw-semi); color: #fff;
+  }
+  .sw__kind {
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase;
+    color: var(--c-accent-on-dark);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .sw__card:hover .sw__media { outline: 1px solid rgba(255, 255, 255, 0.3); outline-offset: 2px; }
+  }
+  .sw__card:focus-visible .sw__media { outline: 2px solid var(--c-accent); outline-offset: 3px; }
+
+  /* ---------- Abschlusskarte ---------- */
+  .sw__all {
+    display: flex; align-items: center; justify-content: center; gap: 0.6em;
+    aspect-ratio: 16 / 9;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: clamp(0.4rem, 1vw, 0.75rem);
+    color: #fff;
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase;
+    transition: border-color var(--dur-base) var(--ease-out), background var(--dur-base) var(--ease-out);
+  }
+  .sw__all :global(.icon) { width: 1em; height: 1em; }
+  @media (hover: hover) and (pointer: fine) {
+    .sw__all:hover { border-color: #fff; background: rgba(255, 255, 255, 0.06); }
+  }
+  .sw__all:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 3px; }
+</style>
+
+<script>
+  /**
+   * Zugabe zur nativen Scrollflaeche: Pfeile und Hover-Vorschau.
+   * Ohne dieses Skript bleibt die Galerie vollstaendig bedienbar – man
+   * wischt, scrollt mit Shift+Mausrad oder bedient sie per Tastatur.
+   */
+  function initSwipe() {
+    document.querySelectorAll<HTMLElement>('[data-sw-rail]').forEach((rail) => {
+      if ((rail as any).__init) return;
+      (rail as any).__init = true;
+
+      const wurzel = rail.closest('section');
+      const prev = wurzel?.querySelector<HTMLButtonElement>('[data-sw-prev]');
+      const next = wurzel?.querySelector<HTMLButtonElement>('[data-sw-next]');
+
+      /** Eine Karte plus Abstand – so weit springt ein Pfeilklick. */
+      const schritt = () => {
+        const karte = rail.querySelector<HTMLElement>('.sw__item');
+        const luecke = parseFloat(getComputedStyle(rail).columnGap || '0') || 0;
+        return karte ? karte.getBoundingClientRect().width + luecke : rail.clientWidth * 0.8;
+      };
+
+      const standAktualisieren = () => {
+        const max = rail.scrollWidth - rail.clientWidth;
+        if (prev) prev.disabled = rail.scrollLeft < 8;
+        if (next) next.disabled = rail.scrollLeft > max - 8;
+      };
+
+      prev?.addEventListener('click', () => rail.scrollBy({ left: -schritt(), behavior: 'smooth' }));
+      next?.addEventListener('click', () => rail.scrollBy({ left: schritt(), behavior: 'smooth' }));
+      rail.addEventListener('scroll', standAktualisieren, { passive: true });
+      addEventListener('resize', standAktualisieren);
+      standAktualisieren();
+
+      /**
+       * Vorschau nur bei echter Maus und nur fuer die Karte unter dem
+       * Zeiger. Auf Touch passiert hier nichts – dort oeffnet der Tap die
+       * Arbeit, und es laeuft nie ein Video ungefragt.
+       */
+      if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+      rail.querySelectorAll<HTMLElement>('[data-sw-card]').forEach((karte) => {
+        const video = karte.querySelector<HTMLVideoElement>('[data-sw-video]');
+        if (!video) return;
+        karte.addEventListener('pointerenter', () => { video.play?.().catch(() => {}); });
+        karte.addEventListener('pointerleave', () => { video.pause(); video.currentTime = 0; });
+      });
+    });
+  }
+
+  initSwipe();
+  document.addEventListener('astro:page-load', initSwipe);
+</script>

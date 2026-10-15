@@ -20,7 +20,7 @@
  * Pflege: src/data/toolkit.ts
  */
 import { Picture } from 'astro:assets';
-import { toolkit, toolkitLead } from '@/data/toolkit';
+import { toolkit } from '@/data/toolkit';
 
 const dateien = import.meta.glob<{ default: ImageMetadata }>(
   '/src/assets/brand/toolkit/*.{svg,png,jpg,webp,avif}',
@@ -36,22 +36,14 @@ const werkzeuge = await Promise.all(
 ---
 <section class="tk" data-theme="dark" data-bg="dark" aria-labelledby="tk-title">
   <div class="container">
-    <header class="tk__head">
-      <p class="eyebrow tk__label" data-reveal="fade">Womit wir arbeiten</p>
-      <h2 class="tk__title" id="tk-title" data-reveal>Technik, die man kennt.</h2>
-      <p class="tk__lead" data-reveal style="--reveal-delay:140ms">{toolkitLead}</p>
-    </header>
+    <h2 class="tk__title" id="tk-title" data-reveal="fade">Womit wir arbeiten</h2>
 
     <ul class="tk__grid" role="list">
       {werkzeuge.map((t, i) => (
-        <li class="tk__item" data-reveal="fade" style={`--reveal-delay:${120 + i * 60}ms`}>
-          <div class="tk__mark">
-            {t.img
-              ? <Picture src={t.img} formats={['webp']} widths={[180, 360]} sizes="150px" alt={t.name} class="tk__logo" loading="lazy" />
-              : <span class="tk__name">{t.name}</span>}
-          </div>
-          <p class="tk__use">{t.use}</p>
-          <p class="tk__kind">{t.kind}</p>
+        <li class="tk__item" data-reveal="fade" style={`--reveal-delay:${80 + i * 50}ms`}>
+          {t.img
+            ? <Picture src={t.img} formats={['webp']} widths={[200, 400]} sizes="170px" alt={t.name} class="tk__logo" loading="lazy" />
+            : <span class="tk__name">{t.name}</span>}
         </li>
       ))}
     </ul>
@@ -59,55 +51,33 @@ const werkzeuge = await Promise.all(
 </section>
 
 <style>
-  .tk { padding-block: clamp(2.5rem, 6vw, 5rem); }
+  .tk { padding-block: clamp(2.5rem, 6vw, 4.5rem); }
 
-  .tk__head { max-width: 42rem; margin-bottom: clamp(2rem, 5vw, 3.5rem); }
-  .tk__label { color: var(--c-accent-on-dark); }
   .tk__title {
-    margin-top: var(--space-4);
-    font-family: var(--font-display); font-weight: 900; font-stretch: 108%;
-    font-size: clamp(1.75rem, 1rem + 3vw, 3.4rem);
-    line-height: 1; letter-spacing: -0.035em; text-transform: uppercase;
-  }
-  .tk__lead { margin-top: var(--space-4); max-width: 46ch; color: var(--fg-muted); line-height: 1.55; }
-
-  /* Spaltenzahl fest statt auto-fit: sechs Werkzeuge gehen durch 1, 2 und 3
-     glatt auf. Bei auto-fit blieb auf breiten Schirmen eine halb leere Zeile
-     stehen, deren Fugenfarbe dann wie ein Fehler aussah. */
-  .tk__grid {
-    display: grid; gap: 1px;
-    grid-template-columns: 1fr;
-    background: var(--c-ink-3);
-    border: 1px solid var(--c-ink-3);
-    border-radius: clamp(0.6rem, 1.5vw, 1rem);
-    overflow: hidden;
-  }
-  @media (min-width: 30rem) { .tk__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  @media (min-width: 60rem) { .tk__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-
-  .tk__item {
-    display: grid; align-content: start; gap: var(--space-3);
-    padding: clamp(1.1rem, 2.6vw, 1.75rem);
-    background: var(--c-ink);
-  }
-
-  .tk__mark { min-height: clamp(1.6rem, 3.5vw, 2.2rem); display: flex; align-items: center; }
-  .tk__logo {
-    width: auto; height: clamp(1.4rem, 3vw, 2rem); object-fit: contain;
-    object-position: left center;
-    /* Monochrom, damit sechs fremde Markenfarben die Seite nicht zerreissen. */
-    filter: grayscale(1) brightness(1.7); opacity: 0.85;
-  }
-  .tk__name {
-    font-family: var(--font-display); font-weight: 800; font-stretch: 104%;
-    font-size: clamp(1rem, 0.9rem + 0.6vw, 1.3rem);
-    letter-spacing: -0.02em; text-transform: uppercase; color: var(--c-paper);
-  }
-
-  .tk__use { font-size: var(--fs-small); line-height: 1.5; color: var(--fg-muted); }
-  .tk__kind {
+    margin-bottom: clamp(1.25rem, 3vw, 2rem);
     font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
-    letter-spacing: var(--ls-wide); text-transform: uppercase;
-    color: var(--c-accent-on-dark);
+    letter-spacing: var(--ls-wider); text-transform: uppercase;
+    color: var(--fg-muted);
+  }
+
+  /* Eine ruhige Reihe statt eines Rasters mit Fugen. Die Logos sollen
+     nebeneinanderstehen wie Marken, nicht wie Produktkacheln. */
+  .tk__grid { display: flex; flex-wrap: wrap; align-items: center; gap: clamp(1.75rem, 6vw, 4.5rem); }
+  .tk__item { display: flex; align-items: center; min-height: 2rem; }
+
+  /* Originalfarben bleiben erhalten – es sind fremde Marken, keine
+     Designelemente. Vereinheitlicht wird nur die Hoehe. */
+  .tk__logo {
+    width: auto; height: clamp(1.4rem, 3vw, 2.1rem);
+    object-fit: contain; object-position: left center;
+    opacity: 0.9;
+  }
+
+  /* Ohne Logodatei: der Name typografisch. Gestaltet, nicht kaputt. */
+  .tk__name {
+    font-family: var(--font-display); font-weight: 700; font-stretch: 104%;
+    font-size: clamp(0.95rem, 0.88rem + 0.4vw, 1.2rem);
+    letter-spacing: -0.015em; text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.55);
   }
 </style>

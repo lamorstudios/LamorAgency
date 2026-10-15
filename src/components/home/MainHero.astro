@@ -4,10 +4,11 @@
  * HERO DER HAUPTWEBSITE
  * ============================================================================
  *
- * SIMPLICITY FIRST. Der erste Bildschirm traegt genau vier Dinge:
- * Herkunft, Botschaft, Einordnung, Handlung. Nichts sonst. Keine Badges,
- * keine Kennzahlen, keine Logowand – die kommen weiter unten, wo sie
- * gelesen werden, statt den ersten Eindruck zuzustellen.
+ * SHOW, DON'T TELL. Der erste Bildschirm traegt genau vier Dinge:
+ * Herkunft, Botschaft, vier Woerter Einordnung, eine Handlung. Sonst
+ * nichts. Keine Badges, keine Kennzahlen, keine zweite Schaltflaeche,
+ * keine Sprungleiste – der Film und die Headline sollen wirken, und das
+ * tun sie nur, wenn nichts daneben um Aufmerksamkeit bittet.
  *
  * DIE WIRKUNG KOMMT AUS DREI QUELLEN
  *   1. Film, bildfuellend und stumm im Hintergrund
@@ -36,7 +37,6 @@
 import Words from '@/components/Words.astro';
 import Icon from '@/components/Icon.astro';
 import { site } from '@/data/site';
-import { focusServices } from '@/data/services';
 import { videoSlot } from '@/lib/media-slots';
 
 const film = videoSlot('hero');
@@ -74,8 +74,7 @@ const film = videoSlot('hero');
     </h1>
 
     <p class="mh__lead" data-reveal style="--reveal-delay:420ms">
-      Film, Motion Design, Branding und Websites – aus einem Studio,
-      mit einem Ansprechpartner.
+      Film, Motion, Branding, Web.
     </p>
 
     <div class="mh__actions" data-reveal style="--reveal-delay:520ms">
@@ -83,21 +82,7 @@ const film = videoSlot('hero');
         <span>Projekt anfragen</span>
         <Icon name="arrow" class="mh__cta-arrow" />
       </a>
-      <a href="/work/" class="mh__ghost">
-        <span>Arbeiten ansehen</span>
-      </a>
     </div>
-
-    {/* Die vier Schwerpunkte als direkter Einstieg. Wer genau eine Sache
-        sucht, muss nicht erst durch die halbe Startseite scrollen. */}
-    <nav class="mh__jump" aria-label="Leistungen" data-reveal="fade" style="--reveal-delay:620ms">
-      {focusServices.map((s) => (
-        <a class="mh__jump-item" href={`/services/#${s.slug}`}>
-          <span class="mh__jump-no">{s.index}</span>
-          <span class="mh__jump-label">{s.title}</span>
-        </a>
-      ))}
-    </nav>
   </div>
 </section>
 
@@ -151,11 +136,14 @@ const film = videoSlot('hero');
     margin-left: -0.035em;
   }
 
+  /* Vier Woerter statt zwei Zeilen. Sie sagen dasselbe und lassen dem
+     Film und der Headline den Platz, den beide brauchen. */
   .mh__lead {
-    margin-top: clamp(1rem, 2.5vh, 1.75rem);
-    max-width: 38ch;
-    font-size: clamp(1.05rem, 0.95rem + 0.7vw, 1.45rem);
-    line-height: 1.45; color: rgba(255, 255, 255, 0.82);
+    margin-top: clamp(0.9rem, 2.2vh, 1.5rem);
+    font-size: clamp(0.95rem, 0.85rem + 0.5vw, 1.25rem);
+    font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.65);
   }
 
   /* ---------- Handlung ---------- */
@@ -180,47 +168,6 @@ const film = videoSlot('hero');
   }
   .mh__cta:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 
-  .mh__ghost {
-    display: inline-flex; align-items: center; min-height: 3.25rem;
-    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
-    letter-spacing: var(--ls-wide); text-transform: uppercase;
-    color: #fff;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.35);
-    padding-bottom: 0.2em; align-self: center;
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .mh__ghost:hover { border-bottom-color: var(--c-accent); }
-  }
-
-  /* ---------- Einstieg in die vier Schwerpunkte ---------- */
-  .mh__jump {
-    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1px; margin-top: clamp(2rem, 5vh, 3.5rem);
-    background: rgba(255, 255, 255, 0.14);
-    border-block: 1px solid rgba(255, 255, 255, 0.14);
-  }
-  @media (min-width: 48rem) { .mh__jump { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-
-  .mh__jump-item {
-    display: flex; align-items: baseline; gap: 0.6em;
-    min-height: 44px; padding: clamp(0.7rem, 2vw, 1rem) clamp(0.5rem, 1.5vw, 0.9rem);
-    background: #000;
-    color: rgba(255, 255, 255, 0.82);
-    transition: color var(--dur-base) var(--ease-out), background var(--dur-base) var(--ease-out);
-  }
-  .mh__jump-no {
-    font-size: var(--fs-eyebrow); font-variant-numeric: tabular-nums;
-    color: var(--c-accent-on-dark); flex: none;
-  }
-  .mh__jump-label {
-    font-size: clamp(0.82rem, 0.75rem + 0.35vw, 1rem);
-    font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
-    letter-spacing: 0.02em;
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .mh__jump-item:hover { background: #0b0b0b; color: #fff; }
-  }
-  .mh__jump-item:focus-visible { outline: 2px solid var(--c-accent); outline-offset: -2px; }
 </style>
 
 <script>
