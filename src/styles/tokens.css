@@ -163,6 +163,69 @@
   --ratio-story: 9 / 16;
 }
 
+/* ==========================================================================
+   PALETTE "MONO" – die Hauptwebsite
+   --------------------------------------------------------------------------
+   Schwarz, Weiss, Hellgrau, ein einziger Akzent. Nichts Warmes, nichts
+   Getoentes: die Wirkung kommt aus Bild, Typografie und Weissraum, nicht
+   aus der Farbe.
+
+   WARUM GESCOPT UND NICHT GLOBAL
+   Die Webdesign-Landingpage laeuft auf derselben Codebasis und behaelt ihre
+   warme Palette unveraendert. Deshalb liegt die neue Palette hinter
+   `data-palette="mono"` auf <html>, gesetzt ueber die Layout-Eigenschaft
+   `palette`. Ohne dieses Attribut aendert sich an keiner bestehenden Seite
+   ein einziger Farbwert.
+
+   WIE ES WIRKT
+   Alle Theme-Flaechen weiter unten leiten ihre Werte aus denselben --c-*
+   Variablen ab. Es genuegt daher, hier die Basis zu tauschen – hell, dunkel
+   und Akzent ziehen automatisch nach.
+
+   KONTRAST (WCAG AA, geprueft)
+   --c-grey      #6e6e6e auf #ffffff  = 5.0:1
+   --c-grey-dark #a3a3a3 auf #000000  = 8.9:1
+   --c-accent-text #bf2f1b auf #ffffff = 5.6:1
+   --c-accent-on-dark #ff5c3d auf #000 = 6.1:1
+   ========================================================================== */
+html[data-palette='mono'] {
+  --c-ink: #000000;          /* Primaergrund dunkel */
+  --c-ink-2: #0b0b0b;        /* abgesetzte dunkle Flaeche */
+  --c-ink-3: #232323;        /* Linien auf dunkel */
+  --c-paper: #ffffff;        /* Primaergrund hell */
+  --c-paper-2: #f5f5f5;      /* zweite helle Flaeche */
+  --c-paper-3: #e4e4e4;      /* Linien auf hell */
+  --c-grey: #6e6e6e;         /* Sekundaertext auf hell */
+  --c-grey-dark: #a3a3a3;    /* Sekundaertext auf dunkel */
+
+  /* Der Akzent bleibt exakt der der Marke und bleibt der einzige Farbton. */
+  --c-accent: #e5432b;
+  --c-accent-text: #bf2f1b;
+  --c-accent-on-dark: #ff5c3d;
+  --c-accent-deep: #b8321e;
+
+  /* Flaechen werden flach statt getoent. Tiefe entsteht durch Linie und
+     Schatten, nicht durch einen zweiten Farbton im Verlauf. */
+  --card-light-bg: #ffffff;
+  --card-light-line: rgba(0, 0, 0, 0.12);
+  --card-light-line-soft: rgba(0, 0, 0, 0.07);
+  --card-light-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 18px 44px -24px rgba(0, 0, 0, 0.22);
+
+  --card-dark-bg: #0b0b0b;
+  --card-dark-line: rgba(255, 255, 255, 0.14);
+  --card-dark-line-soft: rgba(255, 255, 255, 0.08);
+  --card-dark-shadow: 0 1px 2px rgba(0, 0, 0, 0.6), 0 30px 70px -32px rgba(0, 0, 0, 1);
+  --card-dark-glow: 0 0 0 1px rgba(229, 67, 43, 0.12), 0 28px 70px -36px rgba(229, 67, 43, 0.4);
+
+  --tile-light-bg: #f5f5f5;
+  --tile-dark-bg: rgba(255, 255, 255, 0.06);
+
+  /* Die roten Licht-Waschungen hinter Sections entfallen fast vollstaendig –
+     sie waren der auffaelligste Rest des warmen Looks. */
+  --wash-red: rgba(229, 67, 43, 0.07);
+  --wash-red-dark: rgba(229, 67, 43, 0.08);
+}
+
 /* Jede Theme-Fläche setzt ihre Textfarbe selbst (sonst erbt sie den berechneten Body-Wert) */
 [data-theme] { color: var(--fg); }
 

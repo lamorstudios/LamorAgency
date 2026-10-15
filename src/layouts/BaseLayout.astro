@@ -9,8 +9,25 @@ import Cursor from '@/components/Cursor.astro';
 import Intro from '@/components/Intro.astro';
 import { site, social } from '@/data/site';
 
-interface Props extends SEOProps { theme?: 'light' | 'dark'; bodyClass?: string }
-const { theme = 'light', bodyClass = '', jsonLd = [], ...seo } = Astro.props;
+interface Props extends SEOProps {
+  theme?: 'light' | 'dark';
+  bodyClass?: string;
+  /**
+   * Farbpalette der Seite.
+   *   'warm'  bisherige Palette (Knochenpapier, warmes Nahschwarz).
+   *           Standard – jede bestehende Seite bleibt damit unveraendert,
+   *           insbesondere die Webdesign-Landingpage.
+   *   'mono'  Schwarz, Weiss, Hellgrau, ein Akzent. Die Hauptwebsite.
+   * Definition der Werte: src/styles/tokens.css
+   */
+  palette?: 'warm' | 'mono';
+}
+const { theme = 'light', bodyClass = '', palette = 'warm', jsonLd = [], ...seo } = Astro.props;
+
+/** Flaechenfarbe fuer die Browser-UI – muss zur Palette passen. */
+const themeColor = palette === 'mono'
+  ? (theme === 'dark' ? '#000000' : '#ffffff')
+  : (theme === 'dark' ? '#0b0a09' : '#f2ede4');
 
 const organization = {
   '@context': 'https://schema.org',
@@ -38,11 +55,11 @@ const website = {
 };
 ---
 <!doctype html>
-<html lang={site.lang} data-theme={theme}>
+<html lang={site.lang} data-theme={theme} data-palette={palette}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content={theme === 'dark' ? '#0b0a09' : '#f2ede4'} />
+    <meta name="theme-color" content={themeColor} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="generator" content={Astro.generator} />

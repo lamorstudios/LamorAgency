@@ -9,7 +9,7 @@
  * beantwortet genau eine Frage – und zwar in der Reihenfolge, in der sie im
  * Kopf des Besuchers auftaucht:
  *
- *   01 Hero            Wer seid ihr, und was kostet mich das erste Gespraech?
+ *   01 Hero            Wer seid ihr, und was macht ihr? Film, Botschaft, CTA.
  *   02 Featured on     Habt ihr das schon fuer jemanden gemacht, den ich kenne?
  *   03 Leistungen      Was genau bekomme ich – und was bringt mir das?
  *                      Der wichtigste Abschnitt: vier Disziplinen, jede mit
@@ -37,7 +37,7 @@
  * Zeile wieder eingehaengt.
  */
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import HeroVideo from '@/components/sections/HeroVideo.astro';
+import MainHero from '@/components/home/MainHero.astro';
 import FeaturedOn from '@/components/sections/FeaturedOn.astro';
 import ServiceFilms from '@/components/sections/ServiceFilms.astro';
 import SelectedWork from '@/components/home/SelectedWork.astro';
@@ -58,9 +58,10 @@ import { offerCatalog } from '@/lib/schema';
   title={`Werbeagentur München | Video, Motion Graphics & Branding – ${site.name}`}
   description="LAMOR AGENCY aus München: Videografie, Motion Graphics, Branding und Webdesign aus einem Studio. Jede Leistung im Erklärfilm gezeigt. Jetzt Projekt anfragen."
   theme="dark"
+  palette="mono"
   jsonLd={[offerCatalog()]}
 >
-  <HeroVideo />
+  <MainHero />
   <FeaturedOn />
   <ServiceFilms />
   <SelectedWork />
