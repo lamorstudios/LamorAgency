@@ -18,16 +18,20 @@ interface Props extends SEOProps {
    *           Standard – jede bestehende Seite bleibt damit unveraendert,
    *           insbesondere die Webdesign-Landingpage.
    *   'mono'  Schwarz, Weiss, Hellgrau, ein Akzent. Die Hauptwebsite.
+   *   'spatial' Heller Grund, schwebende Cards, Anthrazit. Prototyp der
+   *           raeumlichen Designrichtung.
    * Definition der Werte: src/styles/tokens.css
    */
-  palette?: 'warm' | 'mono';
+  palette?: 'warm' | 'mono' | 'spatial';
 }
 const { theme = 'light', bodyClass = '', palette = 'warm', jsonLd = [], ...seo } = Astro.props;
 
 /** Flaechenfarbe fuer die Browser-UI – muss zur Palette passen. */
 const themeColor = palette === 'mono'
   ? (theme === 'dark' ? '#000000' : '#ffffff')
-  : (theme === 'dark' ? '#0b0a09' : '#f2ede4');
+  : palette === 'spatial'
+    ? (theme === 'dark' ? '#1b1e21' : '#f0f1f2')
+    : (theme === 'dark' ? '#0b0a09' : '#f2ede4');
 
 const organization = {
   '@context': 'https://schema.org',

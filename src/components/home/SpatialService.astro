@@ -1,0 +1,316 @@
+---
+/**
+ * ============================================================================
+ * SPATIAL SERVICES – Prototyp der raeumlichen Designrichtung
+ * ============================================================================
+ *
+ * EINE KOMPOSITION, NICHT VIER CARDS NEBENEINANDER
+ * Jede Leistung ist eine Gruppe aus vier Flaechen in bewusst ungleichen
+ * Groessen: eine grosse 16:9-Filmflaeche, ein hochkantes Social-Video, eine
+ * kleine Leistungs-Card mit Icon und eine Projekt-Card. Sie stehen
+ * asymmetrisch zueinander und bewegen sich beim Scrollen GEMEINSAM – wie
+ * eine Komposition, nicht wie vier einzelne Animationen.
+ *
+ * DIE BEWEGUNG
+ * scripts/spatial-scroll.ts schreibt pro Gruppe eine Zahl --p:
+ *     0 = unter dem Bild, tief hinten
+ *     1 = mittig, vorn, scharf
+ *     2 = oben hinaus, wieder tief hinten
+ * Alles Weitere rechnet CSS daraus. Dadurch laeuft die Bewegung exakt
+ * rueckwaerts, wenn man rueckwaerts scrollt, und sie haengt kontinuierlich
+ * am Scrollstand statt einmalig am Eintritt.
+ *
+ * --d ist die Tiefenstaffelung je Flaeche (0 = vorn, 1 = am weitesten
+ * hinten). Sie steuert, wie weit eine Flaeche reist und wie frueh sie
+ * unscharf wird. Dadurch entsteht Parallaxe innerhalb der Gruppe, ohne dass
+ * eine einzelne Flaeche aus der Reihe tanzt.
+ *
+ * BLUR
+ * Nur zwei Flaechen je Gruppe bekommen ihn, und auf Telefonen gar keine:
+ * eine grosse animierte Filterflaeche ist dort das Teuerste, was man tun
+ * kann. Die Tiefe traegt dann allein ueber Scale und Opacity.
+ *
+ * MEDIEN
+ * Es liegen noch keine echten Dateien vor. Statt erfundener Projekte oder
+ * Stockmaterial stehen hier neutrale Flaechen im exakten Zielformat, leise
+ * mit dem Format beschriftet – so laesst sich die Komposition beurteilen,
+ * ohne dass etwas vorgetaeuscht wird. Sobald Dateien in /public/media
+ * liegen, ersetzen sie die Flaeche ohne Layoutaenderung.
+ */
+import Icon from '@/components/Icon.astro';
+import { serviceFilm } from '@/lib/media-slots';
+
+interface Props {
+  /** Ordnungszahl, zweistellig. */
+  nr: string;
+  titel: string;
+  /** Ein Satz Kundennutzen. Kein zweiter. */
+  nutzen: string;
+  /** Slug aus src/data/services.ts – bestimmt den Erklaerfilm-Slot. */
+  slug: string;
+  /** Icon fuer die kleine Leistungs-Card. */
+  icon: string;
+  /** Beschriftung der kleinen Card. */
+  kachel: string;
+  /** Beschriftung der Projekt-Card. */
+  projekt: string;
+  ziel?: string;
+}
+
+const { nr, titel, nutzen, slug, icon, kachel, projekt, ziel = '/contact/' } = Astro.props;
+const film = serviceFilm(slug);
+---
+<section class="sp" data-spatial aria-labelledby={`sp-${slug}`}>
+  <div class="container">
+    <header class="sp__head">
+      <p class="sp__nr">{nr}</p>
+      <h2 class="sp__titel" id={`sp-${slug}`}>{titel}</h2>
+      <p class="sp__nutzen">{nutzen}</p>
+      <a class="sp__cta" href={ziel}>
+        <span>Projekt anfragen</span>
+        <Icon name="arrow" />
+      </a>
+    </header>
+
+    {/* ---- Die Komposition. Die Reihenfolge im Markup ist die Lesereihenfolge;
+            die Anordnung macht das Grid. ---- */}
+    <div class="sp__raum">
+      {/* Grosse Filmflaeche 16:9 */}
+      <figure class="sp__card sp__card--film" style="--d:0.15">
+        <div class="sp__media sp__media--wide">
+          {film.available ? (
+            <video class="sp__video" muted loop playsinline preload="none"
+              poster={film.poster} disablepictureinpicture aria-hidden="true"
+              tabindex="-1" data-loop-video>
+              {film.webm && <source src={film.webm} type="video/webm" />}
+              {film.mp4 && <source src={film.mp4} type="video/mp4" />}
+            </video>
+          ) : (
+            <span class="sp__leer" aria-hidden="true">16 : 9</span>
+          )}
+        </div>
+        <figcaption class="sp__bu">Erklärfilm {titel}</figcaption>
+      </figure>
+
+      {/* Hochkantes Social-Video 9:16 */}
+      <figure class="sp__card sp__card--social" style="--d:0.55">
+        <div class="sp__media sp__media--story">
+          <span class="sp__leer" aria-hidden="true">9 : 16</span>
+        </div>
+        <figcaption class="sp__bu">Social Cut</figcaption>
+      </figure>
+
+      {/* Kleine Leistungs-Card mit Icon */}
+      <div class="sp__card sp__card--kachel" style="--d:0.85">
+        <span class="sp__icon" aria-hidden="true"><Icon name={icon} /></span>
+        <p class="sp__kachel-text">{kachel}</p>
+      </div>
+
+      {/* Projekt-Card */}
+      <figure class="sp__card sp__card--projekt" style="--d:0.4">
+        <div class="sp__media sp__media--square">
+          <span class="sp__leer" aria-hidden="true">1 : 1</span>
+        </div>
+        <figcaption class="sp__bu">{projekt}</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ==========================================================================
+     Die Bewegungssprache. Alle Werte leiten sich aus --p und --d ab.
+     --p kommt pro Gruppe aus dem Skript, --d steht je Flaeche im Markup.
+     ========================================================================== */
+
+  /* Registriert, damit --p in calc() zuverlaessig als Zahl gilt. */
+  @property --p {
+    syntax: '<number>';
+    initial-value: 1;
+    inherits: true;
+  }
+
+  .sp {
+    /* Ohne Skript (oder vor dem ersten Frame) steht die Gruppe im
+       Ruhezustand. Es darf nie passieren, dass Inhalt unsichtbar bleibt. */
+    --p: 1;
+    --d: 0;
+    padding-block: clamp(4rem, 14vh, 11rem);
+    /* Die gemeinsame Fluchtlinie: alle Flaechen einer Gruppe teilen sich
+       EINE Perspektive. Deshalb wirken sie als Komposition und nicht als
+       vier unabhaengig kippende Kaesten. */
+    perspective: 1600px;
+    perspective-origin: 50% 45%;
+  }
+
+  /* |1 - p| = Abstand vom Ruhepunkt, 0 in der Mitte, 1 an beiden Enden.
+     Jede Flaeche skaliert diesen Abstand mit ihrer eigenen Tiefe --d. */
+  .sp__card {
+    /* Abstand vom Ruhepunkt. max(a, -a) statt abs(): abs() ist erst seit
+       Kurzem breit verfuegbar, und faellt es aus, bricht die ganze
+       Bewegungssprache still zusammen. Diese Form kennt jeder Browser. */
+    --ab: max(0, min(1, max(calc(1 - var(--p)), calc(var(--p) - 1))));
+    --tiefe: calc(var(--ab) * (0.45 + var(--d) * 0.55));
+
+    transform:
+      translate3d(0, calc(var(--tiefe) * -3.5rem), calc(var(--tiefe) * -260px))
+      scale(calc(1 - var(--tiefe) * 0.1));
+    opacity: calc(1 - var(--tiefe) * 0.75);
+    transform-origin: 50% 50%;
+    will-change: transform, opacity;
+  }
+
+  /* Blur nur auf den beiden hinteren Flaechen und nur ab Tablet aufwaerts.
+     Grosse animierte Filter sind auf dem Telefon das Teuerste ueberhaupt. */
+  @media (min-width: 48rem) {
+    .sp__card--social,
+    .sp__card--kachel { filter: blur(calc(var(--tiefe) * 7px)); }
+  }
+
+  /* Der Kopf reist mit, aber flacher – sonst laeuft die Schrift weg. */
+  .sp__head {
+    --ab: max(0, min(1, max(calc(1 - var(--p)), calc(var(--p) - 1))));
+    transform: translate3d(0, calc(var(--ab) * -1.75rem), 0);
+    opacity: calc(1 - var(--ab) * 0.65);
+    will-change: transform, opacity;
+  }
+
+  /* Bei "Bewegung reduzieren" steht alles still und vollstaendig sichtbar. */
+  @media (prefers-reduced-motion: reduce) {
+    .sp__card, .sp__head {
+      transform: none !important;
+      opacity: 1 !important;
+      filter: none !important;
+    }
+  }
+
+  /* ==========================================================================
+     Kopf
+     ========================================================================== */
+  .sp__head { max-width: 34rem; margin-bottom: clamp(2rem, 5vw, 3.5rem); }
+
+  .sp__nr {
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi);
+    font-variant-numeric: tabular-nums; letter-spacing: var(--ls-wider);
+    color: var(--c-accent-text);
+  }
+  .sp__titel {
+    margin-top: var(--space-3);
+    font-family: var(--font-display); font-weight: 900; font-stretch: 108%;
+    font-size: clamp(2rem, 1rem + 3.6vw, 4rem);
+    line-height: 0.98; letter-spacing: -0.038em; text-transform: uppercase;
+    color: var(--c-ink);
+    overflow-wrap: normal; hyphens: none;
+  }
+  .sp__nutzen {
+    margin-top: var(--space-4); max-width: 34ch;
+    font-size: clamp(1rem, 0.94rem + 0.5vw, 1.25rem);
+    line-height: 1.5; color: var(--c-grey);
+  }
+  .sp__cta {
+    display: inline-flex; align-items: center; gap: 0.6em;
+    min-height: 3rem; margin-top: var(--space-5);
+    padding-inline: clamp(1.1rem, 2.5vw, 1.6rem);
+    border-radius: var(--radius-pill);
+    background: var(--c-accent); color: #fff;
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase;
+    transition: background var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
+  }
+  .sp__cta :global(.icon) { width: 1em; height: 1em; transition: transform var(--dur-base) var(--ease-out); }
+  @media (hover: hover) and (pointer: fine) {
+    .sp__cta:hover { background: var(--c-accent-deep); transform: translateY(-2px); }
+    .sp__cta:hover :global(.icon) { transform: translate(0.25em, -0.25em); }
+  }
+  .sp__cta:focus-visible { outline: 3px solid var(--c-ink); outline-offset: 3px; }
+
+  /* ==========================================================================
+     Das asymmetrische Raster
+     Mobil: eine Spalte, klare vertikale Fuehrung.
+     Ab Tablet: 12 Spalten, bewusst ungleiche Felder.
+     ========================================================================== */
+  .sp__raum { display: grid; gap: clamp(1rem, 2.5vw, 1.75rem); }
+
+  @media (min-width: 48rem) {
+    .sp__raum {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      align-items: start;
+    }
+    .sp__card--film    { grid-column: 1 / 9;  }
+    .sp__card--social  { grid-column: 9 / 13; grid-row: 1 / 3; }
+    .sp__card--kachel  { grid-column: 1 / 5;  }
+    .sp__card--projekt { grid-column: 5 / 9;  }
+  }
+  @media (min-width: 75rem) {
+    .sp__card--film    { grid-column: 1 / 8;  }
+    .sp__card--social  { grid-column: 9 / 12; grid-row: 1 / 3; }
+    .sp__card--kachel  { grid-column: 1 / 4;  }
+    .sp__card--projekt { grid-column: 4 / 8;  }
+  }
+
+  /* ==========================================================================
+     Die Flaechen
+     ========================================================================== */
+  .sp__card {
+    background: var(--card-light-bg);
+    border: 1px solid var(--card-light-line);
+    border-radius: var(--radius-card);
+    box-shadow: var(--card-light-shadow);
+    padding: clamp(0.5rem, 1.2vw, 0.75rem);
+  }
+
+  .sp__media {
+    position: relative; overflow: hidden;
+    border-radius: calc(var(--radius-card) - 0.4rem);
+    background: var(--tile-light-bg);
+    display: grid; place-items: center;
+    line-height: 0;
+  }
+  .sp__media--wide   { aspect-ratio: 16 / 9; }
+  .sp__media--story  { aspect-ratio: 9 / 16; }
+  .sp__media--square { aspect-ratio: 1 / 1; }
+
+  .sp__video { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+  /* Neutrale Flaeche mit Formatangabe – klar definiert, nicht vorgetaeuscht. */
+  .sp__leer {
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi);
+    letter-spacing: var(--ls-wider); font-variant-numeric: tabular-nums;
+    color: var(--c-paper-3);
+  }
+
+  .sp__bu {
+    padding: clamp(0.6rem, 1.5vw, 0.9rem) clamp(0.3rem, 1vw, 0.5rem) clamp(0.25rem, 0.8vw, 0.4rem);
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase;
+    color: var(--c-grey);
+  }
+
+  /* Die kleine Card traegt kein Medium, sondern Icon und ein Wort. */
+  .sp__card--kachel {
+    display: grid; align-content: center; gap: var(--space-4);
+    padding: clamp(1.25rem, 3vw, 2rem);
+    min-height: clamp(8rem, 18vw, 11rem);
+  }
+  .sp__icon {
+    display: grid; place-items: center;
+    width: clamp(2.5rem, 5vw, 3.25rem); height: clamp(2.5rem, 5vw, 3.25rem);
+    border-radius: var(--radius-tile);
+    background: var(--c-paper);
+    border: 1px solid var(--card-light-line-soft);
+    color: var(--c-accent-text);
+  }
+  .sp__icon :global(.icon) { width: 45%; height: 45%; }
+  .sp__kachel-text {
+    font-family: var(--font-display); font-weight: 800; font-stretch: 104%;
+    font-size: clamp(1.05rem, 0.95rem + 0.6vw, 1.4rem);
+    line-height: 1.15; letter-spacing: -0.02em; color: var(--c-ink);
+  }
+</style>
+
+<script>
+  import { watchSpatial } from '@/scripts/spatial-scroll';
+  import { watchLoopVideos } from '@/scripts/loop-video';
+  watchSpatial();
+  watchLoopVideos();
+</script>

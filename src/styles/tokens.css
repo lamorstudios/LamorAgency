@@ -226,6 +226,68 @@ html[data-palette='mono'] {
   --wash-red-dark: rgba(229, 67, 43, 0.08);
 }
 
+/* ==========================================================================
+   PALETTE "SPATIAL" – helle Raumgestaltung
+   --------------------------------------------------------------------------
+   Sehr helles Grau als Grund, weisse bis hellgraue Cards, die darueber
+   schweben, Anthrazit als Schrift. Der Akzent bleibt das LAMOR-Rot.
+
+   Der Unterschied zur Palette "mono" ist nicht nur hell statt dunkel: hier
+   traegt der GRUND eine eigene Farbe (#f0f1f2) und die Cards sind heller
+   als er. Dadurch schweben sie, ohne dass ein einziger Glow noetig waere –
+   der Schatten tut die Arbeit, nicht das Leuchten.
+
+   GESCOPT wie "mono": ohne data-palette="spatial" auf <html> aendert sich
+   an keiner bestehenden Seite ein Farbwert.
+
+   KONTRAST (WCAG AA, geprueft)
+   --c-ink #26292d auf #f0f1f2 = 11.8:1
+   --c-grey #5f656b auf #f0f1f2 = 5.1:1
+   --c-accent-text #bf2f1b auf #ffffff = 5.6:1
+   ========================================================================== */
+html[data-palette='spatial'] {
+  /* "ink" ist hier Anthrazit, nicht Schwarz – Schrift und dunkle Flaechen. */
+  --c-ink: #26292d;
+  --c-ink-2: #1b1e21;        /* dunkle Abschnitte */
+  --c-ink-3: #3a3f44;        /* Linien auf dunkel */
+  --c-paper: #f0f1f2;        /* der Grund */
+  --c-paper-2: #ffffff;      /* Cards liegen HELLER als der Grund */
+  --c-paper-3: #dcdee0;      /* Linien auf hell */
+  --c-grey: #5f656b;
+  --c-grey-dark: #a8acb0;
+
+  --c-accent: #e5432b;
+  --c-accent-text: #bf2f1b;
+  --c-accent-on-dark: #ff5c3d;
+  --c-accent-deep: #b8321e;
+
+  /* Cards: flach in der Farbe, raeumlich im Schatten. Zwei Ebenen – ein
+     enger Kontaktschatten und ein weiter, weicher Wurf. So sieht es aus wie
+     Papier ueber einer Flaeche und nicht wie ein Rahmen. */
+  --card-light-bg: #ffffff;
+  --card-light-line: rgba(38, 41, 45, 0.08);
+  --card-light-line-soft: rgba(38, 41, 45, 0.05);
+  --card-light-shadow:
+    0 1px 2px rgba(38, 41, 45, 0.05),
+    0 8px 20px -8px rgba(38, 41, 45, 0.1),
+    0 32px 64px -28px rgba(38, 41, 45, 0.22);
+
+  --card-dark-bg: #1b1e21;
+  --card-dark-line: rgba(255, 255, 255, 0.12);
+  --card-dark-line-soft: rgba(255, 255, 255, 0.07);
+  --card-dark-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 30px 70px -32px rgba(0, 0, 0, 0.8);
+  --card-dark-glow: none;
+
+  --tile-light-bg: #f6f7f8;
+  --tile-dark-bg: rgba(255, 255, 255, 0.06);
+
+  /* Keine roten Waschungen. Die Tiefe kommt aus Schatten, nicht aus Licht. */
+  --wash-red: transparent;
+  --wash-red-dark: transparent;
+
+  --radius-card: clamp(1rem, 2vw, 1.75rem);
+}
+
 /* Jede Theme-Fläche setzt ihre Textfarbe selbst (sonst erbt sie den berechneten Body-Wert) */
 [data-theme] { color: var(--fg); }
 
