@@ -1,0 +1,172 @@
+---
+/**
+ * Hero – emotional UND verständlich.
+ *
+ * Aufbau nach Verkaufslogik statt nach Plakat: Einordnung (Eyebrow) →
+ * Aussage (Headline mit hervorgehobenem Kern) → Erklärung (Subline) →
+ * Handlung (CTAs) → Belege (Chips) und daneben sofort sichtbare Arbeit.
+ * Kein leerer Vollbildschirm: schon der erste Viewport zeigt, was LAMOR tut,
+ * für wen, und womit die Behauptung gedeckt ist.
+ */
+import Media from '@/components/Media.astro';
+import Words from '@/components/Words.astro';
+import { site } from '@/data/site';
+import { stats } from '@/data/stats';
+
+// PLACEHOLDER: durch bestehendes LAMOR-Material ersetzen (siehe README).
+const heroMedia = { type: 'placeholder' as const, alt: 'Arbeit von LAMOR AGENCY', label: '[HERO] Kampagnenbild' };
+const sideA = { type: 'placeholder' as const, alt: 'Social Content von LAMOR AGENCY', label: '[HERO] Social Still' };
+const sideB = { type: 'placeholder' as const, alt: 'Fotoproduktion von LAMOR AGENCY', label: '[HERO] Fotoproduktion' };
+
+// Belege kommen aus den zentralen Zahlen – nichts doppelt gepflegt.
+const proof = [stats[0], stats[1], stats[3]];
+---
+<section class="hx" data-hero data-theme="dark" data-bg="dark" aria-labelledby="hero-title">
+  <div class="container">
+    <!-- Aussage ueber die volle Breite: lange deutsche Woerter brauchen Platz. -->
+    <div class="hx__top">
+      <p class="eyebrow hx__eyebrow">Creative Studio · {site.address.city}</p>
+      <h1 class="hx__title" id="hero-title" data-hero-title>
+        <Words text="Content, Websites &" />
+        <Words text="Markenauftritte," delay={80} />
+        <span class="hx__hl">die <span class="hl">hängen bleiben.</span></span>
+      </h1>
+    </div>
+
+    <div class="hx__grid">
+      <div class="hx__copy">
+        <p class="hx__claim t-serif-i">feel the brand not the ad</p>
+
+      <p class="hx__lead">
+        Video, Foto, Social, Web und Branding – ein Studio in {site.address.city}.
+      </p>
+
+      <div class="hx__actions">
+        <a href="/contact/" class="btn hx__cta" data-magnetic>
+          <span>Projekt anfragen</span>
+          <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+        </a>
+        <a href="/work/" class="hx__ghost">
+          <span>Arbeiten ansehen</span>
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8H14M14 8L9 3M14 8L9 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+        </a>
+      </div>
+
+      <ul class="chips hx__chips" role="list">
+        <li class="chip">Video & Foto im eigenen Haus</li>
+        <li class="chip">Eigene Models & Talents</li>
+        <li class="chip">Website & Branding</li>
+      </ul>
+
+      <ul class="hx__proof" role="list">
+        {proof.map((s) => (
+          <li class="hx__proof-item">
+            <span class="hx__proof-value">{s.prefix ?? ''}{s.value}{s.suffix ?? ''}</span>
+            <span class="hx__proof-label">{s.label}</span>
+          </li>
+        ))}
+        </ul>
+      </div>
+
+      <!-- Arbeit steht schon im ersten Viewport, nicht erst nach dem Scrollen. -->
+    <div class="hx__visual" data-hero-media>
+      <div class="hx__main mock">
+        <Media media={heroMedia} ratio="portrait" sizes="(min-width: 1024px) 34vw, 62vw" widths={[480, 900]} hover />
+        <span class="mock__tag mock__tag--br"><i aria-hidden="true"></i>Commercial · München</span>
+      </div>
+      <div class="hx__stack">
+        <div class="hx__small"><Media media={sideA} ratio="square" sizes="(min-width: 1024px) 16vw, 30vw" widths={[320, 640]} hover /></div>
+        <div class="hx__small"><Media media={sideB} ratio="square" sizes="(min-width: 1024px) 16vw, 30vw" widths={[320, 640]} hover /></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hx {
+    background: var(--c-ink);
+    color: var(--c-paper);
+    padding-top: calc(var(--header-h) + clamp(1.5rem, 5vh, 3.5rem));
+    padding-bottom: clamp(2.5rem, 6vw, 4.5rem);
+    overflow: clip;
+  }
+  .hx__top { margin-bottom: clamp(1.5rem, 3.5vw, 2.5rem); }
+  .hx__grid { display: grid; gap: clamp(2rem, 5vw, 3.5rem); }
+
+  .hx__eyebrow { margin-bottom: var(--space-4); }
+
+  .hx__title {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-stretch: 100%;
+    text-transform: uppercase;
+    /* Laengstes Wort ("MARKENAUFTRITTE,") muss in jeder Breite passen. */
+    /* Bezug ist die volle Containerbreite, deshalb darf die Schrift gross
+       werden. Geprueft am laengsten Wort: "MARKENAUFTRITTE,". */
+    font-size: clamp(1.55rem, 0.2rem + 6.4vw, 7rem);
+    line-height: 0.96;
+    letter-spacing: -0.035em;
+    margin-left: -0.03em;
+    /* Rueckfalllinie fuer lange Komposita wie "Markenauftritte" auf sehr
+       schmalen Geraeten – greift nur, wenn ein Wort sonst ueberlaufen wuerde. */
+    hyphens: auto;
+  }
+  .hx__hl { display: block; }
+
+  .hx__claim {
+    font-size: clamp(1.15rem, 0.9rem + 1.2vw, 1.9rem);
+    color: var(--c-paper);
+    opacity: 0.9;
+  }
+
+  .hx__lead {
+    margin-top: var(--space-4);
+    max-width: 52ch;
+    color: var(--c-grey-dark);
+    font-size: var(--fs-body);
+    line-height: 1.55;
+  }
+
+  .hx__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4) var(--space-6); margin-top: var(--space-5); }
+  .hx__cta { min-height: 3.25rem; }
+  .hx__ghost {
+    display: inline-flex; align-items: center; gap: 0.7em; min-height: 44px;
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi);
+    font-stretch: var(--wd-tight); letter-spacing: var(--ls-wide); text-transform: uppercase;
+    border-bottom: 1px solid currentColor; padding-bottom: 0.3em;
+    transition: color var(--dur-base) var(--ease-out);
+  }
+  .hx__ghost svg { width: 1em; height: 1em; transition: transform var(--dur-base) var(--ease-out); }
+  .hx__ghost:hover { color: var(--c-accent-on-dark); }
+  .hx__ghost:hover svg { transform: translateX(0.3em); }
+
+  .hx__chips { margin-top: var(--space-5); }
+
+  /* Belege als Zahlenreihe – Social Proof ohne eigene Section. */
+  .hx__proof {
+    display: flex; flex-wrap: wrap; gap: var(--space-4) clamp(1.5rem, 4vw, 3rem);
+    margin-top: var(--space-6); padding-top: var(--space-5);
+    border-top: 1px solid var(--c-ink-3);
+  }
+  .hx__proof-item { display: grid; gap: 0.1rem; }
+  .hx__proof-value {
+    font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: var(--wd-wide);
+    font-size: clamp(1.35rem, 1rem + 1.5vw, 2.1rem); line-height: 1; letter-spacing: var(--ls-tight);
+    font-variant-numeric: tabular-nums;
+  }
+  .hx__proof-label {
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--c-grey-dark);
+  }
+
+  /* ---------- Bildseite ---------- */
+  .hx__visual { display: grid; grid-template-columns: 1.55fr 1fr; gap: clamp(0.5rem, 1.5vw, 0.9rem); align-items: start; }
+  .hx__stack { display: grid; gap: clamp(0.5rem, 1.5vw, 0.9rem); }
+  .hx__main, .hx__small { border-radius: clamp(0.5rem, 1.5vw, 0.9rem); overflow: hidden; }
+
+  @media (min-width: 1024px) {
+    .hx__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr); align-items: start; gap: clamp(2.5rem, 5vw, 4.5rem); }
+    .hx__title { font-stretch: 112%; }
+  }
+</style>

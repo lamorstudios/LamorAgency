@@ -1,0 +1,206 @@
+---
+/**
+ * ============================================================================
+ * HERO DER HAUPTWEBSITE
+ * ============================================================================
+ *
+ * SHOW, DON'T TELL. Der erste Bildschirm traegt genau vier Dinge:
+ * Herkunft, Botschaft, vier Woerter Einordnung, eine Handlung. Sonst
+ * nichts. Keine Badges, keine Kennzahlen, keine zweite Schaltflaeche,
+ * keine Sprungleiste – der Film und die Headline sollen wirken, und das
+ * tun sie nur, wenn nichts daneben um Aufmerksamkeit bittet.
+ *
+ * DIE WIRKUNG KOMMT AUS DREI QUELLEN
+ *   1. Film, bildfuellend und stumm im Hintergrund
+ *   2. Typografie in einer Groesse, die nur funktioniert, wenn sonst nichts
+ *      um sie herum steht
+ *   3. Weissraum – der Hero ist absichtlich unten ausgerichtet, damit oben
+ *      Luft bleibt
+ *
+ * OHNE FILM SIEHT ES NICHT KAPUTT AUS
+ * Fehlt hero.mp4, bleibt die Flaeche tiefschwarz mit einer sehr ruhigen
+ * Vignette. Das ist keine Platzhalterflaeche, sondern eine zweite gueltige
+ * Fassung desselben Heros: Die Typografie traegt ihn auch allein. Es
+ * erscheint kein Hinweistext und kein Kasten.
+ * Datei ablegen: public/media/hero.mp4 (Anleitung in public/media/README.md)
+ *
+ * BEWEGUNG
+ * Der Film laeuft stumm, in Schleife, ohne Bedienelemente. Bei "Bewegung
+ * reduzieren" wird er angehalten und das Standbild bleibt stehen – anders
+ * als bei den Erklaerfilmen ist er hier reine Atmosphaere, kein Inhalt,
+ * und niemand verpasst etwas.
+ *
+ * TEXTANIMATION
+ * Mask-Reveal ueber <Words>, zeilenweise. Faellt JavaScript aus, steht der
+ * Text sofort vollstaendig da – der Watchdog in BaseLayout sorgt dafuer.
+ */
+import Words from '@/components/Words.astro';
+import Icon from '@/components/Icon.astro';
+import { site } from '@/data/site';
+import { videoSlot } from '@/lib/media-slots';
+
+const film = videoSlot('hero');
+---
+<section class="mh" data-theme="dark" data-bg="dark" aria-labelledby="mh-title">
+  <div class="mh__bg" aria-hidden="true">
+    {film.available && (
+      <video
+        class="mh__video"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        poster={film.poster}
+        disablepictureinpicture
+        tabindex="-1"
+        data-hero-film
+      >
+        {film.webm && <source src={film.webm} type="video/webm" />}
+        {film.mp4 && <source src={film.mp4} type="video/mp4" />}
+      </video>
+    )}
+    <span class="mh__veil"></span>
+  </div>
+
+  <div class="container mh__inner">
+    <p class="mh__eyebrow" data-reveal="fade">
+      <span class="mh__dot" aria-hidden="true"></span>
+      Kreativagentur · {site.address.city}
+    </p>
+
+    <h1 class="mh__title" id="mh-title">
+      <Words lines={['Feel the brand.', 'Not the ad.']} />
+    </h1>
+
+    <p class="mh__lead" data-reveal style="--reveal-delay:420ms">
+      Film, Motion, Branding, Web.
+    </p>
+
+    <div class="mh__actions" data-reveal style="--reveal-delay:520ms">
+      <a href="/contact/" class="mh__cta" data-magnetic>
+        <span>Projekt anfragen</span>
+        <Icon name="arrow" class="mh__cta-arrow" />
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .mh {
+    position: relative;
+    display: grid;
+    align-content: end;
+    /* svh: auf iOS springt die Hoehe sonst mit der Adressleiste. */
+    min-height: 92svh;
+    padding-top: calc(var(--header-h) + clamp(2rem, 8vh, 5rem));
+    padding-bottom: clamp(2rem, 6vh, 4rem);
+    overflow: clip;
+    isolation: isolate;
+    background: #000;
+  }
+  @media (min-width: 1024px) { .mh { min-height: min(94svh, 62rem); } }
+
+  /* ---------- Hintergrund ---------- */
+  .mh__bg { position: absolute; inset: 0; z-index: -2; background: #000; }
+  .mh__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+  /* Der Schleier macht den Text lesbar und gibt dem Bild unten Gewicht.
+     Ohne Film ist er eine sehr ruhige Vignette – mehr braucht es nicht. */
+  .mh__veil {
+    position: absolute; inset: 0; z-index: 1;
+    background:
+      linear-gradient(to top, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.55) 42%, rgba(0, 0, 0, 0.18) 72%, rgba(0, 0, 0, 0.5) 100%),
+      radial-gradient(120% 80% at 50% 120%, rgba(255, 255, 255, 0.05), transparent 60%);
+  }
+
+  .mh__inner { position: relative; z-index: 1; }
+
+  /* ---------- Auszeichnung ---------- */
+  .mh__eyebrow {
+    display: inline-flex; align-items: center; gap: 0.6em;
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wider); text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.72);
+  }
+  .mh__dot { width: 0.45em; height: 0.45em; border-radius: 50%; background: var(--c-accent); flex: none; }
+
+  /* ---------- Botschaft ---------- */
+  .mh__title {
+    margin-top: clamp(1rem, 3vh, 2rem);
+    font-family: var(--font-display); font-weight: 900; font-stretch: 112%;
+    font-size: clamp(2.9rem, 1rem + 9.4vw, 10.5rem);
+    line-height: 0.88; letter-spacing: -0.045em; text-transform: uppercase;
+    color: #fff;
+    /* Optischer Randausgleich: Versalien sitzen sonst sichtbar eingerueckt. */
+    margin-left: -0.035em;
+  }
+
+  /* Vier Woerter statt zwei Zeilen. Sie sagen dasselbe und lassen dem
+     Film und der Headline den Platz, den beide brauchen. */
+  .mh__lead {
+    margin-top: clamp(0.9rem, 2.2vh, 1.5rem);
+    font-size: clamp(0.95rem, 0.85rem + 0.5vw, 1.25rem);
+    font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.65);
+  }
+
+  /* ---------- Handlung ---------- */
+  .mh__actions {
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: clamp(0.75rem, 2vw, 1.5rem);
+    margin-top: clamp(1.5rem, 4vh, 2.5rem);
+  }
+  .mh__cta {
+    display: inline-flex; align-items: center; gap: 0.7em;
+    min-height: 3.25rem; padding-inline: clamp(1.25rem, 3vw, 1.9rem);
+    border-radius: var(--radius-pill);
+    background: var(--c-accent); color: #fff;
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase;
+    transition: background var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
+  }
+  .mh__cta :global(.icon) { width: 1em; height: 1em; transition: transform var(--dur-base) var(--ease-out); }
+  @media (hover: hover) and (pointer: fine) {
+    .mh__cta:hover { background: var(--c-accent-deep); transform: translateY(-2px); }
+    .mh__cta:hover :global(.icon) { transform: translate(0.25em, -0.25em); }
+  }
+  .mh__cta:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+
+</style>
+
+<script>
+  /**
+   * Der Hintergrundfilm ist Atmosphaere, nicht Inhalt. Deshalb hier – anders
+   * als bei den Erklaerfilmen – die Ruecksicht auf "Bewegung reduzieren":
+   * wer das eingestellt hat, bekommt das Standbild und verpasst nichts.
+   *
+   * Ausserdem: pausieren, sobald der Hero aus dem Bild ist. Ein Film, der
+   * im Hintergrund weiterlaeuft, kostet Akku und Daten ohne Nutzen.
+   */
+  function initHeroFilm() {
+    const video = document.querySelector<HTMLVideoElement>('[data-hero-film]');
+    if (!video || (video as any).__init) return;
+    (video as any).__init = true;
+
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      video.removeAttribute('autoplay');
+      video.pause();
+      return;
+    }
+
+    const spielen = () => video.play?.().catch(() => { /* Poster bleibt stehen. */ });
+    spielen();
+
+    if (!('IntersectionObserver' in window)) return;
+    const io = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) spielen(); else video.pause(); },
+      { threshold: 0.05 },
+    );
+    io.observe(video);
+  }
+
+  initHeroFilm();
+  document.addEventListener('astro:page-load', initHeroFilm);
+</script>

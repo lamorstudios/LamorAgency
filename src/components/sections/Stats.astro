@@ -1,0 +1,53 @@
+---
+/**
+ * LAMOR in Zahlen.
+ * Die Zahl steht im Markup – die Count-up-Animation ist reine Zugabe und
+ * läuft nur, wenn JS aktiv ist und Reduced Motion nicht gesetzt wurde.
+ * Fällt sie aus, steht der Endwert trotzdem da.
+ */
+import { stats } from '@/data/stats';
+
+const fmt = (s: (typeof stats)[number]) =>
+  s.grouped ? new Intl.NumberFormat('de-DE').format(s.value) : String(s.value);
+---
+<section class="stats section" data-theme="accent" data-bg="accent" aria-labelledby="stats-title">
+  <div class="container">
+    <h2 class="t-label stats__label" id="stats-title" data-reveal="fade">LAMOR AGENCY in Zahlen</h2>
+    <dl class="stats__grid">
+      {stats.map((s, i) => (
+        <div class="stats__item" data-reveal style={`--reveal-delay:${i * 80}ms`}>
+          <dt class="visually-hidden">{s.label}</dt>
+          <dd class="stats__value">
+            {s.prefix}<span data-count={s.value} data-grouped={s.grouped ? '' : undefined}>{fmt(s)}</span>{s.suffix}
+          </dd>
+          <p class="stats__name t-h4">{s.label}</p>
+          {s.note && <p class="stats__note t-small">{s.note}</p>}
+        </div>
+      ))}
+    </dl>
+  </div>
+</section>
+
+<style>
+  .stats { background: var(--c-accent); color: #fff; }
+  .stats__label { color: rgba(255, 255, 255, 0.72); margin-bottom: var(--space-7); }
+  .stats__grid { display: grid; gap: var(--space-6); margin: 0; }
+  .stats__item { display: grid; gap: 0.35rem; align-content: start; padding-top: var(--space-4); border-top: 1px solid rgba(255, 255, 255, 0.28); }
+  .stats__value {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: var(--fw-display);
+    font-stretch: var(--wd-mega);
+    font-size: clamp(2.75rem, 1.5rem + 5vw, 5.5rem);
+    line-height: 0.9;
+    letter-spacing: var(--ls-mega);
+    /* Tabellenziffern: die Breite springt beim Hochzählen nicht. */
+    font-variant-numeric: tabular-nums;
+  }
+  .stats__note { color: rgba(255, 255, 255, 0.72); max-width: 30ch; }
+
+  @media (min-width: 620px) { .stats__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 1100px) {
+    .stats__grid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--space-5); }
+  }
+</style>

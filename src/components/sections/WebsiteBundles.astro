@@ -1,0 +1,101 @@
+---
+/**
+ * Die zwei Buendel: Website + Branding und Website + Content.
+ * Frueher am Ende der Paketliste; jetzt eigenstaendig, weil die Paketkarten
+ * und die Leistungsmatrix diese Aufgabe uebernommen haben.
+ * Inhalte und Preise aus src/data/website-pricing.ts.
+ */
+import Icon from '@/components/Icon.astro';
+import Words from '@/components/Words.astro';
+import { websiteBundles, euro } from '@/data/website-pricing';
+---
+<section class="bd" data-theme="light" data-bg="light" aria-labelledby="bd-title">
+  <div class="container">
+    <div class="bd__head">
+      <p class="eyebrow bd__label" data-reveal="fade">Kombinationen</p>
+      <h2 class="bd__title" id="bd-title"><Words text="Zwei Wege, die sich fast immer lohnen." /></h2>
+    </div>
+
+    <ul class="bd__grid" role="list">
+      {websiteBundles.map((b, i) => (
+        <li class={`card bd__card ${i === 1 ? 'card--dark bd__card--dark' : 'card--light'}`} data-reveal>
+          <p class="bd__name">{b.name}</p>
+          <h3 class="bd__headline">{b.headline}</h3>
+          <p class="bd__text">{b.description}</p>
+          <ul class="bd__items" role="list">
+            {b.includes.map((inc) => <li class="bd__item">{inc}</li>)}
+          </ul>
+          <p class="bd__price">
+            <span class="bd__value">{b.price !== null ? `${b.priceFrom ? 'ab ' : ''}${euro(b.price)}` : 'Auf Anfrage'}</span>
+            {b.priceNote && <span class="bd__note">{b.priceNote}</span>}
+          </p>
+          <a href={b.cta.href} class="bd__cta">
+            <span>{b.cta.label}</span>
+            <Icon name="arrow" class="bd__cta-icon" />
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .bd { padding-block: clamp(2rem, 5vw, 4rem); }
+  .bd__head { display: grid; gap: var(--space-3); margin-bottom: clamp(1.25rem, 3vw, 2rem); }
+  .bd__label { color: var(--c-accent-text); }
+  .bd__title {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 110%;
+    font-size: clamp(1.5rem, 0.9rem + 2.6vw, 3rem);
+    line-height: 1.02; letter-spacing: -0.04em; max-width: 22ch; text-wrap: balance;
+  }
+
+  .bd__grid { display: grid; gap: clamp(0.5rem, 1.5vw, 1.25rem); }
+  @media (min-width: 800px) { .bd__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .bd__card {
+    display: grid; align-content: start; gap: clamp(0.4rem, 1.2vw, 0.7rem);
+    padding: clamp(1rem, 2.5vw, 1.75rem);
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) { .bd__card:hover { transform: translateY(-3px); } }
+
+  .bd__name {
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--c-accent-text);
+  }
+  .bd__card--dark .bd__name { color: var(--c-accent-on-dark); }
+  .bd__headline {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 108%;
+    font-size: clamp(1.05rem, 0.9rem + 1.1vw, 1.7rem);
+    line-height: 1.02; letter-spacing: -0.035em; text-transform: uppercase; max-width: 20ch;
+  }
+  .bd__text { font-size: var(--fs-small); line-height: 1.45; color: var(--card-muted); max-width: 46ch; }
+  .bd__items { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.2rem; }
+  .bd__item {
+    padding: 0.35em 0.7em; border-radius: var(--radius-pill);
+    border: 1px solid var(--card-line); color: var(--card-muted);
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase;
+  }
+  .bd__price { display: grid; gap: 0.15rem; margin-top: var(--space-3); }
+  .bd__value {
+    font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: 118%;
+    font-size: clamp(1.4rem, 0.9rem + 2.2vw, 2.4rem);
+    line-height: 0.95; letter-spacing: -0.05em; font-variant-numeric: tabular-nums;
+  }
+  .bd__card--dark .bd__value { color: var(--c-accent-on-dark); }
+  .bd__note { font-size: var(--fs-small); color: var(--card-muted); }
+  .bd__cta {
+    display: inline-flex; align-items: center; gap: 0.5rem; justify-self: start;
+    margin-top: var(--space-3); padding: 0.65rem 1.1rem;
+    border-radius: var(--radius-pill); border: 1px solid var(--card-line);
+    text-decoration: none; color: inherit;
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase;
+    transition: background var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out);
+  }
+  .bd__cta-icon { width: 1.1em; height: 1.1em; }
+  @media (hover: hover) and (pointer: fine) {
+    .bd__cta:hover { background: var(--c-ink); color: var(--c-paper); border-color: var(--c-ink); }
+    .bd__card--dark .bd__cta:hover { background: var(--c-paper); color: var(--c-ink); border-color: var(--c-paper); }
+  }
+</style>

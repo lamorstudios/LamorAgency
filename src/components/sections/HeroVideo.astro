@@ -1,0 +1,218 @@
+---
+/**
+ * Video-Hero der Startseite.
+ *
+ * Das Video ist die Hauptflaeche, die Typografie liegt sehr reduziert darueber:
+ * Marke, Positionierung, ein kurzer Claim, zwei Handlungen. Mehr nicht – das
+ * Video soll verkaufen, nicht der Text.
+ *
+ * ASSET-SLOT: Die Dateien werden zur Build-Zeit in /public/media gesucht
+ * (hero.webm / hero.mp4 / hero-poster.jpg). Liegt keine davon dort, rendert
+ * der Hero die Platzhalter-Flaeche – die Seite bleibt vollstaendig. Anleitung
+ * und Empfehlungen: public/media/README.md
+ *
+ * AUTOPLAY: stumm, in der Seite abspielend, in Schleife. Browser erlauben
+ * Autoplay nur so zuverlaessig. Bei "Bewegung reduzieren" laeuft nichts – dann
+ * steht das Posterbild.
+ *
+ * PERFORMANCE: preload="metadata" statt "auto", damit der Hero die Seite nicht
+ * blockiert; das Poster traegt den ersten Frame. Die Flaeche hat eine feste
+ * Hoehe, es entsteht kein Layoutsprung.
+ */
+import Icon from '@/components/Icon.astro';
+import { site } from '@/data/site';
+import { videoSlot } from '@/lib/media-slots';
+
+const hero = videoSlot('hero');
+---
+<section class="hv" data-hero data-video-hero data-theme="dark" data-bg="dark" aria-labelledby="hero-title">
+  <div class="hv__media">
+    {hero.available ? (
+      <video
+        class="hv__video"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        poster={hero.poster}
+        aria-hidden="true"
+        tabindex="-1"
+        data-hero-video
+      >
+        {hero.webm && <source src={hero.webm} type="video/webm" />}
+        {hero.mp4 && <source src={hero.mp4} type="video/mp4" />}
+      </video>
+    ) : (
+      <div class="hv__slot" role="img" aria-label="Showreel von LAMOR AGENCY">
+        <span class="hv__slot-note">Hero-Video · <code>/public/media/hero.mp4</code></span>
+      </div>
+    )}
+    <span class="hv__veil" aria-hidden="true"></span>
+  </div>
+
+  <div class="container hv__inner">
+    <p class="eyebrow hv__eyebrow">Creative Agency · {site.address.city}</p>
+
+    <h1 class="hv__title" id="hero-title">
+      <span class="hv__brand">LAMOR</span>
+      <span class="hv__brand hv__brand--em">AGENCY</span>
+    </h1>
+
+    <p class="hv__claim t-serif-i">feel the brand not the ad</p>
+
+    <div class="hv__actions">
+      <a href="/contact/" class="btn hv__cta" data-magnetic>
+        <span>Projekt starten</span>
+        <Icon name="arrow" class="btn__arrow" />
+      </a>
+      <a href="/work/" class="hv__ghost">
+        <span>Arbeiten ansehen</span>
+        <Icon name="arrow" />
+      </a>
+    </div>
+
+    <ul class="hv__tags" role="list">
+      <li>Video</li>
+      <li>Fotografie</li>
+      <li>Social Media</li>
+      <li>Models</li>
+      <li>Branding</li>
+    </ul>
+  </div>
+
+  <span class="hv__scroll" aria-hidden="true">Scrollen</span>
+</section>
+
+<script>
+  /**
+   * Autoplay ist nicht garantiert: iOS im Stromsparmodus und einige Browser
+   * lehnen play() ab. Dann bleibt das Posterbild stehen – kein Fehler, nur
+   * kein Video. Ausserdem pausiert das Video, sobald der Hero aus dem Bild
+   * ist: das spart Akku und Datenvolumen.
+   */
+  function initHeroVideo() {
+    const video = document.querySelector<HTMLVideoElement>('[data-hero-video]');
+    if (!video || (video as any).__init) return;
+    (video as any).__init = true;
+
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      video.removeAttribute('autoplay');
+      video.pause();
+      return;
+    }
+
+    video.play?.().catch(() => { /* Poster bleibt stehen. */ });
+
+    if (!('IntersectionObserver' in window)) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) video.play?.().catch(() => {});
+        else video.pause();
+      },
+      { threshold: 0.1 },
+    );
+    io.observe(video);
+  }
+  initHeroVideo();
+  document.addEventListener('astro:page-load', initHeroVideo);
+</script>
+
+<style>
+  .hv {
+    position: relative;
+    display: grid;
+    align-content: end;
+    /* svh statt vh: auf iOS springt die Hoehe sonst mit der Adressleiste. */
+    min-height: 88svh;
+    padding-top: calc(var(--header-h) + var(--space-6));
+    padding-bottom: clamp(2.5rem, 7vh, 5rem);
+    overflow: clip;
+    isolation: isolate;
+  }
+  @media (min-width: 1024px) { .hv { min-height: min(92svh, 60rem); } }
+
+  /* ---------- Medienflaeche ---------- */
+  .hv__media { position: absolute; inset: 0; z-index: -2; background: var(--c-ink); }
+  .hv__video,
+  .hv__slot {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  /* Solange keine Datei vorliegt: eine ruhige Filmflaeche, kein buntes
+     Platzhaltermuster – die Komposition soll auch jetzt schon tragen. */
+  .hv__slot {
+    display: grid; place-items: center;
+    background:
+      radial-gradient(120% 90% at 70% 20%, #262019 0%, #14110f 45%, #0b0a09 100%);
+  }
+  .hv__slot-note {
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase;
+    color: rgba(242, 237, 228, 0.3);
+  }
+  .hv__slot-note code { font-family: inherit; text-transform: none; letter-spacing: 0; }
+  /* Verlauf statt Flaeche: unten lesbar, oben bleibt das Bild sichtbar. */
+  .hv__veil {
+    position: absolute; inset: 0; z-index: 1;
+    background:
+      linear-gradient(to top, rgba(11, 10, 9, 0.92) 0%, rgba(11, 10, 9, 0.55) 38%, rgba(11, 10, 9, 0.25) 70%, rgba(11, 10, 9, 0.45) 100%),
+      radial-gradient(70% 50% at 80% 10%, rgba(229, 67, 43, 0.22), transparent 70%);
+  }
+
+  .hv__inner { position: relative; z-index: 1; display: grid; gap: clamp(0.75rem, 2vw, 1.25rem); }
+  .hv__eyebrow { color: var(--c-accent-on-dark); }
+
+  /* ---------- Typografie ---------- */
+  .hv__title {
+    display: grid;
+    font-family: var(--font-display); font-weight: 900; font-stretch: 118%;
+    font-size: clamp(2.8rem, 1rem + 12vw, 11rem);
+    line-height: 0.86; letter-spacing: -0.05em; text-transform: uppercase;
+  }
+  .hv__brand { display: block; }
+  .hv__brand--em { color: var(--c-accent-on-dark); }
+  .hv__claim {
+    font-size: clamp(1rem, 0.9rem + 1vw, 1.6rem);
+    color: var(--c-paper); opacity: 0.86;
+  }
+
+  .hv__actions { display: flex; flex-wrap: wrap; align-items: center; gap: clamp(0.6rem, 2vw, 1.25rem); margin-top: var(--space-2); }
+  .hv__cta { min-height: 3.1rem; }
+  .hv__ghost {
+    display: inline-flex; align-items: center; gap: 0.5em; min-height: 3.1rem;
+    color: var(--c-paper); text-decoration: none;
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase;
+    border-bottom: 1px solid rgba(242, 237, 228, 0.35);
+  }
+  .hv__ghost :global(.icon) { width: 1.1em; height: 1.1em; transition: transform var(--dur-base) var(--ease-out); }
+  @media (hover: hover) and (pointer: fine) {
+    .hv__ghost:hover { border-bottom-color: var(--c-accent-on-dark); color: var(--c-accent-on-dark); }
+    .hv__ghost:hover :global(.icon) { transform: translateX(0.25em); }
+  }
+
+  .hv__tags {
+    display: flex; flex-wrap: wrap; gap: 0.4rem 0.5rem;
+    margin-top: var(--space-2);
+  }
+  .hv__tags li {
+    padding: 0.4em 0.8em; border-radius: var(--radius-pill);
+    border: 1px solid rgba(242, 237, 228, 0.24);
+    background: rgba(11, 10, 9, 0.35);
+    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase;
+  }
+
+  .hv__scroll {
+    position: absolute; right: var(--gutter); bottom: clamp(2.5rem, 7vh, 5rem);
+    z-index: 1;
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase;
+    color: var(--fg-muted);
+    writing-mode: vertical-rl;
+  }
+  @media (max-width: 767px) { .hv__scroll { display: none; } }
+</style>

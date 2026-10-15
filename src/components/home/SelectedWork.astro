@@ -1,44 +1,88 @@
 ---
+/**
+ * Selected Work – asymmetrisches Editorial-Raster.
+ *
+ * Bewusst kein gleichmässiges Grid: ein randloses Grossformat eröffnet, danach
+ * wechseln sich Hoch- und Querformate in versetzten Spalten ab. Die Versätze
+ * sind fest gesetzt, nicht zufällig – so entsteht Rhythmus statt Unruhe.
+ */
 import { getCollection } from 'astro:content';
 import WorkAct from '@/components/WorkAct.astro';
+import Words from '@/components/Words.astro';
 import ArrowLink from '@/components/ArrowLink.astro';
-const projects = (await getCollection('projects')).filter((p) => p.data.featured).sort((a, b) => a.data.order - b.data.order).slice(0, 6);
+
+const projects = (await getCollection('projects'))
+  .filter((p) => p.data.featured)
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 6);
 const [a, b, c, d, e, f] = projects;
 ---
-<section class="work" id="work" data-theme="light" data-bg="light" aria-labelledby="work-title">
-  <div class="container work__head">
-    <h2 class="t-say work__title" id="work-title" data-reveal>Arbeiten, die man<br />fühlt statt überspringt.</h2>
-    <p class="t-label work__meta" data-reveal="fade">Selected Work</p>
+<section class="wk" id="work" data-theme="light" data-bg="light" aria-labelledby="work-title">
+  <div class="container wk__head">
+    <p class="t-label wk__label">Selected Work</p>
+    <h2 class="wk__title" id="work-title">
+      <Words text="Arbeiten, die man" />
+      <span class="wk__title-em t-serif-i">fühlt</span>
+      <Words text="statt überspringt." delay={120} />
+    </h2>
   </div>
 
-  {a && <WorkAct project={a} index={0} variant="takeover" priority />}
-  {b && <WorkAct project={b} index={1} variant="offset" />}
+  {a && <div class="wk__feature"><WorkAct project={a} index={0} variant="feature" priority /></div>}
 
-  <div class="container work__pair">
-    {c && <WorkAct project={c} index={2} variant="portrait" />}
-    {d && <WorkAct project={d} index={3} variant="portrait" />}
+  <div class="container">
+    <div class="wk__pair">
+      {b && <div class="wk__cell wk__cell--tall-l"><WorkAct project={b} index={1} variant="tall" /></div>}
+      {c && <div class="wk__cell wk__cell--square-r"><WorkAct project={c} index={2} variant="square" /></div>}
+    </div>
   </div>
 
-  {e && <WorkAct project={e} index={4} variant="accent" />}
-  {f && <WorkAct project={f} index={5} variant="wide" />}
+  {d && <div class="container wk__wide"><WorkAct project={d} index={3} variant="wide" /></div>}
 
-  <div class="container work__more" data-reveal>
+  <div class="container">
+    <div class="wk__pair wk__pair--rev">
+      {e && <div class="wk__cell wk__cell--square-l"><WorkAct project={e} index={4} variant="square" /></div>}
+      {f && <div class="wk__cell wk__cell--tall-r"><WorkAct project={f} index={5} variant="tall" /></div>}
+    </div>
+  </div>
+
+  <div class="container wk__more">
     <ArrowLink href="/work/" label="Alle Projekte ansehen" />
   </div>
 </section>
 
 <style>
-  .work { color: var(--c-ink); padding-block: var(--space-9) var(--space-8); overflow: hidden; }
-  .work__head { display: grid; gap: var(--space-4); margin-bottom: var(--space-8); }
-  .work__title { max-width: 18ch; }
-  .work__meta { color: var(--fg-muted); }
-  .work__pair { display: grid; gap: var(--space-6); }
-  .work__more { margin-top: var(--space-8); }
+  .wk { padding-block: var(--space-9) var(--space-8); overflow: clip; }
+
+  .wk__head { display: grid; gap: var(--space-4); margin-bottom: clamp(2rem, 5vw, 4rem); }
+  .wk__label { color: var(--c-accent); }
+  .wk__title {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-stretch: 118%;
+    text-transform: uppercase;
+    font-size: clamp(1.9rem, 0.6rem + 5.6vw, 5.5rem);
+    line-height: 0.92;
+    letter-spacing: -0.04em;
+    max-width: 18ch;
+  }
+  .wk__title-em { color: var(--c-accent); }
+
+  .wk__feature { margin-bottom: clamp(2.5rem, 7vw, 6rem); }
+
+  .wk__pair { display: grid; gap: clamp(2.5rem, 6vw, 4rem); }
+  .wk__wide { margin-block: clamp(2.5rem, 7vw, 6rem); }
+  .wk__more { margin-top: clamp(2.5rem, 6vw, 4.5rem); }
+
+  /* Ab Tablet die Versätze – vorher stört jede Verschiebung nur. */
   @media (min-width: 768px) {
-    .work__head { grid-template-columns: 1fr auto; align-items: end; }
-    .work__meta { text-align: right; }
-    .work__pair { grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--grid-gap); align-items: start; }
-    .work__pair > :global(.act:first-child) { grid-column: 1 / 6; }
-    .work__pair > :global(.act:last-child) { grid-column: 7 / 12; margin-top: var(--space-9); }
+    .wk__pair {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--grid-gap);
+      align-items: start;
+    }
+    .wk__cell--tall-l { grid-column: 1 / 7; }
+    .wk__cell--square-r { grid-column: 8 / -1; margin-top: clamp(4rem, 12vw, 11rem); }
+    .wk__cell--square-l { grid-column: 1 / 6; margin-top: clamp(3rem, 9vw, 8rem); }
+    .wk__cell--tall-r { grid-column: 7 / -1; }
   }
 </style>

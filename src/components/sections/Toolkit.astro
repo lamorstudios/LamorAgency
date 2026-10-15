@@ -1,0 +1,83 @@
+---
+/**
+ * ============================================================================
+ * WERKZEUG UND TECHNIK
+ * ============================================================================
+ *
+ * Auf der bestehenden Website hiess dieser Abschnitt "Unsere Anbieter" und
+ * war eine reine Logoreihe. Hier bekommt jedes Werkzeug eine Zeile dazu:
+ * wofuer es da ist, in einem Satz, auch fuer Laien verstaendlich.
+ *
+ * WARUM DAS SO WICHTIG IST
+ * Der Besucher soll das Gefuehl haben, er wird aufgeklaert – nicht beworben.
+ * "Sony" allein sagt einem Restaurantbesitzer nichts. "Kameras und Objektive
+ * fuer Film und Foto" schon. Genau dieser Unterschied entscheidet, ob jemand
+ * Professionalitaet wahrnimmt oder nur Logos sieht.
+ *
+ * LOGOS: liegen sie in src/assets/brand/toolkit/<file>.svg|png, ersetzt das
+ * Bild den Schriftzug. Ohne Logo steht der Name typografisch – gestaltet,
+ * nicht kaputt. Es wird kein Logo nachgebaut und keine Marke ergaenzt.
+ * Pflege: src/data/toolkit.ts
+ */
+import { Picture } from 'astro:assets';
+import { toolkit } from '@/data/toolkit';
+
+const dateien = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/brand/toolkit/*.{svg,png,jpg,webp,avif}',
+);
+
+const werkzeuge = await Promise.all(
+  toolkit.map(async (t) => {
+    const treffer = Object.keys(dateien).find((p) =>
+      p.includes(`/toolkit/${t.file}.`));
+    return { ...t, img: treffer ? (await dateien[treffer]()).default : undefined };
+  }),
+);
+---
+<section class="tk" data-theme="dark" data-bg="dark" aria-labelledby="tk-title">
+  <div class="container">
+    <h2 class="tk__title" id="tk-title" data-reveal="fade">Womit wir arbeiten</h2>
+
+    <ul class="tk__grid" role="list">
+      {werkzeuge.map((t, i) => (
+        <li class="tk__item" data-reveal="fade" style={`--reveal-delay:${80 + i * 50}ms`}>
+          {t.img
+            ? <Picture src={t.img} formats={['webp']} widths={[200, 400]} sizes="170px" alt={t.name} class="tk__logo" loading="lazy" />
+            : <span class="tk__name">{t.name}</span>}
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .tk { padding-block: clamp(2.5rem, 6vw, 4.5rem); }
+
+  .tk__title {
+    margin-bottom: clamp(1.25rem, 3vw, 2rem);
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wider); text-transform: uppercase;
+    color: var(--fg-muted);
+  }
+
+  /* Eine ruhige Reihe statt eines Rasters mit Fugen. Die Logos sollen
+     nebeneinanderstehen wie Marken, nicht wie Produktkacheln. */
+  .tk__grid { display: flex; flex-wrap: wrap; align-items: center; gap: clamp(1.75rem, 6vw, 4.5rem); }
+  .tk__item { display: flex; align-items: center; min-height: 2rem; }
+
+  /* Originalfarben bleiben erhalten – es sind fremde Marken, keine
+     Designelemente. Vereinheitlicht wird nur die Hoehe. */
+  .tk__logo {
+    width: auto; height: clamp(1.4rem, 3vw, 2.1rem);
+    object-fit: contain; object-position: left center;
+    opacity: 0.9;
+  }
+
+  /* Ohne Logodatei: der Name typografisch. Gestaltet, nicht kaputt. */
+  .tk__name {
+    font-family: var(--font-display); font-weight: 700; font-stretch: 104%;
+    font-size: clamp(0.95rem, 0.88rem + 0.4vw, 1.2rem);
+    letter-spacing: -0.015em; text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.55);
+  }
+</style>

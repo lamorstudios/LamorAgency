@@ -1,34 +1,243 @@
 ---
+/**
+ * DATENSCHUTZERKLÄRUNG – Stand dieser Landingpage.
+ *
+ * GRUNDSATZ: Hier steht ausschliesslich, was auf DIESER Seite tatsaechlich
+ * passiert. Der Inhalt ist nicht von der Wix-Seite uebernommen, sondern aus
+ * dem ausgelieferten Build abgeleitet und dort nachgeprueft:
+ *
+ *   Hosting              Netlify (dist/ wird von Netlify ausgeliefert)
+ *   Formular             Netlify Forms, Formularname "website"
+ *   Spamschutz           Honeypot-Feld "bot-field", kein Captcha
+ *   Schriften            selbst gehostet unter /fonts/*.woff2
+ *   Speicher im Browser  sessionStorage-Schluessel "lamor-intro"
+ *   Externe Links        wa.me und instagram.com – reine Links, keine Embeds
+ *
+ * NICHT vorhanden und deshalb NICHT erwaehnt: Google Fonts oder andere
+ * Schrift-CDNs, Analytics, Tag Manager, Pixel, Karten, Videoeinbettungen,
+ * Cookies, Consent-Banner. Im Build nachgewiesen: keine Treffer fuer
+ * gtag, google-analytics, googletagmanager, plausible, matomo, fathom,
+ * hotjar, facebook.net, fbq, clarity, segment, posthog, fonts.googleapis,
+ * fonts.gstatic, document.cookie.
+ *
+ * Wer hier einen Dienst ergaenzt, ergaenzt ihn erst, wenn er wirklich
+ * eingebaut ist – und entfernt ihn wieder, sobald er rausfliegt.
+ *
+ * Dieser Text ist technisch sauber hergeleitet, ersetzt aber keine
+ * anwaltliche Pruefung.
+ */
 import LegalLayout from '@/layouts/LegalLayout.astro';
 import { site } from '@/data/site';
-/**
- * DATENSCHUTZERKLÄRUNG – Der bestehende Text der Wix-Website wird hier 1:1 übernommen.
- * Hinweis für die Übernahme: Wix-spezifische Abschnitte (Wix-Hosting, Wix-Cookies) entfallen;
- * stattdessen Hosting über Netlify und Netlify Forms (Kontaktformular) ergänzen lassen –
- * inhaltliche Anpassung nur nach manueller/juristischer Prüfung.
- */
+import { legal, hat, legalUpdated } from '@/data/legal';
 ---
-<LegalLayout title="Datenschutz" description={`Datenschutzerklärung der ${site.name}, ${site.address.city}.`} path="/datenschutz">
-  <h2>1. Datenschutz auf einen Blick</h2>
-  <p>[EXISTING TEXT] Bestehende Datenschutzerklärung 1:1 übernehmen.</p>
+<LegalLayout
+  title="Datenschutz"
+  description={`Datenschutzerklärung für ${site.url.replace('https://www.', '')} – Webdesign-Landingpage der ${site.name}.`}
+  path="/datenschutz"
+  updated={legalUpdated}
+>
+  <h2>1. Überblick</h2>
+  <p>
+    Diese Seite ist eine reine Informations- und Anfrageseite. Sie setzt
+    <strong>keine Cookies</strong>, bindet <strong>keine Analyse- oder
+    Tracking-Dienste</strong> ein und lädt <strong>keine Schriften oder
+    Skripte von fremden Servern</strong>. Sie brauchen deshalb keine
+    Cookie-Einwilligung zu erteilen und finden hier auch kein Consent-Banner.
+  </p>
+  <p>
+    Personenbezogene Daten verarbeiten wir nur in zwei Fällen: bei den
+    technisch notwendigen Server-Logdaten, die beim Aufruf jeder Website
+    anfallen, und wenn Sie uns über das Anfrageformular selbst etwas
+    schicken. Beides ist unten im Detail beschrieben.
+  </p>
 
   <h2>2. Verantwortliche Stelle</h2>
   <p>
-    {site.legalName} <span class="todo">TODO_VERIFY</span><br />
+    Verantwortlich für die Datenverarbeitung auf dieser Website ist:
+  </p>
+  <p>
+    {hat(legal.firm)
+      ? legal.firm.value
+      : <span class="todo">{legal.firm.hint}</span>}<br />
     {site.address.street}<br />
     {site.address.zip} {site.address.city}<br />
+    Deutschland
+  </p>
+  <p>
+    Telefon: <a href={site.phoneHref}>{site.phone}</a><br />
     E-Mail: <a href={`mailto:${site.email}`}>{site.email}</a>
+  </p>
+  <p>
+    Verantwortliche Stelle ist die natürliche oder juristische Person, die
+    allein oder gemeinsam mit anderen über die Zwecke und Mittel der
+    Verarbeitung von personenbezogenen Daten entscheidet.
   </p>
 
   <h2>3. Hosting</h2>
-  <p>[EXISTING TEXT] <span class="todo">TODO_VERIFY Hosting-Abschnitt: Wix → Netlify</span></p>
+  <p>
+    Diese Website wird bei <strong>Netlify</strong> gehostet. Anbieter ist die
+    Netlify, Inc., 512 2nd Street, Suite 200, San Francisco, CA 94107, USA.
+  </p>
+  <p>
+    Beim Aufruf der Seite erhebt Netlify als unser Auftragsverarbeiter
+    automatisch Daten, die Ihr Browser übermittelt und die für die
+    Auslieferung technisch erforderlich sind – insbesondere
+    IP-Adresse, Datum und Uhrzeit des Zugriffs, aufgerufene Adresse,
+    übertragene Datenmenge, Statuscode, verweisende Seite sowie Browser- und
+    Betriebssystemkennung. Diese Daten werden nicht mit anderen Datenquellen
+    zusammengeführt und dienen dem sicheren, stabilen und
+    missbrauchsgeschützten Betrieb der Seite.
+  </p>
+  <p>
+    Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO. Unser berechtigtes
+    Interesse liegt in der technisch fehlerfreien Darstellung und der
+    Abwehr von Angriffen. Mit Netlify besteht ein Vertrag zur
+    Auftragsverarbeitung nach Art. 28 DSGVO. Da Netlify Daten auch in den
+    USA verarbeiten kann, stützt sich die Übermittlung auf die
+    Standardvertragsklauseln der EU-Kommission beziehungsweise auf die
+    Zertifizierung nach dem EU-US Data Privacy Framework.
+  </p>
+  <p>
+    Weitere Informationen:
+    <a href="https://www.netlify.com/privacy/" target="_blank" rel="noopener noreferrer">netlify.com/privacy</a>
+  </p>
 
-  <h2>4. Kontaktformular</h2>
-  <p>[EXISTING TEXT] <span class="todo">TODO_VERIFY Netlify Forms</span></p>
+  <h2>4. Anfrageformular</h2>
+  <p>
+    Wenn Sie uns über das Formular „Kostenlose Website-Einschätzung" eine
+    Anfrage schicken, verarbeiten wir die Angaben, die Sie dort eintragen:
+  </p>
+  <ul>
+    <li>Name</li>
+    <li>Firma, sofern angegeben</li>
+    <li>Telefonnummer oder E-Mail-Adresse</li>
+    <li>Ihre aktuelle Website, sofern angegeben</li>
+    <li>gewünschte Leistung und Budgetrahmen</li>
+    <li>Ihre Projektbeschreibung</li>
+    <li>
+      der Stand des Preisrechners zum Zeitpunkt des Absendens, also
+      gewähltes Paket, gewählte Laufzeit und die daraus angezeigte Monatsrate
+    </li>
+  </ul>
+  <p>
+    Die Übermittlung läuft über <strong>Netlify Forms</strong>, einen Dienst
+    desselben Anbieters. Die Angaben werden dort gespeichert und uns
+    zusätzlich per E-Mail an <a href={`mailto:${site.email}`}>{site.email}</a>
+    zugestellt. Wir verwenden sie ausschließlich, um Ihre Anfrage zu
+    beantworten und ein Angebot zu erstellen – nicht für Werbung und nicht
+    für andere Zwecke.
+  </p>
+  <p>
+    Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO, soweit die Anfrage auf
+    den Abschluss eines Vertrags gerichtet ist, im Übrigen Ihre Einwilligung
+    nach Art. 6 Abs. 1 lit. a DSGVO, die Sie mit dem Setzen des Häkchens im
+    Formular erteilen. Sie können diese Einwilligung jederzeit für die
+    Zukunft widerrufen – eine formlose E-Mail genügt. Die Rechtmäßigkeit der
+    bis zum Widerruf erfolgten Verarbeitung bleibt davon unberührt.
+  </p>
+  <p>
+    Wir behalten die Daten, bis der Zweck der Verarbeitung entfällt, Sie uns
+    zur Löschung auffordern oder Ihre Einwilligung widerrufen. Zwingende
+    gesetzliche Aufbewahrungsfristen, insbesondere handels- und
+    steuerrechtliche, bleiben unberührt.
+  </p>
 
-  <h2>5. Ihre Rechte</h2>
-  <p>[EXISTING TEXT]</p>
+  <h2>5. Spamschutz des Formulars</h2>
+  <p>
+    Das Formular enthält ein für Sie unsichtbares zusätzliches Eingabefeld,
+    ein sogenanntes Honeypot-Feld. Automatisierte Programme füllen solche
+    Felder in der Regel aus, Menschen nicht. Ist das Feld ausgefüllt, wird
+    die Einsendung als Spam verworfen.
+  </p>
+  <p>
+    Dabei werden keine zusätzlichen personenbezogenen Daten erhoben, es
+    findet keine Analyse Ihres Verhaltens statt und es wird kein Captcha
+    eines Drittanbieters geladen. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f
+    DSGVO; unser berechtigtes Interesse liegt im Schutz vor automatisiertem
+    Missbrauch.
+  </p>
 
-  <h2>6. Social Media / Instagram</h2>
-  <p>[EXISTING TEXT]</p>
+  <h2>6. Schriftarten</h2>
+  <p>
+    Die verwendeten Schriften liegen auf unserem eigenen Server und werden
+    von dort geladen. Es besteht <strong>keine Verbindung zu Google Fonts
+    oder einem anderen Schriften-Dienst</strong>, und es werden dabei keine
+    Daten an Dritte übertragen.
+  </p>
+
+  <h2>7. Speicherung im Browser</h2>
+  <p>
+    Diese Seite setzt keine Cookies. Sie speichert lediglich einen einzigen
+    technischen Wert im Sitzungsspeicher Ihres Browsers
+    (<code>sessionStorage</code>), damit die kurze Einblendung beim
+    Seitenstart nur einmal pro Besuch erscheint und nicht bei jedem
+    Seitenwechsel erneut. Dieser Wert enthält keine personenbezogenen Daten,
+    verlässt Ihren Browser nicht und wird beim Schließen des Tabs automatisch
+    gelöscht.
+  </p>
+  <p>
+    Der Zugriff ist nach § 25 Abs. 2 Nr. 2 TDDDG unbedingt erforderlich, um
+    den ausdrücklich gewünschten Dienst bereitzustellen, und damit
+    einwilligungsfrei.
+  </p>
+
+  <h2>8. Verschlüsselung</h2>
+  <p>
+    Diese Seite wird ausschließlich über eine verschlüsselte Verbindung
+    ausgeliefert (TLS, erkennbar an <code>https://</code> und dem
+    Schloss-Symbol im Browser). Daten, die Sie über das Formular an uns
+    senden, können dabei nicht ohne Weiteres von Dritten mitgelesen werden.
+  </p>
+
+  <h2>9. Links zu WhatsApp und Instagram</h2>
+  <p>
+    Auf dieser Seite finden Sie Links zu WhatsApp und zu unserem
+    Instagram-Profil. Dabei handelt es sich um gewöhnliche Verweise – es
+    werden <strong>keine Inhalte dieser Dienste eingebettet</strong>, keine
+    Skripte geladen und keine Zählpixel gesetzt. Solange Sie die Links nicht
+    anklicken, werden keine Daten an diese Anbieter übertragen.
+  </p>
+  <p>
+    Erst wenn Sie einen dieser Links öffnen, verlassen Sie unsere Seite und
+    es gelten die Datenschutzbestimmungen des jeweiligen Anbieters. Beide
+    Dienste gehören zur Meta Platforms Ireland Ltd., Merrion Road, Dublin 4,
+    D04 X2K5, Irland. Wenn Sie uns über WhatsApp schreiben, verarbeitet Meta
+    dabei Ihre Rufnummer und den Nachrichteninhalt.
+  </p>
+  <p>
+    Weitere Informationen:
+    <a href="https://www.whatsapp.com/legal/privacy-policy-eea" target="_blank" rel="noopener noreferrer">WhatsApp-Datenschutzrichtlinie</a>
+    ·
+    <a href="https://privacycenter.instagram.com/policy" target="_blank" rel="noopener noreferrer">Instagram-Datenschutzrichtlinie</a>
+  </p>
+
+  <h2>10. Ihre Rechte</h2>
+  <p>Ihnen stehen gegenüber uns die folgenden Rechte zu:</p>
+  <ul>
+    <li>Auskunft über die zu Ihrer Person gespeicherten Daten (Art. 15 DSGVO)</li>
+    <li>Berichtigung unrichtiger Daten (Art. 16 DSGVO)</li>
+    <li>Löschung (Art. 17 DSGVO)</li>
+    <li>Einschränkung der Verarbeitung (Art. 18 DSGVO)</li>
+    <li>Datenübertragbarkeit (Art. 20 DSGVO)</li>
+    <li>Widerspruch gegen eine Verarbeitung auf Grundlage berechtigter Interessen (Art. 21 DSGVO)</li>
+    <li>Widerruf einer erteilten Einwilligung mit Wirkung für die Zukunft (Art. 7 Abs. 3 DSGVO)</li>
+  </ul>
+  <p>
+    Dafür genügt eine formlose Nachricht an
+    <a href={`mailto:${site.email}`}>{site.email}</a>.
+  </p>
+  <p>
+    Unabhängig davon können Sie sich bei einer Datenschutz-Aufsichtsbehörde
+    beschweren (Art. 77 DSGVO). Für nicht-öffentliche Stellen mit Sitz in
+    Bayern ist das Bayerische Landesamt für Datenschutzaufsicht (BayLDA),
+    Promenade 18, 91522 Ansbach, zuständig.
+  </p>
+
+  <h2>11. Änderungen dieser Erklärung</h2>
+  <p>
+    Wir passen diese Datenschutzerklärung an, sobald sich die Technik dieser
+    Seite oder die Rechtslage ändert – etwa wenn ein weiterer Dienst
+    hinzukommt. Es gilt jeweils die hier veröffentlichte Fassung.
+    Stand: {legalUpdated}.
+  </p>
 </LegalLayout>

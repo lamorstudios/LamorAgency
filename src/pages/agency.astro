@@ -1,0 +1,153 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import Media from '@/components/Media.astro';
+import Words from '@/components/Words.astro';
+import SectionLabel from '@/components/SectionLabel.astro';
+import ArrowLink from '@/components/ArrowLink.astro';
+import Clients from '@/components/sections/Clients.astro';
+import Stats from '@/components/sections/Stats.astro';
+import Process from '@/components/sections/Process.astro';
+import Testimonials from '@/components/sections/Testimonials.astro';
+import ContactCta from '@/components/ContactCta.astro';
+import { site } from '@/data/site';
+import { services } from '@/data/services';
+import { team } from '@/data/team';
+import { breadcrumb } from '@/lib/schema';
+
+const ph = (label: string, ratio: 'wide' | 'portrait' | 'square' | 'cinema' = 'wide') =>
+  ({ type: 'placeholder' as const, label, alt: '', ratio });
+---
+<BaseLayout
+  title="Agency – Creative Studio München"
+  description={`LAMOR AGENCY ist ein Creative Studio aus ${site.address.city} für Video, Fotografie, Social Media, Branding, Webdesign und Models. Konzept, Produktion und Ausspielung aus einer Hand.`}
+  jsonLd={[breadcrumb([{ name: 'Agency', path: '/agency/' }])]}
+>
+  <PageHeader
+    kicker="Agency"
+    title="Agency"
+    titleLines={['Ein Studio', `aus ${site.address.city}.`]}
+    lead="Video, Fotografie, Social Media, Branding, Web und Models – aus einem Haus, mit einer Handschrift."
+    meta={site.claim}
+  />
+
+  <section class="ag-intro container" aria-label="Studio">
+    <div class="ag-intro__media" data-reveal="fade">
+      <Media media={ph('[AGENCY] Studio / Team', 'cinema')} reveal parallax sizes="100vw" />
+    </div>
+  </section>
+
+  <section class="ag-philo section container" aria-labelledby="philo-title">
+    <div class="ag-philo__grid">
+      <div>
+        <SectionLabel label="Haltung" />
+        <h2 class="t-h2" id="philo-title" data-reveal>Feel the brand.<br />Not the ad.</h2>
+      </div>
+      <div class="ag-philo__text prose" data-reveal style="--reveal-delay:150ms">
+        <p>
+          Marken werden nicht über Anzeigen erlebt, sondern über Inhalte: über Bilder,
+          Bewegtbild und Momente, die sich wie Kultur anfühlen und nicht wie Werbung.
+          Genau dafür arbeitet LAMOR AGENCY.
+        </p>
+        <p>
+          Eine Marke sollte sich genauso gut anfühlen, wie sie aussieht. Deshalb hört
+          unsere Arbeit nicht beim fertigen Video auf: Wir denken Bildsprache, Kanal und
+          Website zusammen, damit am Ende ein Auftritt steht und nicht eine Sammlung
+          einzelner Dateien.
+        </p>
+        <p>
+          Content ist gut. Wiedererkennung ist besser.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <Stats />
+
+  <section class="ag-expertise section container" aria-labelledby="expertise-title">
+    <SectionLabel label="Expertise" />
+    <h2 class="t-say ag-expertise__title" id="expertise-title" data-reveal>
+      <Words text="Was wir können." />
+    </h2>
+    <ul role="list" class="ag-expertise__list">
+      {services.map((s, i) => (
+        <li data-reveal style={`--reveal-delay:${i * 45}ms`}>
+          <a href={`/services/#${s.slug}`} class="ag-expertise__item">
+            <span class="ag-expertise__name">{s.title}</span>
+            <span class="t-label t-muted hide-mobile">{s.items.slice(0, 2).join(' / ')}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+    <div class="ag-expertise__more" data-reveal><ArrowLink href="/services/" label="Alle Leistungen" /></div>
+  </section>
+
+  <Process />
+
+  <section class="ag-team section container" data-theme="light" data-bg="light" aria-labelledby="team-title">
+    <SectionLabel label="Team" />
+    <h2 class="t-say ag-team__title" id="team-title" data-reveal>
+      <Words lines={['Die Menschen', 'hinter LAMOR AGENCY.']} />
+    </h2>
+    <ul role="list" class="ag-team__grid">
+      {team.map((m, i) => (
+        <li class={`ag-team__member ${m.lead ? 'ag-team__member--lead' : ''}`} data-reveal style={`--reveal-delay:${i * 90}ms`}>
+          <Media
+            media={{ type: m.image ? 'image' : 'placeholder', src: m.image, alt: m.name, label: '[TEAM] Portrait', ratio: 'portrait' }}
+            surface={[5, 2, 8][i % 3]}
+            reveal
+            hover
+            sizes="(min-width: 900px) 32vw, 100vw"
+          />
+          <p class="ag-team__name t-h4">{m.name}</p>
+          <p class="t-label t-muted">{m.role}</p>
+          {m.bio && <p class="t-small t-muted ag-team__bio">{m.bio}</p>}
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <Testimonials />
+  <Clients theme="dark" title="Auszug aus den Marken, mit denen wir gearbeitet haben." />
+  <ContactCta />
+</BaseLayout>
+
+<style>
+  .ag-intro { padding-bottom: var(--space-9); }
+
+  .ag-philo__grid { display: grid; gap: var(--space-7); }
+  .ag-philo__text { padding-top: 0.5rem; }
+  @media (min-width: 768px) {
+    .ag-philo__grid { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); column-gap: var(--space-9); align-items: start; }
+  }
+
+  .ag-expertise__title { margin-bottom: var(--space-6); max-width: 14ch; }
+  .ag-expertise__list { border-top: 1px solid var(--line); }
+  .ag-expertise__item {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: var(--space-4); padding-block: var(--space-3);
+    border-bottom: 1px solid var(--line); min-height: 44px;
+  }
+  .ag-expertise__name {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 0.9rem + 2.6vw, 3rem);
+    font-weight: var(--fw-display);
+    font-stretch: var(--wd-mega);
+    line-height: 1;
+    letter-spacing: var(--ls-tight);
+    text-transform: uppercase;
+    transition: transform var(--dur-base) var(--ease-out), color var(--dur-base);
+  }
+  @media (hover: hover) { .ag-expertise__item:hover .ag-expertise__name { transform: translateX(0.3em); color: var(--c-accent); } }
+  .ag-expertise__more { margin-top: var(--space-6); }
+
+  .ag-team__title { margin-bottom: var(--space-8); }
+  .ag-team__grid { display: grid; gap: var(--space-7) var(--grid-gap); }
+  .ag-team__member { display: grid; gap: var(--space-2); align-content: start; }
+  .ag-team__name { margin-top: var(--space-3); }
+  .ag-team__bio { margin-top: var(--space-2); max-width: 36ch; }
+  @media (min-width: 768px) {
+    .ag-team__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .ag-team__member:nth-child(2) { margin-top: var(--space-8); }
+  }
+</style>

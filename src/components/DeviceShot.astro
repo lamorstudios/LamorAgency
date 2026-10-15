@@ -1,0 +1,73 @@
+---
+/**
+ * ============================================================================
+ * GERAETE-MOTIV (Laptop + Smartphone)
+ * ============================================================================
+ *
+ * Das gelieferte Motiv aus src/assets/webdesign/hero-devices.png. Es stand
+ * urspruenglich im Hero der Landingpage; seit dem Tausch der beiden Visuals
+ * steht es im orangen Abschnitt "Website + Content".
+ *
+ * Diese Komponente ist nur der Umzug jenes Blocks an eine wiederverwendbare
+ * Stelle – dasselbe Motiv, dasselbe Markup, dieselbe Bildaufbereitung. Es
+ * wurde nichts nachgebaut und keine neue Grafik erzeugt.
+ *
+ * MOTIV UNVERAENDERT: unbeschnitten, ohne Overlay, ohne Zoom. Das
+ * Seitenverhaeltnis kommt aus der Datei, deshalb steht hier keine ratio.
+ *
+ * fallbackFormat JPEG statt PNG: die PNG-Variante waere in voller Breite
+ * 2,3 MB gross. AVIF und WebP bedienen praktisch alle Browser, der Rest
+ * bekommt ein schlankes JPEG.
+ *
+ * KEIN PLATZHALTER: Fehlt die Datei, rendert die Komponente nichts. Lieber
+ * eine Spalte ohne Bild als eine sichtbare Platzhalterflaeche auf einer
+ * Seite, die Kunden sehen.
+ */
+import { Picture } from 'astro:assets';
+
+interface Props {
+  /** Wie breit das Bild im Layout steht – fuer die Bildauswahl des Browsers. */
+  sizes?: string;
+  /** Wird beim ersten Bildschirm gebraucht? Dann sofort laden. */
+  eager?: boolean;
+  class?: string;
+}
+
+const {
+  sizes = '(min-width: 1024px) 44vw, 100vw',
+  eager = false,
+  class: klasse,
+} = Astro.props;
+
+const dateien = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/webdesign/hero-devices.{png,jpg,jpeg,webp,avif}',
+);
+const schluessel = Object.keys(dateien)[0];
+const motiv = schluessel ? (await dateien[schluessel]()).default : undefined;
+---
+{motiv && (
+  <div class:list={['mock', 'mock--photo', klasse]}>
+    <div class="mock__frame">
+      <Picture
+        src={motiv}
+        formats={['avif', 'webp']}
+        fallbackFormat="jpeg"
+        widths={[560, 900, 1280, 1600]}
+        sizes={sizes}
+        alt="Responsive Webdesign auf Desktop und Smartphone"
+        loading={eager ? 'eager' : 'lazy'}
+        decoding="async"
+        {...(eager ? { fetchpriority: 'high' as const } : {})}
+      />
+    </div>
+  </div>
+)}
+
+<style>
+  /* Beim echten Motiv faellt der Fensterrahmen weg: das Bild fuellt die Karte
+     randlos aus und behaelt nur deren runde Ecken. Keine Verlaeufe, keine
+     Overlays, kein Zoom – nur das Motiv. */
+  .mock--photo .mock__frame { padding: 0; border-color: transparent; background: transparent; }
+  .mock--photo :global(img),
+  .mock--photo :global(picture) { display: block; width: 100%; height: auto; }
+</style>

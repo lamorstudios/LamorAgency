@@ -1,0 +1,191 @@
+---
+/**
+ * ============================================================================
+ * SMARTPHONE-MOCKUP
+ * ============================================================================
+ *
+ * Ein Premium-Smartphone, vollstaendig aus CSS gebaut: duenner dunkler
+ * Metallrahmen, gestufte Eckenradien, dezente Dynamic-Island-Aussparung,
+ * Seitentasten. Kein Bild, kein PNG, kein 3D-Modell – dadurch bleibt es
+ * scharf auf jedem Display, laedt nichts nach und laesst sich ueber eine
+ * einzige Variable (--pm-w) in jeder Groesse einsetzen.
+ *
+ * BEWUSST KEIN APPLE-BEZUG: kein Logo, kein Geraetename, keine iOS-Elemente.
+ * Es soll an ein modernes Premium-Smartphone erinnern und ansonsten als
+ * neutrales LAMOR-Mockup funktionieren.
+ *
+ * SEITENVERHAELTNIS DER DISPLAYFLAECHE
+ * Die Aussparung hat exakt das Verhaeltnis des Videos (Standard 9:16). Das
+ * ist Absicht: das Material ist randvoll mit Text, und jeder Beschnitt haette
+ * Ueberschriften angeschnitten. Bei gleichem Verhaeltnis schneidet
+ * object-fit: cover nichts weg, verhindert aber Haarlinien an den Kanten.
+ * Wer ein Video mit anderem Verhaeltnis einsetzt, gibt `ratio` mit – dann
+ * bleibt das Display in diesem Verhaeltnis und der Rahmen waechst mit.
+ *
+ * KLASSENPRAEFIX: pm- (phone mockup). NICHT ph-: .ph ist in global.css
+ * bereits die Platzhalterflaeche und wuerde dieses Mockup ueberschreiben.
+ *
+ * ABSPIELEN
+ * autoplay, muted, loop, playsinline, ohne Bedienelemente und ohne
+ * Play-Knopf. Das Video laeuft auch ohne JavaScript; das Skript pausiert es
+ * nur ausserhalb des Sichtfelds (Akku, Datenvolumen).
+ */
+import type { VideoSlot } from '@/lib/media-slots';
+
+interface Props {
+  /** Videodateien aus /public/media, ermittelt ueber videoSlot(). */
+  video: VideoSlot;
+  /** Was im Display laeuft – fuer Screenreader, da das Video stumm ist. */
+  alt: string;
+  /** Verhaeltnis der Displayflaeche, als "breite / hoehe". Standard 9/16. */
+  ratio?: string;
+  /**
+   * Breite des Geraets. Standard: waechst mit dem Viewport, von 240 px
+   * auf dem Handy bis 384 px auf grossen Bildschirmen.
+   */
+  width?: string;
+  class?: string;
+}
+
+const {
+  video,
+  alt,
+  ratio = '9 / 16',
+  width = 'clamp(15rem, 12rem + 14vw, 24rem)',
+  class: klasse,
+} = Astro.props;
+---
+{video.available && (
+  <figure class:list={['pm', klasse]} style={`--pm-w:${width};--pm-ratio:${ratio}`}>
+    <div class="pm__body">
+      <div class="pm__screen">
+        <video
+          class="pm__video"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          poster={video.poster}
+          disablepictureinpicture
+          aria-hidden="true"
+          tabindex="-1"
+          data-loop-video
+        >
+          {video.webm && <source src={video.webm} type="video/webm" />}
+          {video.mp4 && <source src={video.mp4} type="video/mp4" />}
+        </video>
+        {/* Aussparung fuer Kamera und Sensor – liegt wie beim echten Geraet
+            ueber dem Bildinhalt, nicht neben ihm. */}
+        <span class="pm__island" aria-hidden="true"></span>
+      </div>
+
+      {/* Seitentasten: nur angedeutet, sie machen die Silhouette glaubwuerdig. */}
+      <span class="pm__key pm__key--silent" aria-hidden="true"></span>
+      <span class="pm__key pm__key--up" aria-hidden="true"></span>
+      <span class="pm__key pm__key--down" aria-hidden="true"></span>
+      <span class="pm__key pm__key--power" aria-hidden="true"></span>
+    </div>
+    <figcaption class="visually-hidden">{alt}</figcaption>
+  </figure>
+)}
+
+<style>
+  .pm {
+    /* Alle Masse haengen an der Geraetebreite – dadurch skaliert das
+       Mockup proportional und es gibt keine Sonderwerte pro Breakpoint. */
+    --pm-bezel: calc(var(--pm-w) * 0.026);
+    --pm-radius: calc(var(--pm-w) * 0.148);
+    --pm-key: calc(var(--pm-w) * 0.012);
+
+    width: var(--pm-w);
+    max-width: 100%;
+    margin: 0 auto;
+    /* Leichte raeumliche Setzung, keine Animation. Bewusst flach gehalten:
+       eine staerkere Drehung wuerde den Text im Video verzerren. */
+    transform: perspective(1600px) rotateY(-7deg) rotateX(1.5deg) rotate(0.5deg);
+    transform-origin: 50% 50%;
+  }
+
+  /* ---------- Gehaeuse: duenner dunkler Metallrahmen ---------- */
+  .pm__body {
+    position: relative;
+    padding: var(--pm-bezel);
+    border-radius: var(--pm-radius);
+    /* Gebuerstetes dunkles Metall: schmale Lichtkanten an den Seiten,
+       dazwischen tiefe Schatten. */
+    background:
+      linear-gradient(100deg,
+        #4a4a4e 0%, #17171a 6%, #35353a 16%, #0e0e10 34%,
+        #202024 58%, #0d0d0f 74%, #3c3c41 92%, #131315 100%);
+    box-shadow:
+      /* Innenkante: das Licht, das sich im polierten Rand faengt. */
+      inset 0 0 0 1px rgba(255, 255, 255, 0.16),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.22),
+      /* Das Geraet steht im Raum, nicht auf der Flaeche. */
+      0 2px 4px rgba(11, 10, 9, 0.24),
+      0 18px 36px -12px rgba(11, 10, 9, 0.42),
+      0 42px 72px -24px rgba(11, 10, 9, 0.38);
+  }
+
+  /* ---------- Displayflaeche ---------- */
+  .pm__screen {
+    position: relative;
+    aspect-ratio: var(--pm-ratio);
+    border-radius: calc(var(--pm-radius) - var(--pm-bezel));
+    overflow: hidden;
+    background: #000;
+    /* Safari schneidet runde Ecken innerhalb transformierter Vorfahren sonst
+       nicht sauber ab – diese Maske erzwingt es. */
+    -webkit-mask-image: -webkit-radial-gradient(#fff, #000);
+    isolation: isolate;
+  }
+
+  .pm__video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    /* Video und Aussparung haben dasselbe Verhaeltnis: cover schneidet hier
+       nichts weg und verzerrt nichts, faengt aber Rundungsreste ab. */
+    object-fit: cover;
+  }
+
+  .pm__island {
+    position: absolute;
+    top: calc(var(--pm-w) * 0.022);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 27%;
+    height: calc(var(--pm-w) * 0.072);
+    border-radius: var(--radius-pill, 999px);
+    background: #050506;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  }
+
+  /* ---------- Seitentasten ---------- */
+  .pm__key {
+    position: absolute;
+    width: var(--pm-key);
+    border-radius: calc(var(--pm-key) * 0.6);
+    background: linear-gradient(180deg, #3a3a3f, #141416);
+  }
+  .pm__key--silent { left: calc(var(--pm-key) * -0.5); top: 16%; height: 4%; }
+  .pm__key--up     { left: calc(var(--pm-key) * -0.5); top: 24%; height: 7%; }
+  .pm__key--down   { left: calc(var(--pm-key) * -0.5); top: 33%; height: 7%; }
+  .pm__key--power  { right: calc(var(--pm-key) * -0.5); top: 26%; height: 11%; }
+
+  /* Auf kleinen Bildschirmen flacher stellen: die Drehung koennte sonst
+     ueber den Seitenrand hinausragen. */
+  @media (max-width: 640px) {
+    .pm { transform: perspective(1600px) rotateY(-4deg) rotate(0.3deg); }
+  }
+  /* Beruehrungsbedienung ohne Maus: ganz gerade, das liest sich ruhiger. */
+  @media (hover: none) and (max-width: 480px) {
+    .pm { transform: none; }
+  }
+</style>
+
+<script>
+  import { watchLoopVideos } from '@/scripts/loop-video';
+  watchLoopVideos();
+</script>

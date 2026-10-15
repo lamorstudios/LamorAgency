@@ -1,25 +1,36 @@
 ---
-import { mainNav, legalNav } from '@/data/navigation';
+import { footerNav, legalNav } from '@/data/navigation';
 import { site, social } from '@/data/site';
+import { standalone } from '@/lib/standalone';
 const year = new Date().getFullYear();
+
+/* STANDALONE (temporaer, siehe src/lib/standalone.ts):
+   Die Navigationsspalte wuerde in den noch unfertigen Relaunch fuehren und
+   entfaellt deshalb. Impressum und Datenschutz bleiben – Pflichtangaben.
+   Der Abschluss-CTA springt zum Formular auf derselben Seite. */
+const footerCta = standalone.enabled
+  ? { label: 'Website anfragen', href: '#anfrage' }
+  : { label: 'Projekt anfragen', href: '/contact/' };
 ---
 <footer class="footer" data-theme="dark">
   <div class="container">
     <div class="footer__top">
-      <p class="footer__claim t-h3" data-reveal>Neues Projekt, neue Marke,<br />neuer Content?</p>
-      <a href="/contact/" class="btn footer__cta" data-magnetic>
-        <span>Projekt anfragen</span>
+      <p class="footer__claim t-h3" data-reveal>Neue Marke, neuer Content,<br />neuer Auftritt?</p>
+      <a href={footerCta.href} class="btn footer__cta" data-magnetic>
+        <span>{footerCta.label}</span>
         <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
       </a>
     </div>
 
-    <div class="footer__grid">
+    <div class={`footer__grid ${standalone.enabled ? 'footer__grid--standalone' : ''}`}>
+      {!standalone.enabled && (
       <div class="footer__col">
         <p class="t-label t-muted">Navigation</p>
         <ul role="list" class="footer__list">
-          {mainNav.map((i) => <li><a href={i.href} class="link">{i.label}</a></li>)}
+          {footerNav.map((i) => <li><a href={i.href} class="link">{i.label}</a></li>)}
         </ul>
       </div>
+      )}
       <div class="footer__col">
         <p class="t-label t-muted">Contact</p>
         <ul role="list" class="footer__list">
@@ -51,7 +62,7 @@ const year = new Date().getFullYear();
 
   <div class="container footer__bottom">
     <p class="t-label t-muted">© <span data-year>{year}</span> {site.name}. {site.address.city}.</p>
-    <p class="t-label t-muted hide-mobile">Creative Studio · Social Media · Film · Branding · Design</p>
+    <p class="t-label t-muted hide-mobile">Video · Fotografie · Social Media · Webdesign · Branding · Models</p>
     <a href="#top" class="t-label footer__totop link">Nach oben ↑</a>
   </div>
 </footer>
@@ -70,13 +81,15 @@ const year = new Date().getFullYear();
   .footer__list a { display: inline-flex; min-height: 44px; align-items: center; }
   .footer__list .link::after { bottom: 0.6em; }
   .footer__address address { font-style: normal; color: var(--c-grey-dark); line-height: 1.5; padding-top: 0.5rem; }
-  .footer__wordmark { padding-inline: var(--gutter); line-height: 0.74; font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: var(--wd-mega); letter-spacing: -0.05em; text-transform: uppercase; font-size: clamp(5.5rem, 24vw, 30rem); color: var(--c-paper); user-select: none; transform: translateY(0.07em); }
+  .footer__wordmark { padding-inline: var(--gutter); line-height: 0.74; font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: var(--wd-mega); letter-spacing: -0.05em; text-transform: uppercase; font-size: clamp(2.6rem, 13vw, 16rem); text-wrap: balance; color: var(--c-paper); user-select: none; transform: translateY(0.07em); }
   .footer__wordmark sup { font-size: 0.16em; vertical-align: top; margin-left: 0.05em; font-weight: var(--fw-regular); position: relative; top: 0.35em; }
   .footer__bottom { display: flex; flex-wrap: wrap; gap: var(--space-4) var(--space-7); justify-content: space-between; padding-block: var(--space-5); border-top: 1px solid var(--c-ink-3); }
   .footer__totop { min-height: 44px; display: inline-flex; align-items: center; }
   @media (min-width: 768px) {
     .footer__top { grid-template-columns: 1fr auto; }
     .footer__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    /* STANDALONE: ohne Navigationsspalte bleiben drei. */
+    .footer__grid--standalone { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   }
 </style>
 

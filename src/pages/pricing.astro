@@ -1,0 +1,28 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import Pricing from '@/components/sections/Pricing.astro';
+import SingleServices from '@/components/sections/SingleServices.astro';
+import Process from '@/components/sections/Process.astro';
+import Faq from '@/components/sections/Faq.astro';
+import ContactCta from '@/components/ContactCta.astro';
+import { breadcrumb, faqPage, offerCatalog } from '@/lib/schema';
+---
+<BaseLayout
+  title="Preise & Pakete – Werbeagentur München"
+  description="Transparente Modelle statt Angebots-Dschungel: monatlicher Betrag plus einmaliger Projektstart. Dazu Einzelleistungen auf Anfrage. Alle Preise netto."
+  jsonLd={[breadcrumb([{ name: 'Pricing', path: '/pricing/' }]), offerCatalog(), faqPage()]}
+>
+  <PageHeader
+    kicker="Pricing"
+    title="Pricing"
+    titleLines={['Was eine', 'Zusammenarbeit kostet.']}
+    lead="Ein monatlicher Betrag für die laufende Arbeit, ein einmaliger Projektstart für den Aufbau. Kein Kleingedrucktes, keine Überraschungen."
+    meta="Alle Preise netto"
+  />
+  <Pricing />
+  <SingleServices />
+  <Process />
+  <Faq />
+  <ContactCta />
+</BaseLayout>

@@ -1,0 +1,177 @@
+---
+/**
+ * ============================================================================
+ * LEISTUNGEN – DER FILM IST DER INHALT
+ * ============================================================================
+ *
+ * SHOW, DON'T TELL. Pro Disziplin steht hier genau vier Mal etwas:
+ *
+ *   Ordnungszahl + Titel     wer das hier ist
+ *   Ein Satz Kundennutzen    warum ihn das angeht
+ *   Eine grosse Filmflaeche  was wir koennen – das uebernimmt die Arbeit
+ *   Ein dezenter Link        wo es weitergeht
+ *
+ * Alles andere – Einzelleistungen, Technik, Ablauf – gehoert auf die
+ * jeweilige Unterseite. Auf der Startseite waere es Text, der den Film
+ * kleiner macht.
+ *
+ * DIE FILMFLAECHE IST DIE HAUPTSACHE
+ * Sie laeuft ueber die volle Breite des Containers und ist auf jedem Geraet
+ * das groesste Element des Abschnitts. Der Text sitzt darueber in einer
+ * Zeile – nicht daneben in einer zweiten Spalte, die dem Film die Haelfte
+ * wegnimmt.
+ *
+ * ASSET-SLOT
+ * Die Filme werden zur Build-Zeit in /public/media gesucht
+ * (erklaerfilm-<slug>.mp4, optional .webm und -poster.jpg). Fehlt ein Film,
+ * bleibt die Flaeche in voller Groesse stehen und traegt nur die
+ * Ordnungszahl – kein Hinweistext, kein "Video folgt", nichts Kaputtes.
+ * Anleitung: public/media/README.md
+ *
+ * KEIN GLEICHZEITIGES AUTOPLAY
+ * preload="none" plus Abspielen erst im Sichtfeld, pausiert ausserhalb.
+ * Es laeuft hoechstens, was man gerade sieht.
+ */
+import { focusServices } from '@/data/services';
+import { serviceFilm } from '@/lib/media-slots';
+import Icon from '@/components/Icon.astro';
+
+const bloecke = focusServices.map((s) => ({ service: s, film: serviceFilm(s.slug) }));
+---
+<section class="sf" data-theme="dark" data-bg="dark" aria-labelledby="sf-title">
+  <h2 class="visually-hidden" id="sf-title">Unsere Leistungen</h2>
+
+  {bloecke.map(({ service, film }) => (
+    <article class="sf__block" aria-labelledby={`sf-${service.slug}`}>
+      <div class="container">
+        <header class="sf__head">
+          <p class="sf__meta" data-reveal="fade">
+            <span class="sf__no">{service.index}</span>
+            <span class="sf__rule" aria-hidden="true"></span>
+          </p>
+          <h3 class="sf__name" id={`sf-${service.slug}`} data-reveal>{service.title}</h3>
+          <p class="sf__promise" data-reveal style="--reveal-delay:90ms">{service.promise}</p>
+        </header>
+      </div>
+
+      {/* Die Filmflaeche laeuft bewusst breiter als der Text. */}
+      <div class="sf__stage" data-reveal="fade" style="--reveal-delay:140ms">
+        <div class="sf__frame">
+          {film.available ? (
+            <video
+              class="sf__video"
+              muted
+              loop
+              playsinline
+              preload="none"
+              poster={film.poster}
+              disablepictureinpicture
+              aria-hidden="true"
+              tabindex="-1"
+              data-loop-video
+            >
+              {film.webm && <source src={film.webm} type="video/webm" />}
+              {film.mp4 && <source src={film.mp4} type="video/mp4" />}
+            </video>
+          ) : (
+            <span class="sf__quiet" aria-hidden="true">{service.index}</span>
+          )}
+        </div>
+      </div>
+
+      <div class="container">
+        <a href={`/services/#${service.slug}`} class="sf__link" data-reveal="fade" style="--reveal-delay:180ms">
+          <span>Mehr zu {service.title}</span>
+          <Icon name="arrow" />
+        </a>
+      </div>
+    </article>
+  ))}
+</section>
+
+<style>
+  .sf { padding-block: clamp(2.5rem, 7vw, 6rem); }
+
+  .sf__block { padding-block: clamp(2rem, 6vw, 5rem); }
+  .sf__block:first-of-type { padding-top: 0; }
+
+  /* ---------- Kopf: drei Zeilen, mehr nicht ---------- */
+  /* KEINE Breitenbegrenzung auf dem Kopf: sie hat die Headline erwischt und
+     "VIDEOGRAFIE" mitten im Wort umbrechen lassen. Begrenzt wird nur der
+     Nutzensatz, und zwar weiter unten an ihm selbst. */
+  .sf__head { margin-bottom: clamp(1.25rem, 3vw, 2rem); }
+
+  .sf__meta { display: flex; align-items: center; gap: 0.9rem; }
+  .sf__no {
+    font-size: var(--fs-eyebrow); font-variant-numeric: tabular-nums;
+    font-weight: var(--fw-semi); letter-spacing: var(--ls-wide);
+    color: var(--c-accent-on-dark);
+  }
+  .sf__rule { flex: 1; max-width: 4rem; height: 1px; background: rgba(255, 255, 255, 0.25); }
+
+  .sf__name {
+    margin-top: var(--space-3);
+    /* Ein Disziplinname wird nie getrennt. Lieber laeuft er schmaler. */
+    overflow-wrap: normal; hyphens: none;
+    font-family: var(--font-display); font-weight: 900; font-stretch: 110%;
+    font-size: clamp(2rem, 1rem + 4.4vw, 4.6rem);
+    line-height: 0.95; letter-spacing: -0.04em; text-transform: uppercase;
+    color: #fff;
+  }
+
+  /* Ein Satz. Wenn hier ein zweiter steht, ist etwas schiefgelaufen. */
+  .sf__promise {
+    margin-top: var(--space-4); max-width: 40ch;
+    font-size: clamp(1rem, 0.92rem + 0.6vw, 1.35rem);
+    line-height: 1.4; color: rgba(255, 255, 255, 0.72);
+  }
+
+  /* ---------- Filmflaeche ---------- */
+  .sf__stage {
+    margin-top: clamp(1.25rem, 3vw, 2rem);
+    padding-inline: var(--gutter);
+  }
+  /* Auf breiten Schirmen darf die Flaeche ueber den Textcontainer
+     hinauslaufen – der Film soll das groesste Element der Seite sein. */
+  @media (min-width: 64rem) { .sf__stage { padding-inline: clamp(1rem, 3vw, 3rem); } }
+
+  .sf__frame {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: clamp(0.5rem, 1.2vw, 1rem);
+    background: #0b0b0b;
+    line-height: 0;
+  }
+  .sf__video { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+  /* Ohne Film: dieselbe Flaeche, nur still. Keine Beschriftung, kein Kasten,
+     keine Andeutung von etwas Fehlendem. */
+  .sf__quiet {
+    position: absolute; inset: 0;
+    display: grid; place-items: center;
+    font-family: var(--font-display); font-weight: 900; font-stretch: 118%;
+    font-size: clamp(4rem, 14vw, 12rem); line-height: 1; letter-spacing: -0.05em;
+    color: rgba(255, 255, 255, 0.05);
+  }
+
+  /* ---------- Dezenter Link ---------- */
+  .sf__link {
+    display: inline-flex; align-items: center; gap: 0.5em;
+    min-height: 44px; margin-top: clamp(0.75rem, 2vw, 1.25rem);
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.7);
+  }
+  .sf__link :global(.icon) { width: 1em; height: 1em; transition: transform var(--dur-base) var(--ease-out); }
+  @media (hover: hover) and (pointer: fine) {
+    .sf__link:hover { color: #fff; }
+    .sf__link:hover :global(.icon) { transform: translateX(0.3em); }
+  }
+  .sf__link:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 4px; }
+</style>
+
+<script>
+  import { watchLoopVideos } from '@/scripts/loop-video';
+  watchLoopVideos();
+</script>

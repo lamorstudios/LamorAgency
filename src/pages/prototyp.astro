@@ -1,0 +1,97 @@
+---
+/**
+ * ============================================================================
+ * PROTOTYP: SPATIAL MOTION DESIGN
+ * ============================================================================
+ *
+ * Eine eigene Seite, NICHT die Startseite. Sie zeigt die neue raeumliche
+ * Designrichtung an zwei Leistungsgruppen, damit die Choreografie
+ * beurteilbar ist: man muss eine Gruppe nach hinten gehen und die naechste
+ * aus der Tiefe kommen sehen, um zu erkennen, ob die Bewegung stimmt.
+ *
+ * Die Startseite und die Webdesign-Landingpage bleiben davon unberuehrt.
+ *
+ * NOINDEX: Prototyp, gehoert nicht in den Index und nicht in die Sitemap.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import SpatialService from '@/components/home/SpatialService.astro';
+---
+<BaseLayout
+  title="Prototyp – Spatial Motion Design | LAMOR AGENCY"
+  description="Interner Gestaltungsprototyp der raeumlichen Designrichtung."
+  theme="light"
+  palette="spatial"
+  noindex
+>
+  <div class="pt">
+    <header class="pt__kopf">
+      <div class="container">
+        <p class="pt__label">Prototyp · Gestaltungsrichtung</p>
+        <h1 class="pt__titel">Spatial<br />Motion Design</h1>
+        <p class="pt__lead">
+          Scrollen. Die Gruppen kommen aus der Tiefe nach vorn und gehen
+          wieder zurück – rückwärts läuft dieselbe Bewegung exakt umgekehrt.
+        </p>
+      </div>
+    </header>
+
+    <SpatialService
+      nr="01"
+      titel="Videoproduktion"
+      nutzen="Ein Film, der deine Marke so aussehen lässt, wie du sie meinst."
+      slug="video-production"
+      icon="image"
+      kachel="Dreh, Schnitt, Grading"
+      projekt="Projektbeispiel"
+    />
+
+    <SpatialService
+      nr="02"
+      titel="Motion Graphics"
+      nutzen="Dein Angebot wird in wenigen Sekunden verstanden."
+      slug="motion-graphics"
+      icon="bolt"
+      kachel="Erklärfilm & Animation"
+      projekt="Projektbeispiel"
+    />
+
+    <footer class="pt__fuss">
+      <div class="container">
+        <p class="pt__hinweis">
+          Ende des Prototyps. Die Medienflächen zeigen ihr Zielformat –
+          sobald echte Dateien vorliegen, ersetzen sie die Fläche ohne
+          Layoutänderung.
+        </p>
+      </div>
+    </footer>
+  </div>
+</BaseLayout>
+
+<style>
+  .pt { background: var(--c-paper); color: var(--c-ink); }
+
+  .pt__kopf {
+    padding-top: calc(var(--header-h) + clamp(3rem, 10vh, 7rem));
+    padding-bottom: clamp(2rem, 8vh, 5rem);
+  }
+  .pt__label {
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wider); text-transform: uppercase;
+    color: var(--c-accent-text);
+  }
+  .pt__titel {
+    margin-top: var(--space-4);
+    font-family: var(--font-display); font-weight: 900; font-stretch: 112%;
+    font-size: clamp(2.6rem, 1rem + 7vw, 7rem);
+    line-height: 0.9; letter-spacing: -0.045em; text-transform: uppercase;
+    margin-left: -0.03em;
+  }
+  .pt__lead {
+    margin-top: var(--space-5); max-width: 40ch;
+    font-size: clamp(1rem, 0.94rem + 0.5vw, 1.3rem);
+    line-height: 1.5; color: var(--c-grey);
+  }
+
+  .pt__fuss { padding-block: clamp(3rem, 10vh, 7rem); }
+  .pt__hinweis { max-width: 46ch; font-size: var(--fs-small); line-height: 1.6; color: var(--c-grey); }
+</style>

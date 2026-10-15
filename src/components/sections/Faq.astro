@@ -1,0 +1,123 @@
+---
+/**
+ * FAQ-Accordion auf Basis von <details>/<summary>.
+ * Bewusst nativ: öffnet und schließt auch ohne JavaScript, ist von Haus aus
+ * per Tastatur bedienbar und für Screenreader korrekt ausgezeichnet.
+ * Die Animation ist reine Zugabe (::details-content bzw. ein Open-Keyframe).
+ *
+ * Preise werden nicht im FAQ-Text gepflegt: {{PREIS_START}} wird hier aus
+ * src/data/pricing.ts ersetzt.
+ */
+import Words from '@/components/Words.astro';
+import ArrowLink from '@/components/ArrowLink.astro';
+import { faqs, type FaqItem } from '@/data/faq';
+import { resolveFaqTokens } from '@/lib/faq';
+
+interface Props {
+  /** Eigene Fragenliste – ohne Angabe die allgemeinen LAMOR-FAQ. */
+  items?: FaqItem[];
+  heading?: string;
+  label?: string;
+  lead?: string;
+  /** Eindeutige id, falls mehrere FAQ-Blöcke auf einer Seite stehen. */
+  id?: string;
+  /** Ziel des "Frage stellen"-Links. Auf Landingpages der eigene Anker. */
+  ctaHref?: string;
+}
+const {
+  items: given,
+  heading = 'Fragen, die uns oft gestellt werden.',
+  label = 'FAQ',
+  lead = 'Etwas nicht dabei? Schreib uns – wir antworten direkt und ohne Verkaufsgespräch.',
+  id = 'faq',
+  ctaHref = '/contact/',
+} = Astro.props;
+
+// Preis-Platzhalter zentral auflösen (siehe src/lib/faq.ts).
+const items = resolveFaqTokens(given ?? faqs);
+---
+<section class="faq section" id={id} data-theme="light" data-bg="light" aria-labelledby={`${id}-title`}>
+  <div class="container faq__inner">
+    <div class="faq__head">
+      <p class="t-label faq__label" data-reveal="fade">{label}</p>
+      <h2 class="t-sec faq__title" id={`${id}-title`}><Words text={heading} /></h2>
+      <p class="t-body t-muted faq__lead" data-reveal style="--reveal-delay:140ms">{lead}</p>
+      <div class="faq__head-cta" data-reveal="fade" style="--reveal-delay:220ms">
+        <ArrowLink href={ctaHref} label="Frage stellen" />
+      </div>
+    </div>
+
+    <div class="faq__list">
+      {items.map((f, i) => (
+        <details class="faq__item" name={id} data-reveal style={`--reveal-delay:${Math.min(i * 50, 300)}ms`}>
+          <summary class="faq__q">
+            <span class="faq__q-text">{f.q}</span>
+            <span class="faq__icon" aria-hidden="true"></span>
+          </summary>
+          <div class="faq__body">
+            <p class="faq__a">{f.a}</p>
+          </div>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq__inner { display: grid; gap: var(--space-7); align-items: start; }
+  @media (min-width: 1024px) {
+    .faq__inner { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: var(--space-8); }
+    /* Die Überschrift bleibt stehen, während die Fragen laufen. */
+    .faq__head { position: sticky; top: calc(var(--header-h) + var(--space-6)); }
+  }
+  .faq__label { color: var(--c-accent); margin-bottom: var(--space-3); }
+  .faq__title { max-width: 16ch; }
+  .faq__lead { max-width: 40ch; margin-top: var(--space-4); }
+  .faq__head-cta { margin-top: var(--space-5); }
+
+  .faq__list { display: grid; border-top: 1px solid var(--line); }
+  .faq__item { border-bottom: 1px solid var(--line); }
+
+  .faq__q {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-5);
+    padding-block: clamp(1rem, 2.5vw, 1.5rem);
+    cursor: pointer;
+    list-style: none;
+    font-family: var(--font-display);
+    font-size: var(--fs-h4);
+    font-weight: var(--fw-semi);
+    line-height: 1.25;
+    letter-spacing: var(--ls-snug);
+    transition: color var(--dur-fast) var(--ease-out);
+    min-height: 44px;
+  }
+  .faq__q::-webkit-details-marker { display: none; }
+  .faq__q:hover { color: var(--c-accent); }
+  .faq__q:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+
+  /* Plus, das beim Öffnen zum Minus wird. */
+  .faq__icon { position: relative; width: 1rem; height: 1rem; margin-top: 0.3em; flex-shrink: 0; }
+  .faq__icon::before, .faq__icon::after {
+    content: '';
+    position: absolute;
+    inset: 50% 0 auto 0;
+    height: 1.5px;
+    background: currentColor;
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+  .faq__icon::after { transform: rotate(90deg); }
+  .faq__item[open] .faq__icon::after { transform: rotate(0deg); }
+  .faq__item[open] .faq__q { color: var(--c-accent); }
+
+  .faq__body { padding-bottom: clamp(1rem, 2.5vw, 1.5rem); }
+  .faq__a { max-width: 62ch; color: var(--fg-muted); }
+
+  /* Sanftes Aufklappen, wo der Browser es kann – sonst schaltet es einfach um. */
+  @media (prefers-reduced-motion: no-preference) {
+    .faq__item[open] .faq__body { animation: faq-open var(--dur-base) var(--ease-out) both; }
+    @keyframes faq-open { from { opacity: 0; transform: translateY(-0.5rem); } to { opacity: 1; transform: none; } }
+  }
+</style>

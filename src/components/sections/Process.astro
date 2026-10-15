@@ -1,0 +1,218 @@
+---
+/**
+ * Warum LAMOR – Strukturvergleich plus Ablauf in einer Komposition.
+ *
+ * Oben die Gegenueberstellung "einzeln organisiert" gegen "bei LAMOR": links
+ * zurueckhaltend, rechts die dunkle Flaeche mit der grossen Zahl. Darunter der
+ * Ablauf als waagerechte Leiste – Stichworte statt Saetze. Die Phasen liegen
+ * als Spannen exakt ueber ihren Schritten.
+ */
+import Icon from '@/components/Icon.astro';
+import Words from '@/components/Words.astro';
+import Button from '@/components/Button.astro';
+import { processSteps } from '@/data/process';
+import { structure } from '@/data/comparison';
+
+const phaseOrder = ['Denken', 'Produzieren', 'Ausspielen'] as const;
+const phases = phaseOrder.map((name) => {
+  const steps = processSteps.filter((s) => s.phase === name);
+  return { name, span: steps.length, from: steps[0].index, to: steps[steps.length - 1].index };
+});
+---
+<section class="proc wash" data-theme="dark" data-bg="dark" aria-labelledby="proc-title">
+  <div class="container">
+    <div class="proc__head">
+      <div>
+        <p class="eyebrow proc__label" data-reveal="fade">{structure.eyebrow}</p>
+        <h2 class="proc__title" id="proc-title">
+          <Words text={structure.headline} />
+          <span class="proc__title-em">{structure.headlineAccent}</span>
+        </h2>
+      </div>
+      <div class="proc__intro" data-reveal style="--reveal-delay:160ms">
+        <p class="proc__lead">Strategie, Produktion, Design und Website laufen über denselben Tisch.</p>
+        <div class="proc__cta"><Button href="/contact/" label="Projekt anfragen" /></div>
+      </div>
+    </div>
+
+    <!-- Strukturvergleich: links die uebliche Organisation, rechts die Zahl. -->
+    <div class="proc__duel" data-reveal>
+      <div class="card card--light proc__panel">
+        <p class="proc__panel-label">{structure.usualLabel}</p>
+        <ul class="proc__list" role="list">
+          {structure.rows.map((r) => (
+            <li class="proc__item">
+              <span class="proc__topic">{r.topic}</span>
+              <span class="proc__usual">{r.usual}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <span class="vs proc__vs" aria-hidden="true">vs.</span>
+
+      <div class="card card--dark proc__panel proc__panel--good">
+        <p class="proc__panel-label proc__panel-label--good">{structure.lamorLabel}</p>
+        <ul class="proc__list" role="list">
+          {structure.rows.map((r) => (
+            <li class="proc__item proc__item--good">
+              <span class="proc__num">{r.value}</span>
+              <span class="proc__lamor">{r.lamor}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+
+    <!-- Ablauf -->
+    <div class="proc__railwrap">
+      <p class="proc__rail-label">Der Ablauf – zehn Schritte, ein Haus</p>
+      <div class="proc__rail" tabindex="0" role="group" aria-label="Ablauf in zehn Schritten, waagerecht scrollbar">
+        <div class="proc__track">
+          {phases.map((p) => (
+            <div class="proc__phase" style={`--span:${p.span}`}>
+              <span class="proc__phase-name">{p.name}</span>
+              <span class="proc__phase-range">{p.from}–{p.to}</span>
+            </div>
+          ))}
+          {processSteps.map((s) => (
+            <div class="proc__step">
+              <span class="proc__dot" aria-hidden="true"></span>
+              <span class="proc__index">{s.index}</span>
+              <h3 class="proc__name">{s.title}</h3>
+              <p class="proc__text">{s.text}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+      <span class="proc__hint" aria-hidden="true"><Icon name="arrow" class="proc__hint-icon" />Leiste seitlich scrollen</span>
+    </div>
+  </div>
+</section>
+
+<style>
+  .proc { padding-block: clamp(2.75rem, 6vw, 5.5rem); }
+
+  .proc__head { display: grid; gap: var(--space-4); margin-bottom: clamp(1.5rem, 3.5vw, 2.5rem); }
+  .proc__label { color: var(--c-accent-on-dark); }
+  .proc__title {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 112%;
+    font-size: clamp(2rem, 0.9rem + 4.6vw, 4.6rem);
+    line-height: 0.98; letter-spacing: -0.04em; max-width: 22ch; text-wrap: balance;
+  }
+  .proc__title-em { color: var(--c-accent-on-dark); }
+  .proc__intro { display: grid; gap: var(--space-4); align-content: end; }
+  .proc__lead { font-size: clamp(0.95rem, 2.2vw, 1.2rem); line-height: 1.45; color: var(--fg-muted); max-width: 40ch; }
+  .proc__cta { justify-self: start; }
+  @media (min-width: 900px) {
+    .proc__head { grid-template-columns: minmax(0, 1fr) minmax(0, 0.78fr); gap: var(--space-8); align-items: end; }
+  }
+
+  /* ---------- Strukturvergleich ---------- */
+  .proc__duel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(0.5rem, 1.6vw, 2.25rem);
+    align-items: stretch;
+    position: relative;
+    margin-bottom: clamp(1.75rem, 4vw, 3rem);
+  }
+  .proc__panel { padding: clamp(0.75rem, 2.2vw, 1.6rem); }
+  .proc__panel-label {
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--c-grey);
+    padding-bottom: clamp(0.5rem, 1.4vw, 0.85rem);
+    border-bottom: 1px solid var(--card-line);
+  }
+  .proc__panel-label--good { color: var(--c-accent-on-dark); }
+  .proc__list { display: grid; }
+  .proc__item {
+    display: grid; gap: 0.1rem;
+    padding-block: clamp(0.6rem, 1.6vw, 0.95rem);
+  }
+  .proc__item + .proc__item { border-top: 1px solid var(--card-line); }
+  .proc__topic {
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--c-grey);
+  }
+  .proc__usual { font-size: clamp(0.78rem, 1.9vw, 1rem); line-height: 1.3; color: var(--c-ink); min-width: 0; hyphens: auto; }
+
+  /* Rechts traegt die Zahl die Zeile. */
+  .proc__item--good { grid-template-columns: auto minmax(0, 1fr); align-items: baseline; gap: clamp(0.5rem, 1.6vw, 0.9rem); }
+  .proc__num {
+    font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: 118%;
+    font-size: clamp(1.6rem, 1rem + 2.6vw, 3rem); line-height: 0.85;
+    letter-spacing: -0.05em; color: var(--c-accent-on-dark);
+    font-variant-numeric: tabular-nums;
+  }
+  .proc__lamor {
+    font-size: clamp(0.78rem, 1.9vw, 1rem); line-height: 1.25; font-weight: var(--fw-semi);
+    min-width: 0; hyphens: auto;
+  }
+  .proc__vs { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 3; }
+
+  /* ---------- Ablaufleiste ---------- */
+  .proc__railwrap { position: relative; }
+  .proc__rail-label {
+    font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--fg-muted);
+    margin-bottom: var(--space-4);
+  }
+  .proc__rail {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline-start: var(--gutter);
+    scrollbar-width: thin;
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+    padding-bottom: var(--space-4);
+  }
+  .proc__rail:focus-visible { outline: 2px solid var(--c-accent-on-dark); outline-offset: 4px; }
+
+  .proc__track {
+    --col: clamp(10rem, 15vw, 13rem);
+    display: grid;
+    grid-template-columns: repeat(10, var(--col));
+    grid-template-rows: auto auto;
+    width: max-content;
+  }
+  .proc__phase {
+    grid-row: 1; grid-column: span var(--span);
+    display: flex; align-items: baseline; gap: var(--space-3);
+    border-top: 2px solid var(--c-accent);
+    padding: 0.55rem 1.25rem 1rem 0;
+    font-size: var(--fs-eyebrow); letter-spacing: var(--ls-wide); text-transform: uppercase;
+  }
+  .proc__phase-name { font-weight: var(--fw-semi); font-stretch: var(--wd-tight); }
+  .proc__phase-range { color: var(--fg-muted); font-variant-numeric: tabular-nums; }
+
+  .proc__step {
+    grid-row: 2; position: relative; scroll-snap-align: start;
+    border-top: 1px solid var(--line);
+    padding: 1rem 1.25rem 0 0;
+    display: grid; gap: 0.3rem; align-content: start;
+  }
+  .proc__dot { position: absolute; top: -0.3rem; left: 0; width: 0.55rem; height: 0.55rem; border-radius: 50%; background: var(--c-accent); }
+  .proc__step:not(:nth-child(4)):not(:nth-child(6)):not(:nth-child(11)) .proc__dot {
+    background: var(--fg-muted); opacity: 0.5; width: 0.35rem; height: 0.35rem; top: -0.2rem;
+  }
+  .proc__index {
+    font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: 118%;
+    font-size: 0.8rem; letter-spacing: var(--ls-wide); color: var(--fg-muted); font-variant-numeric: tabular-nums;
+  }
+  .proc__name {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 112%;
+    text-transform: uppercase; font-size: clamp(0.95rem, 0.85rem + 0.4vw, 1.2rem);
+    line-height: 1.05; letter-spacing: -0.025em;
+  }
+  .proc__text { font-size: 0.8rem; line-height: 1.4; color: var(--fg-muted); }
+
+  .proc__hint {
+    display: flex; align-items: center; gap: 0.5em; margin-top: var(--space-3);
+    font-size: var(--fs-eyebrow); letter-spacing: var(--ls-wide);
+    text-transform: uppercase; color: var(--fg-muted);
+  }
+  .proc__hint-icon { width: 1em; height: 1em; }
+  @media (min-width: 1600px) { .proc__hint { display: none; } }
+</style>

@@ -1,0 +1,291 @@
+---
+/**
+ * "So sehen unsere Websites aus." – echte Projekte statt Platzhalter.
+ *
+ * DARSTELLUNG
+ * Der echte Screenshot ist das Hauptelement. Drumherum liegt nur eine sehr
+ * reduzierte Browserzeile aus HTML/CSS (drei Punkte + Domain). Bewusst
+ * KEINE fotorealistische Browser-Grafik, kein Laptop- oder Handy-Mockup:
+ * solche Rahmen wirken künstlich und lenken vom Projekt ab.
+ *
+ * ANIMATION
+ * Die drei Originalscreenshots liegen als Ebenen übereinander und blenden
+ * sehr ruhig ineinander über – reines CSS, kein Slider, keine Pfeile, kein
+ * Autoplay-Skript. Die Animation läuft erst, wenn der Abschnitt im Blick
+ * ist (Klasse `is-inview` aus src/scripts/motion.ts).
+ *
+ * PROGRESSIVE ENHANCEMENT
+ *   - Ohne JavaScript läuft die Überblendung trotzdem (reines CSS).
+ *   - Steht die Animation still, ist immer der erste Screenshot zu sehen.
+ *   - Bei `prefers-reduced-motion` gibt es keine Bewegung: die Screenshots
+ *     stehen dann untereinander, es geht kein Inhalt verloren.
+ *
+ * BILDER
+ * Kommen aus src/assets/work/<id>/ und werden zur Build-Zeit aufgelöst.
+ * Fehlt eine Datei, wird ein klar gekennzeichneter Slot gerendert – diese
+ * Komponente baut niemals einen Screenshot nach.
+ */
+import { Picture } from 'astro:assets';
+import Words from '@/components/Words.astro';
+import Media from '@/components/Media.astro';
+import { showcaseCases, showcaseOpenSlots, type ShowcaseCase } from '@/data/website-showcase';
+
+const files = import.meta.glob<{ default: ImageMetadata }>('/src/assets/work/**/*.{png,jpg,jpeg,webp,avif}');
+
+type Resolved = { case: ShowcaseCase; shots: { img: ImageMetadata; alt: string; view: string }[] };
+
+const cases: Resolved[] = [];
+for (const c of showcaseCases) {
+  const shots = [];
+  for (const s of c.shots) {
+    const key = `/src/assets/work/${c.id}/${s.file}`;
+    if (!files[key]) continue;
+    shots.push({ img: (await files[key]()).default, alt: s.alt, view: s.view });
+  }
+  cases.push({ case: c, shots });
+}
+
+/** Ein Schritt der Überblendung. Bewusst lang – es soll nicht blinken. */
+const STEP = 4.2;
+---
+<section class="sc section" data-theme="dark" data-bg="dark" aria-labelledby="sc-title">
+  <div class="container">
+    <div class="sc__head">
+      <p class="t-label sc__label" data-reveal="fade">Referenzen</p>
+      <h2 class="t-sec sc__title" id="sc-title"><Words text="So sehen unsere Websites aus." /></h2>
+    </div>
+
+    {cases.map(({ case: c, shots }) => (
+      <article class="sc__case" data-reveal>
+        <a class="sc__link" href={c.url} target="_blank" rel="noopener noreferrer">
+          <div class="sc__visual">
+            <div class="sc__chrome" aria-hidden="true">
+              <span class="sc__dots"><i></i><i></i><i></i></span>
+              <span class="sc__domain">{c.domain}</span>
+            </div>
+
+            {shots.length > 0 ? (
+              <div
+                class="sc__stack"
+                style={`--step:${STEP}s; --cycle:${(STEP * shots.length).toFixed(1)}s`}
+              >
+                {shots.map((s, i) => (
+                  <div
+                    class={`sc__shot ${i === 0 ? 'sc__shot--base' : ''}`}
+                    style={`--d:${(shots.length - i) % shots.length}`}
+                  >
+                    <Picture
+                      src={s.img}
+                      formats={['avif', 'webp']}
+                      widths={[420, 640, 900, 1200]}
+                      sizes="(min-width: 900px) 40vw, 92vw"
+                      alt={s.alt}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              /* Kein erfundenes Bild: sichtbarer Slot, bis die echten
+                 Screenshots unter src/assets/work/<id>/ liegen. */
+              <div class="sc__missing" role="img" aria-label={`Screenshots für ${c.client} fehlen noch`}>
+                <p class="t-label">Screenshot folgt</p>
+                <p class="t-small">src/assets/work/{c.id}/</p>
+              </div>
+            )}
+          </div>
+
+          <div class="sc__meta">
+            <p class="sc__client">{c.client}</p>
+            <p class="sc__role">{c.meta}</p>
+            <span class="sc__cta">
+              Website ansehen
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" class="sc__arrow"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+            </span>
+            {shots.length > 1 && (
+              <ul class="sc__views" role="list" style={`--step:${STEP}s; --cycle:${(STEP * shots.length).toFixed(1)}s`}>
+                {shots.map((s, i) => (
+                  <li class="sc__view" style={`--i:${i}`}>{s.view}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </a>
+      </article>
+    ))}
+
+    {showcaseOpenSlots > 0 && (
+      <ul class="sc__slots swipe" role="list">
+        {Array.from({ length: showcaseOpenSlots }).map((_, i) => (
+          <li class="sc__slot" data-reveal style={`--reveal-delay:${i * 110}ms`}>
+            <Media
+              media={{ type: 'placeholder', alt: 'Platz für eine weitere echte Referenz', label: 'Referenz folgt' }}
+              ratio="portrait"
+              sizes="(min-width: 900px) 30vw, 70vw"
+            />
+          </li>
+        ))}
+      </ul>
+    )}
+
+    <p class="t-small t-muted sc__note" data-reveal="fade">
+      Echte Screenshots aus einem echten Projekt. Jede Website entsteht
+      individuell – weitere Referenzen kommen nach und nach dazu.
+    </p>
+  </div>
+</section>
+
+<style>
+  .sc__head { display: grid; gap: var(--space-3); margin-bottom: var(--space-7); }
+  .sc__label { color: var(--c-accent); }
+  .sc__title { max-width: 18ch; }
+
+  /* ---------- Case ---------- */
+  .sc__case { margin-bottom: var(--space-7); }
+  .sc__link {
+    display: grid; gap: var(--space-5);
+    color: inherit; text-decoration: none;
+    border-radius: var(--radius-lg, 1.25rem);
+  }
+  .sc__link:focus-visible { outline: 2px solid var(--c-accent-on-dark); outline-offset: 6px; }
+
+  /* Visual: reduzierte Browserzeile + Screenshot. Kein Geräte-Mockup.
+     Die Screenshots sind Handy-Aufnahmen, deshalb bleibt der Rahmen schmal –
+     hochskaliert auf halbe Bildschirmbreite würde er unscharf wirken. */
+  .sc__visual {
+    max-width: 420px;
+    background: var(--c-ink-2);
+    border: 1px solid var(--c-ink-3);
+    border-radius: 0.9rem;
+    overflow: hidden;
+    box-shadow: var(--card-dark-shadow);
+    transition: transform var(--dur-base, 0.4s) var(--ease-out, ease), box-shadow var(--dur-base, 0.4s) var(--ease-out, ease);
+  }
+  .sc__chrome {
+    display: flex; align-items: center; gap: 0.75rem;
+    padding: 0.55rem 0.8rem;
+    border-bottom: 1px solid var(--c-ink-3);
+    background: var(--c-ink);
+  }
+  .sc__dots { display: inline-flex; gap: 0.32rem; flex: none; }
+  .sc__dots i { width: 0.42rem; height: 0.42rem; border-radius: 50%; background: var(--c-ink-3); }
+  .sc__domain {
+    font-size: 0.72rem; letter-spacing: 0.04em; color: var(--c-grey-dark);
+    font-family: var(--font-mono, ui-monospace, monospace);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+
+  /* Ebenen: erster Screenshot gibt die Höhe vor, die anderen liegen darüber.
+     Sehr lange Seiten werden wie in einem Browserfenster unten abgeschnitten. */
+  .sc__stack {
+    position: relative; background: var(--c-ink-2);
+    max-height: min(72vh, 760px); overflow: hidden;
+  }
+  /* Weicher Auslauf statt harter Schnittkante. */
+  .sc__stack::after {
+    content: ''; position: absolute; inset: auto 0 0 0; height: 9%;
+    background: linear-gradient(to bottom, rgba(16, 13, 11, 0), var(--c-ink-2));
+    pointer-events: none;
+  }
+  .sc__shot { position: absolute; inset: 0; }
+  .sc__shot--base { position: relative; }
+  .sc__shot :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+  .sc__shot--base :global(img) { height: auto; }
+
+  /* Sehr ruhige Überblendung. Steht sie still, ist Screenshot 1 zu sehen. */
+  .sc__shot {
+    animation: sc-shot var(--cycle) linear infinite;
+    /* Negativer Versatz: jede Ebene startet an ihrer Stelle im Zyklus, damit
+       schon im ersten Frame genau ein Screenshot sichtbar ist. --d kommt aus
+       der Komponente und haelt die Reihenfolge Shot 1 → 2 → 3. */
+    animation-delay: calc(var(--d) * var(--step) * -1);
+    animation-play-state: paused;
+  }
+  @keyframes sc-shot {
+    0%, 28% { opacity: 1; }
+    33.34%, 94.5% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+  /* Läuft, sobald der Abschnitt im Blick ist – und immer ohne JavaScript,
+     weil dann niemand die Klasse setzen kann. */
+  .sc__case.is-inview .sc__shot,
+  :global(html:not(.js)) .sc__shot { animation-play-state: running; }
+
+  /* ---------- Beschriftung ---------- */
+  .sc__meta { display: grid; gap: 0.35rem; align-content: start; }
+  .sc__client {
+    font-family: var(--font-display); font-weight: 900; font-stretch: 108%;
+    text-transform: uppercase; letter-spacing: -0.02em; line-height: 1;
+    font-size: clamp(1.5rem, 0.9rem + 2.6vw, 2.8rem);
+  }
+  .sc__role { color: var(--c-grey-dark); font-size: var(--fs-small); }
+  .sc__cta {
+    display: inline-flex; align-items: center; gap: 0.4em;
+    margin-top: var(--space-3); min-height: 44px;
+    color: var(--c-accent-on-dark); font-size: var(--fs-small);
+    letter-spacing: 0.02em;
+  }
+  .sc__arrow { width: 0.85em; height: 0.85em; flex: none; transition: transform var(--dur-fast, 0.25s) var(--ease-out, ease); }
+  .sc__link:hover .sc__arrow { transform: translate(2px, -2px); }
+  .sc__link:hover .sc__visual { transform: translateY(-3px); box-shadow: var(--card-dark-glow), var(--card-dark-shadow); }
+
+  /* Welche Ansicht gerade zu sehen ist – drei Wörter, keine Slider-Punkte. */
+  .sc__views { display: flex; flex-wrap: wrap; gap: 0.35rem 1.1rem; margin-top: var(--space-4); }
+  .sc__view {
+    font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em;
+    color: var(--c-grey-dark); opacity: 0.35;
+    animation: sc-view var(--cycle) linear infinite;
+    animation-delay: calc(var(--i) * var(--step));
+    animation-play-state: paused;
+  }
+  @keyframes sc-view {
+    0%, 30% { opacity: 1; color: var(--c-paper); }
+    34%, 100% { opacity: 0.35; color: var(--c-grey-dark); }
+  }
+  .sc__case.is-inview .sc__view,
+  :global(html:not(.js)) .sc__view { animation-play-state: running; }
+
+  /* ---------- Fehlende Screenshots ---------- */
+  .sc__missing {
+    display: grid; gap: 0.4rem; place-content: center; text-align: center;
+    aspect-ratio: 9 / 16; color: var(--c-grey-dark);
+    background: repeating-linear-gradient(135deg, var(--c-ink-2) 0 12px, var(--c-ink) 12px 24px);
+  }
+
+  /* ---------- Freie Plätze ---------- */
+  .sc__slots { display: grid; gap: var(--grid-gap); margin-bottom: var(--space-6); }
+  .sc__slot { opacity: 0.5; }
+  .sc__note { margin-top: var(--space-5); max-width: 56ch; }
+
+  @media (min-width: 900px) {
+    .sc__link {
+      grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+      gap: var(--space-8);
+      align-items: center;
+      max-width: 1000px;
+    }
+    /* Untereinander liest sich der Ablauf der Seite wie ein Inhaltsverzeichnis. */
+    .sc__views { flex-direction: column; gap: 0.55rem; margin-top: var(--space-5); }
+    .sc__view { font-size: 0.78rem; }
+    .sc__slots { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .sc__slot { grid-column: span 1; }
+  }
+  @media (min-width: 700px) and (max-width: 899.98px) {
+    .sc__slots { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+
+  /* ---------- Reduced Motion ---------- */
+  /* Keine Bewegung. Damit trotzdem nichts verloren geht, stehen die
+     Screenshots dann untereinander statt übereinander. */
+  @media (prefers-reduced-motion: reduce) {
+    .sc__stack { display: grid; }
+    .sc__shot, :global(html:not(.js)) .sc__shot { position: relative; inset: auto; opacity: 1; animation: none; }
+    .sc__shot :global(img) { height: auto; }
+    .sc__shot + .sc__shot { border-top: 1px solid var(--c-ink-3); }
+    .sc__stack { max-height: none; }
+    .sc__stack::after { display: none; }
+    .sc__view, :global(html:not(.js)) .sc__view { animation: none; opacity: 1; }
+    .sc__link:hover .sc__visual { transform: none; }
+  }
+</style>

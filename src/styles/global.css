@@ -79,11 +79,11 @@ ul[role='list'], ol[role='list'] { list-style: none; padding: 0; }
   text-transform: uppercase;
   text-wrap: balance;
 }
-.t-mega { font-size: var(--fs-mega); line-height: 0.78; letter-spacing: var(--ls-mega); }
-.t-hero { font-size: var(--fs-hero); line-height: var(--lh-tight); letter-spacing: var(--ls-mega); }
-.t-display { font-size: var(--fs-display); line-height: 0.9; letter-spacing: var(--ls-tight); }
-.t-h1 { font-size: var(--fs-h1); line-height: 0.92; letter-spacing: var(--ls-tight); }
-.t-h2 { font-size: var(--fs-h2); line-height: 0.96; letter-spacing: var(--ls-tight); font-stretch: var(--wd-wide); }
+.t-mega { font-size: var(--fs-mega); line-height: 0.88; letter-spacing: var(--ls-mega); }
+.t-hero { font-size: var(--fs-hero); line-height: 0.95; letter-spacing: var(--ls-mega); }
+.t-display { font-size: var(--fs-display); line-height: 0.98; letter-spacing: var(--ls-tight); }
+.t-h1 { font-size: var(--fs-h1); line-height: 1; letter-spacing: var(--ls-tight); }
+.t-h2 { font-size: var(--fs-h2); line-height: 1.02; letter-spacing: var(--ls-tight); font-stretch: var(--wd-wide); }
 .t-h3 {
   font-family: var(--font-display);
   font-size: var(--fs-h3);
@@ -249,8 +249,8 @@ ul[role='list'], ol[role='list'] { list-style: none; padding: 0; }
 .media--hover:hover > img, .media--hover:hover > picture img, .media--hover:hover > video,
 a:hover .media--hover > img, a:hover .media--hover > picture img, a:hover .media--hover > video { transform: scale(1.04); }
 .media--hover:hover > .ph, a:hover .media--hover > .ph { transform: none; }
-.media--reveal { clip-path: inset(0 0 100% 0); }
-.media--reveal.is-inview { clip-path: inset(0 0 0 0); transition: clip-path var(--dur-reveal) var(--ease-expo); }
+.js .media--reveal { clip-path: inset(0 0 100% 0); }
+.js .media--reveal.is-inview { clip-path: inset(0 0 0 0); transition: clip-path var(--dur-reveal) var(--ease-expo); }
 
 /* --------------------------------------------------------------------------
    MEDIA SURFACES (temporäre Platzhalter)
@@ -324,24 +324,57 @@ a:hover .media--hover > img, a:hover .media--hover > picture img, a:hover .media
 .placeholder__label { opacity: 0.7; }
 
 /* ==========================================================================
-   REVEAL SYSTEM (CSS-Basis, JS setzt .is-inview)
+   REVEAL SYSTEM  –  PROGRESSIVE ENHANCEMENT
+   --------------------------------------------------------------------------
+   GRUNDREGEL: Inhalt ist IMMER sichtbar. Versteckt wird ausschliesslich unter
+   `html.js` – die Klasse setzt ein Inline-Script im <head>, und ein Watchdog
+   im selben Script nimmt sie nach 2.5s wieder weg, falls das Motion-Modul
+   nicht startet (JS-Fehler, Bundle nicht geladen, sehr langsames Geraet).
+   Ohne JS, bei kaputtem JS oder bei Reduced Motion steht alles sofort da.
    ========================================================================== */
-[data-reveal] { opacity: 0; transform: translateY(2rem); transition: opacity var(--dur-slow) var(--ease-out), transform var(--dur-slow) var(--ease-out); transition-delay: var(--reveal-delay, 0ms); }
-[data-reveal].is-inview { opacity: 1; transform: none; }
-[data-reveal='fade'] { transform: none; }
+.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(var(--reveal-shift, 1.25rem));
+  transition: opacity var(--dur-slow) var(--ease-out), transform var(--dur-slow) var(--ease-out);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+.js [data-reveal].is-inview { opacity: 1; transform: none; }
+.js [data-reveal='fade'] { transform: none; }
 
-/* Text mask reveal: Wörter in .word > .word__inner */
+/* Text mask reveal: Woerter in .word > .word__inner */
 .words { display: block; }
-.words .word { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.08em; margin-bottom: -0.08em; }
-.words .word__inner { display: inline-block; transform: translateY(110%); transition: transform var(--dur-reveal) var(--ease-expo); transition-delay: calc(min(var(--i, 0) * 38ms, 640ms) + var(--reveal-delay, 0ms)); will-change: transform; }
-.words.is-inview .word__inner { transform: translateY(0); }
+.words .word { display: inline-block; vertical-align: top; }
+/* Oben Platz fuer Umlautpunkte und Akzente, unten fuer Unterlaengen.
+   Die negativen Margins heben das Padding im Satzbild wieder auf. */
+.js .words .word { overflow: hidden; padding-block: 0.3em 0.14em; margin-block: -0.3em -0.14em; }
+.js .words .word__inner {
+  display: inline-block;
+  /* 155 %: der Wortkoerper muss auch das grosszuegige obere Padding raeumen. */
+  transform: translateY(155%);
+  transition: transform var(--dur-reveal) var(--ease-expo);
+  transition-delay: calc(min(var(--i, 0) * 38ms, 640ms) + var(--reveal-delay, 0ms));
+  will-change: transform;
+}
+.js .words.is-inview .word__inner { transform: translateY(0); }
 
 /* Line rule reveal */
-.rule { height: 1px; background: var(--line); transform-origin: left; transform: scaleX(0); transition: transform var(--dur-reveal) var(--ease-expo); }
-.rule.is-inview { transform: scaleX(1); }
+.rule { height: 1px; background: var(--line); transform-origin: left; }
+.js .rule { transform: scaleX(0); transition: transform var(--dur-reveal) var(--ease-expo); }
+.js .rule.is-inview { transform: scaleX(1); }
 
+/* Mobile: kuerzere Wege, weniger Bewegung. */
+@media (max-width: 767px) {
+  :root { --reveal-shift: 0.75rem; }
+}
+
+/* Reduced Motion und der Watchdog-Fall (html ohne .js) zeigen alles sofort. */
 @media (prefers-reduced-motion: reduce) {
-  [data-reveal], .words .word__inner, .rule, .media--reveal { opacity: 1 !important; transform: none !important; clip-path: none !important; }
+  [data-reveal], .words .word__inner, .rule, .media--reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+    transition: none !important;
+  }
 }
 
 /* ==========================================================================
@@ -364,6 +397,413 @@ a:hover .media--hover > img, a:hover .media--hover > picture img, a:hover .media
 /* Zeilen, die sich beim Scrollen gegeneinander bewegen */
 .drift { will-change: transform; }
 
+
+
+/* ==========================================================================
+   EDITORIAL-TYPOGRAFIE
+   Die Groteske traegt, die Serif setzt Akzente. Das Zusammenspiel macht den
+   Unterschied zwischen "Interface" und "Magazin" – deshalb steht die Serif
+   nie im Fliesstext, sondern nur dort, wo ein Wort Haltung zeigen soll.
+   ========================================================================== */
+.t-serif {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-stretch: normal;
+  text-transform: none;
+  letter-spacing: -0.01em;
+}
+/* Der kursive Einwurf mitten in einer Versal-Headline – die Signaturgeste. */
+.t-serif-i {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-stretch: normal;
+  text-transform: none;
+  letter-spacing: -0.015em;
+  /* Die Serif hat eine kleinere x-Hoehe als Archivo: leicht hochskalieren,
+     damit beide Schriften optisch gleich gross wirken. */
+  font-size: 1.12em;
+  line-height: 0.9;
+}
+
+/* Versal-Groteske, so breit und schwer wie die Achse hergibt. */
+.t-wall {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-stretch: 125%;
+  text-transform: uppercase;
+  letter-spacing: -0.045em;
+  line-height: 0.82;
+  text-wrap: balance;
+}
+
+/* ==========================================================================
+   LAUFBAND
+   Eine Reihe, zweimal im Markup, wandert endlos. Ohne JS, damit sie auch
+   dann laeuft, wenn das Motion-Modul nicht startet. Bei Reduced Motion
+   steht sie still und laesst sich stattdessen antippen und schieben.
+   ========================================================================== */
+.marquee {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+.marquee__row {
+  display: flex;
+  align-items: center;
+  flex: none;
+  gap: var(--marquee-gap, clamp(2rem, 5vw, 5rem));
+  padding-right: var(--marquee-gap, clamp(2rem, 5vw, 5rem));
+  margin: 0;
+  list-style: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .marquee__row { animation: marquee-run var(--marquee-speed, 40s) linear infinite; }
+  .marquee--reverse .marquee__row { animation-direction: reverse; }
+  .marquee:hover .marquee__row { animation-play-state: paused; }
+  @keyframes marquee-run { to { transform: translateX(-100%); } }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee { overflow-x: auto; scrollbar-width: none; }
+  .marquee::-webkit-scrollbar { display: none; }
+}
+
+/* Randlose Flaeche, die den Container verlaesst – ohne 100vw-Trick,
+   damit auf Seiten mit Scrollbar kein horizontaler Ueberlauf entsteht. */
+.edge {
+  margin-inline: calc(-1 * var(--gutter));
+}
+
+/* Feine Linie als Section-Trenner, laeuft beim Scrollen auf. */
+.hairline { height: 1px; background: var(--line); transform-origin: left; }
+.js .hairline { transform: scaleX(0); transition: transform 1.2s var(--ease-expo); }
+.js .hairline.is-inview { transform: scaleX(1); }
+
+
+/* ==========================================================================
+   VERKAUFS-BAUSTEINE
+   Wiederkehrende Elemente, die pro Bildschirm Information liefern:
+   Eyebrow, Chip, Badge, Geraeterahmen, Schrittkette, Preis-Splitter.
+   Bewusst global, weil sie auf Startseite und Landingpage gleich aussehen.
+   ========================================================================== */
+
+/* Auszeichnung mit Linien links und rechts – ordnet den Block ein, bevor
+   die Headline kommt. */
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.9em;
+  font-family: var(--font-body);
+  font-size: var(--fs-eyebrow);
+  font-weight: var(--fw-semi);
+  font-stretch: var(--wd-tight);
+  letter-spacing: var(--ls-wider);
+  text-transform: uppercase;
+  color: var(--c-accent-text);
+}
+[data-theme='dark'] .eyebrow, .surface-ink .eyebrow { color: var(--c-accent-on-dark); }
+.eyebrow::before { content: ''; width: clamp(1.5rem, 4vw, 3rem); height: 1px; background: currentColor; flex: none; opacity: 0.55; }
+.eyebrow--center { justify-content: center; }
+.eyebrow--center::after { content: ''; width: clamp(1.5rem, 4vw, 3rem); height: 1px; background: currentColor; flex: none; opacity: 0.55; }
+
+/* Hervorgehobenes Wort in einer Headline – der Griff, mit dem die Referenz
+   ihre Aussagen lesbar macht. */
+.hl { color: var(--c-accent); }
+[data-theme='dark'] .hl { color: var(--c-accent-on-dark); }
+
+/* Haken-Chips: knappe Belege unter einer Headline. */
+.chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+  padding: 0.6em 1em;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-eyebrow);
+  font-weight: var(--fw-semi);
+  font-stretch: var(--wd-tight);
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  color: var(--fg);
+  background: color-mix(in srgb, var(--fg) 4%, transparent);
+}
+.chip::before {
+  content: '';
+  width: 0.95em; height: 0.95em; flex: none;
+  border-radius: 50%;
+  background: var(--c-accent) no-repeat center / 0.55em
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none'><path d='M2 6.5L4.8 9L10 3' stroke='white' stroke-width='2.2' stroke-linecap='square'/></svg>");
+}
+.chip--plain::before { display: none; }
+
+/* Badge: eine kurze Einordnung an einer Karte. */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.45em 0.85em;
+  border-radius: var(--radius-pill);
+  background: var(--c-accent);
+  color: #fff;
+  font-size: var(--fs-eyebrow);
+  font-weight: var(--fw-semi);
+  font-stretch: var(--wd-tight);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  line-height: 1;
+}
+.badge--quiet { background: color-mix(in srgb, var(--fg) 8%, transparent); color: var(--fg); }
+
+/* Geraeterahmen mit schwebenden Beschriftungen – zeigt Arbeit, statt sie zu
+   behaupten. Die Labels sitzen bewusst halb ausserhalb des Rahmens. */
+.mock { position: relative; }
+.mock__frame {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: clamp(0.75rem, 2vw, 1.25rem);
+  background: var(--bg-2);
+  padding: clamp(0.4rem, 1vw, 0.7rem);
+  overflow: hidden;
+}
+.mock__bar { display: flex; gap: 0.3rem; padding: 0.35rem 0.2rem 0.55rem; }
+.mock__bar span { width: 0.45rem; height: 0.45rem; border-radius: 50%; background: var(--line); }
+.mock__tag {
+  position: absolute;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.5em 0.85em;
+  border-radius: var(--radius-pill);
+  background: var(--c-ink);
+  color: var(--c-paper);
+  border: 1px solid var(--c-ink-3);
+  font-size: var(--fs-eyebrow);
+  font-weight: var(--fw-semi);
+  font-stretch: var(--wd-tight);
+  letter-spacing: 0.04em;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+.mock__tag--tl { top: clamp(0.5rem, 2vw, 1rem); left: clamp(0.5rem, 2vw, 1rem); }
+.mock__tag--br { bottom: clamp(0.5rem, 2vw, 1rem); right: clamp(0.5rem, 2vw, 1rem); }
+.mock__tag i { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--c-accent); flex: none; }
+
+/* Kompakte Schrittkette – Ablauf ohne eigene Section. */
+.steps { display: grid; gap: 0.5rem; }
+.steps__item { display: flex; align-items: baseline; gap: 0.7em; font-size: var(--fs-small); }
+.steps__n {
+  flex: none;
+  display: inline-grid; place-items: center;
+  width: 1.6em; height: 1.6em;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  font-family: var(--font-display);
+  font-size: 0.75em;
+  font-weight: var(--fw-bold);
+  color: var(--c-accent);
+}
+@media (min-width: 620px) { .steps { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem 1.25rem; } }
+
+/* Preis-Splitter: einmalig links, monatlich rechts – die eine Stelle, an der
+   Missverstaendnisse entstehen, deshalb visuell getrennt. */
+.split {
+  display: grid;
+  border: 1px solid var(--line);
+  border-radius: clamp(0.75rem, 2vw, 1rem);
+  overflow: hidden;
+}
+.split__col { padding: clamp(1rem, 2.5vw, 1.5rem); display: grid; gap: 0.3rem; align-content: start; }
+.split__col + .split__col { border-top: 1px solid var(--line); }
+.split__label { font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight); letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--fg-muted); }
+.split__value {
+  font-family: var(--font-display);
+  font-weight: var(--fw-display);
+  font-stretch: var(--wd-wide);
+  font-size: clamp(1.5rem, 1rem + 2.2vw, 2.6rem);
+  line-height: 1;
+  letter-spacing: var(--ls-tight);
+  font-variant-numeric: tabular-nums;
+}
+.split__note { font-size: var(--fs-small); color: var(--fg-muted); }
+.split__col--lead .split__value { color: var(--c-accent); }
+@media (min-width: 560px) {
+  .split { grid-template-columns: 1fr 1fr; }
+  .split__col + .split__col { border-top: 0; border-left: 1px solid var(--line); }
+}
+
+/* Sticky-CTA – nur dort einsetzen, wo eine Seite auf eine Anfrage hinarbeitet. */
+/* Schwebende Leiste statt Vollbalken: sie verdeckt weniger und wirkt
+   wie ein Element der Seite, nicht wie eine Browserleiste. */
+.sticky-cta {
+  position: fixed;
+  left: 0; right: 0;
+  bottom: calc(0.6rem + env(safe-area-inset-bottom));
+  z-index: var(--z-nav);
+  display: flex;
+  gap: 0.4rem;
+  padding-inline: var(--gutter);
+  transform: translateY(calc(100% + 1.5rem));
+  transition: transform var(--dur-base) var(--ease-out);
+}
+.sticky-cta.is-on { transform: none; }
+.sticky-cta__main {
+  flex: 1; justify-content: center;
+  min-height: 2.85rem; padding-block: 0.6rem;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 10px 30px -10px rgba(11, 10, 9, 0.55);
+}
+.sticky-cta__alt {
+  flex: none; display: grid; place-items: center;
+  width: 2.85rem; height: 2.85rem; border-radius: 50%;
+  color: var(--c-paper);
+  background: color-mix(in srgb, var(--c-ink) 86%, transparent);
+  border: 1px solid rgba(242, 237, 228, 0.18);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 10px 30px -10px rgba(11, 10, 9, 0.55);
+}
+.sticky-cta__alt svg { width: 1.2rem; height: 1.2rem; }
+@media (min-width: 900px) { .sticky-cta { display: none; } }
+@media (prefers-reduced-motion: reduce) { .sticky-cta { transition: none; } }
+
+
+/* ==========================================================================
+   SWIPE-REIHE
+   Kartensets, die gestapelt zu viel Hoehe kosten, laufen auf schmalen
+   Geraeten waagerecht. Nativer Scroll-Container mit Snap: funktioniert mit
+   Finger, Trackpad, Tastatur und ohne JavaScript. Ab der Breite, ab der das
+   Raster passt, wird daraus wieder ein normales Grid.
+   ========================================================================== */
+.swipe {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: min(82vw, 22rem);
+  gap: var(--grid-gap);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  /* Ohne das schnappt die erste Karte an den Rand und frisst die Gasse. */
+  scroll-padding-inline-start: var(--gutter);
+  scrollbar-width: none;
+  /* Karten beginnen und enden buendig am Containerrand. */
+  margin-inline: calc(-1 * var(--gutter));
+  padding-inline: var(--gutter);
+  padding-bottom: var(--space-3);
+}
+.swipe::-webkit-scrollbar { display: none; }
+.swipe > * { scroll-snap-align: start; }
+
+/* Hinweis, dass sich die Reihe schieben laesst – verschwindet im Grid. */
+.swipe-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  margin-top: var(--space-3);
+  font-size: var(--fs-eyebrow);
+  font-weight: var(--fw-semi);
+  font-stretch: var(--wd-tight);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+.swipe-hint::after { content: ''; width: 1.75rem; height: 1px; background: currentColor; }
+
+/* ==========================================================================
+   FORMULARE
+   Global, weil mehrere Formulare dieselbe Darstellung teilen
+   (allgemeine Anfrage und die kurze Website-Lead-Form).
+   ========================================================================== */
+
+  .form { display: grid; gap: var(--space-6); }
+  .form__row { display: grid; gap: var(--space-6); }
+  @media (min-width: 620px) { .form__row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5); } }
+
+  .form__field { display: grid; gap: var(--space-2); min-width: 0; }
+  .form__field label, .form__legend { color: var(--fg-muted); transition: color var(--dur-fast); }
+  .form__field:focus-within label { color: var(--fg); }
+
+  .form input[type='text'], .form input[type='email'], .form input[type='tel'], .form textarea, .form select {
+    width: 100%;
+    min-height: 3.25rem;
+    padding: 0.9rem 0;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    border-radius: 0;
+    font-size: var(--fs-lead);
+    line-height: 1.3;
+    color: var(--fg);
+    transition: border-color var(--dur-base) var(--ease-out);
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .form textarea { resize: vertical; min-height: 8rem; }
+  .form input::placeholder, .form textarea::placeholder { color: color-mix(in srgb, var(--fg-muted) 65%, transparent); }
+  .form input:focus, .form textarea:focus, .form select:focus { outline: none; border-bottom-color: var(--fg); }
+  .form [aria-invalid='true'] { border-bottom-color: var(--c-accent); }
+
+  /* Select braucht einen eigenen Pfeil, weil appearance: none den nativen entfernt. */
+  .form__select { position: relative; }
+  .form__select select { padding-right: 2rem; cursor: pointer; }
+  .form__select option { background: var(--c-ink); color: var(--c-paper); }
+  .form__select-icon { position: absolute; right: 0; top: 50%; width: 1rem; height: 1rem; transform: translateY(-50%); pointer-events: none; color: var(--fg-muted); }
+
+  .form__fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: var(--space-3); min-width: 0; }
+  .form__chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .form__chip { position: relative; }
+  .form__chip input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+  .form__chip span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0.6em 1.1em;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-pill);
+    font-family: var(--font-body);
+    font-size: var(--fs-eyebrow);
+    font-weight: var(--fw-semi);
+    font-stretch: var(--wd-tight);
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+    color: var(--fg-muted);
+    transition: background var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
+  }
+  .form__chip input:checked + span { background: var(--c-accent); border-color: var(--c-accent); color: #fff; }
+  .form__chip input:focus-visible + span { outline: 2px solid var(--fg); outline-offset: 3px; }
+  @media (hover: hover) { .form__chip:hover span { border-color: var(--fg); color: var(--fg); } }
+  .form__chip input:checked + span:hover { color: #fff; }
+
+  .form__consent { display: grid; gap: var(--space-2); }
+  .form__check { display: flex; align-items: flex-start; gap: 0.75em; cursor: pointer; }
+  .form__check input {
+    flex-shrink: 0;
+    width: 1.15rem; height: 1.15rem;
+    margin-top: 0.15em;
+    accent-color: var(--c-accent);
+    cursor: pointer;
+  }
+  .form__check span { max-width: 60ch; color: var(--fg-muted); }
+
+  .form__error { color: var(--c-accent); }
+  .form__error:empty { display: none; }
+
+  .form__actions { display: grid; gap: var(--space-4); justify-items: start; padding-top: var(--space-2); }
+  .form__hint { max-width: 44ch; }
+
+  .form__status { padding: var(--space-6); border: 1px solid var(--line); }
+  .form__status.is-success { border-color: var(--fg); }
+  .form__status.is-error { border-color: var(--c-accent); }
+  .form__status h2 { font-size: var(--fs-h3); font-family: var(--font-display); letter-spacing: var(--ls-snug); margin-bottom: var(--space-2); }
+  .form.is-sent .form__row,
+  .form.is-sent .form__field,
+  .form.is-sent .form__fieldset,
+  .form.is-sent .form__consent,
+  .form.is-sent .form__actions { display: none; }
+  .form.is-busy .btn { opacity: 0.6; pointer-events: none; }
+
 /* ==========================================================================
    UTILITIES
    ========================================================================== */
@@ -375,3 +815,214 @@ a:hover .media--hover > img, a:hover .media--hover > picture img, a:hover .media
 .hide-mobile { display: none; }
 @media (min-width: 768px) { .hide-mobile { display: revert; } .hide-desktop { display: none; } }
 @media (min-width: 900px) { .hide-desktop-lg { display: none; } }
+
+/* ==========================================================================
+   FLAECHEN-SYSTEM (Cards, Kacheln, Pills, Kennzahlen, Waschungen)
+
+   Die Regel aus dem Mockup: eine helle Flaeche ist zurueckhaltend, eine dunkle
+   Flaeche ist die Antwort. Tiefe entsteht aus Verlauf + Haarlinie + sehr
+   weichem Schatten, nicht aus Rahmen. Alle Werte kommen aus tokens.css.
+   ========================================================================== */
+
+/* Basisgroesse fuer alle Icons – ohne das dehnt Flex sie auf Containerhoehe. */
+.icon { width: 1em; height: 1em; flex: none; display: block; }
+
+.card {
+  position: relative;
+  border-radius: var(--radius-card);
+  isolation: isolate;
+}
+
+/* Zurueckhaltende Flaeche: der Ist-Zustand, das Nebenstehende. */
+.card--light {
+  background: var(--card-light-bg);
+  border: 1px solid var(--card-light-line);
+  box-shadow: var(--card-light-shadow);
+  color: var(--c-ink);
+  --card-line: var(--card-light-line-soft);
+  --card-muted: var(--c-grey);
+  --card-tile: var(--tile-light-bg);
+  --card-tile-line: var(--card-light-line);
+}
+
+/* Die Antwort: dunkel, mit rotem Schein und innerem Lichtsaum oben. */
+.card--dark {
+  background: var(--card-dark-bg);
+  border: 1px solid var(--card-dark-line);
+  box-shadow: var(--card-dark-shadow), var(--card-dark-glow);
+  color: var(--c-paper);
+  --card-line: var(--card-dark-line-soft);
+  --card-muted: var(--c-grey-dark);
+  --card-tile: var(--tile-dark-bg);
+  --card-tile-line: var(--card-dark-line);
+}
+/* Innerer Lichtsaum – gibt der Kante Materialitaet statt eines harten Rahmens. */
+.card--dark::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(120% 80% at 50% -20%, rgba(255, 255, 255, 0.07), transparent 60%);
+  z-index: -1;
+}
+
+.card--accent {
+  background: var(--card-accent-bg);
+  border: 1px solid var(--card-accent-line);
+  box-shadow: var(--card-accent-shadow);
+  color: #fff;
+  --card-line: rgba(255, 255, 255, 0.24);
+  --card-muted: rgba(255, 255, 255, 0.82);
+  --card-tile: rgba(255, 255, 255, 0.16);
+  --card-tile-line: rgba(255, 255, 255, 0.28);
+}
+
+.card__pad { padding: clamp(1rem, 2.4vw, 1.75rem); }
+
+/* ---------- Icon-Kachel: quadratisch, ruhig, immer gleich gross ---------- */
+.itile {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: clamp(1.9rem, 4.6vw, 2.5rem);
+  aspect-ratio: 1;
+  border-radius: var(--radius-tile);
+  background: var(--card-tile, var(--tile-light-bg));
+  border: 1px solid var(--card-tile-line, var(--line));
+  color: currentColor;
+}
+.itile svg { width: 52%; height: 52%; }
+.itile--bad { color: var(--card-muted, var(--fg-muted)); }
+.itile--good { color: var(--c-accent-on-dark); }
+
+/* Runde Marke im Kopf einer Vergleichs-Card */
+.rmark {
+  display: grid; place-items: center; flex: none;
+  width: clamp(1.6rem, 4vw, 2.2rem); aspect-ratio: 1; border-radius: 50%;
+}
+.rmark svg { width: 55%; height: 55%; }
+.rmark--bad { border: 1.5px solid var(--c-accent); color: var(--c-accent); }
+.rmark--good { background: var(--c-accent); color: #fff; box-shadow: 0 0 0 4px rgba(229, 67, 43, 0.16); }
+
+/* ---------- Status-Pill (Konsistent / Effizient / …) ---------- */
+.spill {
+  display: inline-flex; align-items: center;
+  padding: 0.4em 0.75em;
+  border-radius: var(--radius-pill);
+  font-size: clamp(0.6rem, 1.4vw, 0.7rem);
+  font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+  letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap;
+  background: rgba(229, 67, 43, 0.14);
+  border: 1px solid rgba(229, 67, 43, 0.28);
+  color: var(--c-accent-on-dark);
+}
+.spill--quiet {
+  background: rgba(11, 10, 9, 0.05);
+  border-color: var(--card-light-line);
+  color: var(--c-grey);
+}
+
+/* ---------- Schwebendes VS.-Badge zwischen zwei Panels ---------- */
+.vs {
+  display: grid; place-items: center;
+  width: clamp(2.2rem, 7vw, 3.4rem); aspect-ratio: 1;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #ffffff, #f2ede4);
+  border: 1px solid var(--card-light-line);
+  box-shadow: 0 2px 4px rgba(11, 10, 9, 0.06), 0 14px 30px -12px rgba(11, 10, 9, 0.28);
+  color: var(--c-ink);
+  font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: var(--wd-tight);
+  font-size: clamp(0.62rem, 1.7vw, 0.82rem); letter-spacing: 0.06em; text-transform: uppercase;
+}
+
+/* ---------- Kennzahlen-Streifen ---------- */
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+@media (min-width: 760px) { .metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.metric {
+  display: grid; align-content: start; gap: 0.1rem;
+  padding: clamp(0.9rem, 2.4vw, 1.6rem) clamp(0.9rem, 2.2vw, 1.5rem);
+  position: relative;
+}
+/* Trennlinien als Innenlinien statt als Rahmen um jede Zelle. */
+.metric + .metric::before {
+  content: ''; position: absolute; inset: 12% auto 12% 0; width: 1px;
+  background: var(--card-line, var(--line));
+}
+@media (max-width: 759px) {
+  .metric:nth-child(odd)::before { display: none; }
+  .metric:nth-child(n + 3)::after {
+    content: ''; position: absolute; inset: 0 6% auto 6%; height: 1px;
+    background: var(--card-line, var(--line));
+  }
+}
+.metric__value {
+  font-family: var(--font-display); font-weight: var(--fw-display); font-stretch: 118%;
+  font-size: clamp(1.6rem, 1rem + 3.2vw, 3.2rem);
+  line-height: 0.92; letter-spacing: -0.05em;
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.metric__label {
+  margin-top: 0.4rem;
+  font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); font-stretch: var(--wd-tight);
+  letter-spacing: var(--ls-wide); text-transform: uppercase;
+}
+.metric__note { font-size: clamp(0.72rem, 1.8vw, 0.85rem); line-height: 1.4; color: var(--card-muted, var(--fg-muted)); }
+
+/* ---------- Licht-Waschung hinter einer Section ---------- */
+.wash { position: relative; isolation: isolate; }
+.wash::before {
+  content: '';
+  position: absolute; inset: 0;
+  pointer-events: none; z-index: -1;
+  background:
+    radial-gradient(70% 55% at 85% 0%, var(--wash-red), transparent 70%),
+    radial-gradient(60% 50% at 0% 100%, rgba(11, 10, 9, 0.05), transparent 70%);
+}
+[data-theme='dark'].wash::before,
+[data-theme='dark'] .wash::before {
+  background:
+    radial-gradient(70% 55% at 85% 0%, var(--wash-red-dark), transparent 70%),
+    radial-gradient(55% 45% at 5% 95%, rgba(242, 237, 228, 0.05), transparent 70%);
+}
+
+/* Zeile in einer Vergleichs-Card: Kachel · Text · Pill */
+.crow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(0.5rem, 1.6vw, 0.85rem);
+  padding-block: clamp(0.55rem, 1.5vw, 0.9rem);
+}
+.crow + .crow { border-top: 1px solid var(--card-line, var(--line)); }
+.crow__text {
+  font-size: clamp(0.82rem, 2.1vw, 1.02rem); line-height: 1.3;
+  min-width: 0; hyphens: auto;
+}
+.crow__pill { grid-column: 2; justify-self: start; }
+/* Unter 400px gehoert die Breite dem Text: die Icon-Kachel ist Zierde,
+   der Vergleich ist der Inhalt. Sonst bricht er mitten im Wort. */
+@media (max-width: 399px) {
+  .crow { grid-template-columns: minmax(0, 1fr); }
+  .crow > .itile { display: none; }
+  .crow__pill { grid-column: 1; }
+}
+@media (min-width: 1024px) {
+  .crow { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .crow__pill { grid-column: 3; justify-self: end; }
+}
+
+/* Einheitliche Section-Ueberschrift: schwere Displayschrift statt Fliesstext.
+   Ersetzt das frueher editoriale .t-say in den Sections. */
+.t-sec {
+  font-family: var(--font-display); font-weight: 900; font-stretch: 112%;
+  font-size: clamp(1.9rem, 0.9rem + 4.2vw, 4.2rem);
+  line-height: 0.98; letter-spacing: -0.04em;
+  text-wrap: balance;
+}

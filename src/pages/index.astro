@@ -1,52 +1,56 @@
 ---
+/**
+ * ============================================================================
+ * STARTSEITE
+ * ============================================================================
+ *
+ * SHOW, DON'T TELL. Acht Abschnitte, und sieben davon zeigen etwas, statt es
+ * zu beschreiben. Der Text auf dieser Seite hat genau eine Aufgabe: sagen,
+ * was man gerade sieht, und wo es weitergeht.
+ *
+ *   01 Hero         Film, vier Woerter, ein Knopf.
+ *   02 Kundenlogos  Eine ruhige Leiste. Wer schon mit uns gearbeitet hat.
+ *   03 Leistungen   Vier Disziplinen, je eine grosse Filmflaeche, je ein
+ *                   Satz. Der Film macht die Arbeit, nicht der Absatz.
+ *   04 Arbeiten     Horizontale Swipe-Galerie. Weitere Projekte liegen
+ *                   ausserhalb des Bildes und werden erwischt, nicht
+ *                   weggescrollt.
+ *   05 Technik      Logos. Keine Erklaerzeilen.
+ *   06 Ablauf       Drei Schritte.
+ *   07 Stimme       Eine echte Bewertung.
+ *   08 Kontakt      Der Abschluss.
+ *
+ * AUF UNTERSEITEN VERLAGERT, Komponenten bleiben unveraendert im Projekt:
+ *   Showreel, Comparison, WebsiteTeaser, ModelsTeaser, Pricing, Faq,
+ *   EditorialWork, Clients, Industries, SelectedWork (ersetzt durch
+ *   WorkSwipe), Process (Langfassung, ersetzt durch ProcessShort).
+ * Models & Talents bleibt ein eigener Bereich und steht in der Navigation.
+ */
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import Hero from '@/components/home/Hero.astro';
-import AgencyStatement from '@/components/home/AgencyStatement.astro';
-import SelectedWork from '@/components/home/SelectedWork.astro';
-import FeaturedProject from '@/components/home/FeaturedProject.astro';
-import Statement from '@/components/home/Statement.astro';
-import ServicesList from '@/components/ServicesList.astro';
-import SectionLabel from '@/components/SectionLabel.astro';
-import Clients from '@/components/Clients.astro';
+import MainHero from '@/components/home/MainHero.astro';
+import FeaturedOn from '@/components/sections/FeaturedOn.astro';
+import ServiceFilms from '@/components/sections/ServiceFilms.astro';
+import WorkSwipe from '@/components/home/WorkSwipe.astro';
+import Toolkit from '@/components/sections/Toolkit.astro';
+import ProcessShort from '@/components/home/ProcessShort.astro';
+import Testimonials from '@/components/sections/Testimonials.astro';
 import ContactCta from '@/components/ContactCta.astro';
-import ArrowLink from '@/components/ArrowLink.astro';
 import { site } from '@/data/site';
+import { offerCatalog } from '@/lib/schema';
 ---
 <BaseLayout
-  title={`${site.name} | Social Media, Film & Branding Agentur München`}
-  description={site.description}
+  title={`Werbeagentur München | Video, Motion Graphics & Branding – ${site.name}`}
+  description="LAMOR AGENCY aus München: Videografie, Motion Graphics, Branding und Webdesign aus einem Studio. Jetzt Projekt anfragen."
   theme="dark"
-  bodyClass="has-bg-transitions"
+  palette="mono"
+  jsonLd={[offerCatalog()]}
 >
-  <Hero />
-  <AgencyStatement />
-  <SelectedWork />
-  <FeaturedProject />
-  <Statement />
-
-  <section class="home-services section" data-theme="light" data-bg="light" aria-labelledby="services-title">
-    <div class="container">
-      <div class="home-services__head">
-        <SectionLabel label="Leistungen" />
-        <h2 class="t-say home-services__title" id="services-title" data-reveal>Neun Disziplinen,<br />ein Studio.</h2>
-      </div>
-      <ServicesList mode="compact" />
-      <div class="home-services__more" data-reveal>
-        <ArrowLink href="/services/" label="Alle Leistungen im Detail" />
-      </div>
-    </div>
-  </section>
-
-  <div data-theme="light" data-bg="light">
-    <Clients />
-  </div>
-
+  <MainHero />
+  <FeaturedOn />
+  <ServiceFilms />
+  <WorkSwipe />
+  <Toolkit />
+  <ProcessShort />
+  <Testimonials />
   <ContactCta />
 </BaseLayout>
-
-<style>
-  .home-services { color: var(--c-ink); padding-block: var(--space-10) var(--space-9); }
-  .home-services__head { margin-bottom: var(--space-8); }
-  .home-services__title { max-width: 14ch; }
-  .home-services__more { margin-top: var(--space-8); }
-</style>
